@@ -1,0 +1,24 @@
+{
+  "lastCheck": "2026-05-14T21:08:00+08:00",
+  "lastEmailCheck": "2026-05-09T23:28:00+08:00",
+  "lastCalendarCheck": "2026-05-08T20:52:00+08:00",
+  "lastNotifyCheck": "2026-05-08T20:39:00+08:00",
+  "lastMemoryRefine": "2026-05-13T04:04:44+08:00",
+  "lastSessionCheck": "2026-05-07T15:00:00+08:00",
+  "lastDeepAudit": "2026-05-07T16:21:00+08:00",
+  "systemVersion": "2026.5.7",
+  "pluginsLoaded": 22,
+  "skillsEligible": 82,
+  "cronJobs": 8,
+  "notes": "SESSION-STATE 新鲜度检查 v2 刷新 (21:00)",
+  "lastMemoryRefinement": "2026-05-14T04:05:52+08:00",
+  "systemStatus": {
+    "memoryRefinement": "✅ 正常 (2026-05-14 04:05)",
+    "gatewayVersion": "2026.5.7",
+    "mcphub": "✅ 13/13 healthy via SSE",
+    "memoryLanceDB": "✅ 已激活 (memory-lancedb)",
+    "gatewayRestart": "✅ 20:59",
+    "acpxBridge": "✅ pluginToolsMcpBridge + openClawToolsMcpBridge",
+    "cronJobs": "9 个活跃任务"
+  }
+}

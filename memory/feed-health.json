@@ -1,0 +1,220 @@
+{
+  "sources": {
+    "36氪": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "Google AI Blog": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "Hacker News": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "Hugging Face Blog": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "LangChain Blog": {
+      "consecutiveFailures": 1,
+      "lastError": "failed to fetch feed: status 404",
+      "firstFailure": "2026-04-16T17:00:48.111Z",
+      "totalFailures": 1
+    },
+    "Ollama Blog": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "OpenAI Blog": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "OpenClaw Releases": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "Solidot": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "TechCrunch": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "The Verge": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "少数派": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "机器之心": {
+      "consecutiveFailures": 1,
+      "lastError": "failed to parse feed: Failed to detect feed type",
+      "firstFailure": "2026-04-16T17:00:48.111Z",
+      "totalFailures": 1
+    },
+    "花叔 (AlchainHust)": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "量子位": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "firstFailure": null,
+      "totalFailures": 0
+    },
+    "钛媒体": {
+      "consecutiveFailures": 1,
+      "lastError": "failed to fetch feed: status 503",
+      "firstFailure": "2026-04-16T17:00:48.111Z",
+      "totalFailures": 1
+    }
+  },
+  "lastScan": {
+    "timestamp": "2026-04-16T17:00:48.108Z",
+    "sources": [
+      {
+        "name": "36氪",
+        "status": "healthy",
+        "found": 30,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "Google AI Blog",
+        "status": "healthy",
+        "found": 20,
+        "new": 1,
+        "error": null
+      },
+      {
+        "name": "Hacker News",
+        "status": "healthy",
+        "found": 20,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "Hugging Face Blog",
+        "status": "healthy",
+        "found": 764,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "LangChain Blog",
+        "status": "degraded",
+        "found": 0,
+        "new": 0,
+        "error": "failed to fetch feed: status 404"
+      },
+      {
+        "name": "Ollama Blog",
+        "status": "healthy",
+        "found": 48,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "OpenAI Blog",
+        "status": "healthy",
+        "found": 938,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "OpenClaw Releases",
+        "status": "healthy",
+        "found": 10,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "Solidot",
+        "status": "healthy",
+        "found": 20,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "TechCrunch",
+        "status": "healthy",
+        "found": 20,
+        "new": 1,
+        "error": null
+      },
+      {
+        "name": "The Verge",
+        "status": "healthy",
+        "found": 10,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "少数派",
+        "status": "healthy",
+        "found": 10,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "机器之心",
+        "status": "degraded",
+        "found": 0,
+        "new": 0,
+        "error": "failed to parse feed: Failed to detect feed type"
+      },
+      {
+        "name": "花叔 (AlchainHust)",
+        "status": "healthy",
+        "found": 1,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "量子位",
+        "status": "healthy",
+        "found": 10,
+        "new": 0,
+        "error": null
+      },
+      {
+        "name": "钛媒体",
+        "status": "degraded",
+        "found": 0,
+        "new": 0,
+        "error": "failed to fetch feed: status 503"
+      }
+    ],
+    "healthy": 13,
+    "degraded": 0,
+    "failed": 3
+  }
+}

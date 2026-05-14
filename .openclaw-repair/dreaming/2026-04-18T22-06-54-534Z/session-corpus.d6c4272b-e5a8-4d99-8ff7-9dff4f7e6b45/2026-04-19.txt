@@ -1,0 +1,4 @@
+[main/sessions/817ce527-3b60-443a-8963-d9f2397fe265.jsonl#L5] User: [cron:ed6bd9e9-da68-4d63-b9a0-4b1722ed3653 Evolver Watchdog] 自主任务：Evolver 健康检查。 用 exec 工具运行以下命令： command: node src/ops/lifecycle.js status workdir: /home/wszmd520520/.openclaw/workspace/skills/evolver 重要约束： - 禁止使用 cd 命令 - 禁止使用 && 或 ; 连接多个命令 - 只用 exec 的 workdir 参数指定工作目录 - 只用
+[main/sessions/817ce527-3b60-443a-8963-d9f2397fe265.jsonl#L8] Assistant: ✅ Evolver 运行中 (PID 44511)
+[main/sessions/db305501-1092-46dc-908c-527c15453d5c.jsonl#L5] User: [cron:ed6bd9e9-da68-4d63-b9a0-4b1722ed3653 Evolver Watchdog] 自主任务：Evolver 健康检查。 用 exec 工具运行以下命令： command: node src/ops/lifecycle.js status workdir: /home/wszmd520520/.openclaw/workspace/skills/evolver 重要约束： - 禁止使用 cd 命令 - 禁止使用 && 或 ; 连接多个命令 - 只用 exec 的 workdir 参数指定工作目录 - 只用
+[main/sessions/db305501-1092-46dc-908c-527c15453d5c.jsonl#L8] Assistant: ✅ Evolver 运行中（PID 23618）

@@ -1,0 +1,6 @@
+{
+  "name": "feed-health-checker",
+  "version": "1.0.0",
+  "description": "Monitor RSS/Atom feed health, track recurring failures, and generate health reports",
+  "main": "index.js"
+}

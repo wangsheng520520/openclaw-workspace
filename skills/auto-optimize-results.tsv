@@ -1,0 +1,24 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-04-14T18:45	baseline	proactive-agent	-	88	baseline	-	v3.1.0 极高质量：WAL/Buffer/Cron/安全/自进化 全覆盖，有scripts+refs+assets	dry_run
+2026-04-14T18:45	baseline	self-improving-agent	-	86	baseline	-	v1.0 极高质量：完整日志格式+Hook+提升路径+技能提取，有scripts+refs+assets	dry_run
+2026-04-14T18:45	baseline	huashu-nuwa	-	92	baseline	-	极高质量：6 Agent Swarm+三重验证+5 Phase 完整流程，有scripts+refs	dry_run
+2026-04-14T18:45	baseline	darwin-skill	-	85	baseline	-	高质量：8维评估+棘轮机制+人在回路，有assets	dry_run
+2026-04-14T18:45	baseline	humanizer	-	82	baseline	-	高质量：17.8KB详细规则，AI文本人性化专精	dry_run
+2026-04-14T18:45	baseline	automation-workflows	-	72	baseline	-	中等：工作流定义清晰但缺少scripts/refs/检查点	dry_run
+2026-04-14T18:45	baseline	ontology	-	75	baseline	-	中等：有scripts+refs，类型系统完整，但实测使用率低	dry_run
+2026-04-14T18:45	baseline	multi-search-engine	-	74	baseline	-	中等：16引擎覆盖好，有refs，但边界条件不足	dry_run
+2026-04-14T18:45	baseline	evolver	-	70	baseline	-	中等：有scripts+assets，GEP协议完整，但验证问题多	dry_run
+2026-04-14T18:45	baseline	agent-browser-clawdbot	-	68	baseline	-	中等：浏览器自动化基础完整，但无scripts/refs	dry_run
+2026-04-14T18:45	baseline	file-manager	-	67	baseline	-	中等偏下：有scripts+refs但文件小(3.7KB)，指令不够具体	dry_run
+2026-04-14T18:45	baseline	deep-research-pro	-	65	baseline	-	中等偏下：深度研究框架但缺少检查点和边界条件	dry_run
+2026-04-14T18:45	baseline	skill-vetter	-	70	baseline	-	中等：安全审查清单完整，但缺少自动化脚本	dry_run
+2026-04-14T18:45	baseline	playwright-mcp	-	63	baseline	-	中等偏下：MCP配置指南但缺少scripts/refs/异常处理	dry_run
+2026-04-14T18:45	baseline	answeroverflow	-	58	baseline	-	偏低：纯搜索指南，无scripts/refs，缺少工作流和边界条件	dry_run
+2026-04-14T18:45	baseline	document-pro	-	55	baseline	-	偏低：功能描述但缺少实际可执行的工作流和异常处理	dry_run
+2026-04-14T18:45	baseline	code-generator	-	52	baseline	-	偏低：文件很小(1.7KB)，有scripts但指令过于简单	dry_run
+2026-04-14T18:45	baseline	summarize	-	56	baseline	-	偏低：简单指南(2.2KB)，缺少结构化工作流	dry_run
+2026-04-14T18:45	baseline	wechat-article	-	48	baseline	-	低：最小(1.3KB)，有scripts但SKILL.md过于简单	dry_run
+2026-04-14T18:50	optimize-r1	wechat-article	48	68	keep	全维度	重写：添加触发条件+4步工作流+失败处理+Obsidian集成+限制说明	dry_run
+2026-04-14T18:50	optimize-r1	code-generator	52	72	keep	全维度	重写：添加触发条件+工作流+输出规范+自检清单+示例	dry_run
+2026-04-14T18:50	optimize-r1	document-pro	55	73	keep	全维度	重写：添加5步工作流+失败处理+输出模板+Obsidian集成+依赖说明	dry_run
+2026-04-14T18:50	optimize-r1	summarize	56	72	keep	全维度	重写：添加工作流+双路径(CLI/替代)+输出格式+参数表+API配置	dry_run

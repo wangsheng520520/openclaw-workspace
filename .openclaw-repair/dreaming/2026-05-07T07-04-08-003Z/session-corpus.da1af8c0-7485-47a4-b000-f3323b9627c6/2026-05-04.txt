@@ -1,0 +1,24 @@
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1669] User: 查看我升级之前的配置备份，恢复我的插件
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1673] Assistant: 差异很清楚。只有 **4 个插件被移除**，技能都没丢。现在看看这 4 个在 v2026.5.2 里是什么状态：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1683] Assistant: 找到答案了！v2026.5.2 **外部化**了大量插件。这 4 个不再内置于核心包，需要从 npm 单独安装。让我恢复配置并修复：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1685] Assistant: 已恢复配置。现在安装外部化的插件包：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1715] Assistant: ✅ 4 个插件全部安装成功。重启 Gateway 让它们加载：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1725] Assistant: 还是找不到。看看 v2026.5.2 的插件安装机制：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1735] Assistant: 问题找到了——插件要装在 OpenClaw 自己的 `node_modules` 里。创建软链接：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1741] User: 主动汇报任务结果
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1747] User: 主动汇报任务结果
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1749] User: wszmd520520@BF-202511271408:~$ pkill openclaw && sleep 3 && systemctl --user restart openclaw-gateway wszmd520520@BF-202511271408:~$
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1767] Assistant: symlink 方案也不行。看 v2026.5.2 的插件注册机制：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1795] Assistant: 找到了！`openclaw plugins install` 命令：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1815] Assistant: 文件被覆盖了。逐个安装：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1821] User: 看一下这个公众号文章是否对你修复插件有帮助https://mp.weixin.qq.com/s/TiqRVihRzh4dp8lMuElRKA
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1824] Assistant: 微信文章被 JS 壳挡住了。先检查插件安装进程：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1830] Assistant: 单个安装，逐个验证：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1840] Assistant: 逐个安装互相覆盖。尝试一次性全部安装：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1843] User: 看一下这个公众号文章是否对你修复插件有帮助 https://mp.weixin.qq.com/s/TiqRVihRzh4dp8lMuElRKA
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1858] Assistant: 所有 4 个插件已成功安装到正确位置！现在重启 Gateway 验证：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1866] Assistant: `diagnostics-otel` 已被识别！剩下 3 个有 stale 标记。尝试 doctor fix + 重新 enable：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1876] Assistant: `doctor --fix` 清掉了 lobster/diffs 的 stale 条目。重新安装：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1888] Assistant: 所有 4 个插件已被 `plugins list` 识别！只是 lobster/diffs 在 config entries 中缺失。补全配置条目：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1898] Assistant: diffs 修复。手动补全配置：
+[main/sessions/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L1900] Assistant: 全部就位。SIGUSR1 重载：

@@ -1,0 +1,11 @@
+{
+  "name": "todo-manager",
+  "version": "1.0.0",
+  "description": "Scan codebase for TODO/FIXME/HACK comments and generate structured reports",
+  "main": "index.js",
+  "scripts": {
+    "scan": "node scripts/scan-todos.js"
+  },
+  "keywords": ["todo", "scanner", "technical-debt"],
+  "license": "MIT"
+}

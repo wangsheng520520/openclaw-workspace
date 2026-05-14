@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "skills": {
+    "skill-vetter": {
+      "source": "clawhub:skill-vetter",
+      "sourceType": "clawhub"
+    },
+    "self-improving-agent": {
+      "source": "clawhub:self-improving-agent",
+      "sourceType": "clawhub"
+    },
+    "ontology": {
+      "source": "clawhub:ontology",
+      "sourceType": "clawhub"
+    },
+    "proactive-agent": {
+      "source": "clawhub:proactive-agent",
+      "sourceType": "clawhub"
+    },
+    "multi-search-engine": {
+      "source": "clawhub:multi-search-engine",
+      "sourceType": "clawhub"
+    },
+    "agent-browser-clawdbot": {
+      "source": "clawhub:agent-browser-clawdbot",
+      "sourceType": "clawhub"
+    },
+    "huashu-nuwa": {
+      "source": "alchaincyf/nuwa-skill",
+      "sourceType": "github"
+    },
+    "ada-lovelace": {
+      "source": "user:ada-lovelace",
+      "sourceType": "local"
+    },
+    "evolver": {
+      "source": "github:EvoMap/evolver",
+      "sourceType": "github",
+      "version": "1.57.0"
+    },
+    "code-generator": {
+      "source": "clawhub:code-generator",
+      "sourceType": "clawhub"
+    },
+    "wechat-article": {
+      "source": "clawhub:wechat-article",
+      "sourceType": "clawhub"
+    },
+    "playwright-mcp": {
+      "source": "clawhub:playwright-mcp",
+      "sourceType": "clawhub"
+    },
+    "file-manager": {
+      "source": "clawhub:file-manager",
+      "sourceType": "clawhub"
+    },
+    "deep-research-pro": {
+      "source": "clawhub:deep-research-pro",
+      "sourceType": "clawhub"
+    },
+    "summarize": {
+      "source": "system:summarize",
+      "sourceType": "builtin"
+    },
+    "automation-workflows": {
+      "source": "clawhub:automation-workflows",
+      "sourceType": "clawhub"
+    },
+    "humanizer": {
+      "source": "clawhub:humanizer",
+      "sourceType": "clawhub"
+    }
+  }
+}

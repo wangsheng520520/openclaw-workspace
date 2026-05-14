@@ -1,0 +1,6 @@
+🧬 [2026-04-17T01:26:03.822Z] START Wrapper PID=2193 Attempt=1 Cycle=#0001
+🧬 [2026-04-17T01:33:02.060Z] START Wrapper PID=2384 Attempt=1 Cycle=#0002
+🧬 [2026-04-17T01:33:48.449Z] START Wrapper PID=2444 Attempt=1 Cycle=#0003
+🧬 [2026-04-17T01:46:03.288Z] ERROR Wrapper PID=2444 Cycle=#0003 Duration=734.84s: Child process exited with code null
+🧬 [2026-04-17T01:46:09.301Z] START Wrapper PID=2444 Attempt=2 Cycle=#0003
+🧬 [2026-04-17T01:48:14.779Z] START Wrapper PID=3112 Attempt=1 Cycle=#0004

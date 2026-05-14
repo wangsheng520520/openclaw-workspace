@@ -1,0 +1,172 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "chrome-devtools-mcp@latest"
+      ],
+      "description": "MCPhub Chrome DevTools MCP (via Docker)"
+    },
+    "playwright": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless"
+      ],
+      "description": "MCPhub Playwright MCP (via Docker)"
+    },
+    "exa-search": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "exa-mcp-server"
+      ],
+      "description": "MCPhub Exa Search MCP (via Docker)",
+      "env": {
+        "EXA_API_KEY": "ea72205d-4920-4b22-af22-f9e7222ce522"
+      }
+    },
+    "mcp-deepwiki": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "mcp-deepwiki@latest"
+      ],
+      "description": "MCPhub DeepWiki MCP (via Docker)"
+    },
+    "amap": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@amap/amap-maps-mcp-server"
+      ],
+      "description": "MCPhub 高德地图 MCP (via Docker)",
+      "env": {
+        "AMAP_MAPS_API_KEY": "a1251a0acdd54d98189e5cb6a592c102"
+      }
+    },
+    "Memory": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "description": "MCPhub Memory MCP (via Docker)"
+    },
+    "sequential-thinking": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "description": "MCPhub Sequential Thinking MCP (via Docker)"
+    },
+    "context7": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "description": "MCPhub Context7 MCP (via Docker)"
+    },
+    "github": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "description": "MCPhub GitHub MCP (via Docker)",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "PLACEHOLDER_REPLACE_WITH_GITHUB_TOKEN"
+      }
+    },
+    "thinking-models": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "--no-cache",
+        "@thinking-models/mcp-server"
+      ],
+      "description": "MCPhub Thinking Models MCP (via Docker)"
+    },
+    "mcp-server-chart": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@antv/mcp-server-chart"
+      ],
+      "description": "MCPhub Chart MCP (via Docker)"
+    },
+    "think-tool": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@cgize/mcp-think-tool"
+      ],
+      "description": "MCPhub Think Tool MCP (via Docker)"
+    },
+    "markmap": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "mcphub",
+        "npx",
+        "-y",
+        "@jinzcdev/markmap-mcp-server"
+      ],
+      "description": "MCPhub Markmap MCP (via Docker)",
+      "env": {
+        "MARKMAP_DIR": "/app/markmap"
+      }
+    }
+  }
+}

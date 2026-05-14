@@ -1,0 +1,11 @@
+[2026-05-14T14:20:07.408Z] Starting evolver...
+[2026-05-14T14:20:07.431Z] Loop mode enabled (internal daemon, bridge=true, verbose=false).
+[2026-05-14T14:20:07.537Z] [SSE] Event stream unavailable: eventsource_not_available (falling back to poll)
+[2026-05-14T14:20:07.542Z] [Validator] Validator mode is ENABLED. Your node will participate in Hub validation tasks: CPU, network bandwidth, and staked credits WILL be used. To opt out, set EVOLVER_VALIDATOR_ENABLED=false (or unset it).
+[2026-05-14T14:20:07.560Z] [ValidatorDaemon] started.
+[2026-05-14T14:20:07.611Z] [ATP-AutoBuyer] Started (dailyCap=50, perOrderCap=10, cold-start half-cap for 300s)
+[2026-05-14T14:20:07.615Z] [ATP-AutoDeliver] Started (pollMs=60000)
+[2026-05-14T14:20:09.999Z] [Heartbeat] Registered with hub. Node: node_1bca3f083efc
+[2026-05-14T14:20:10.231Z] [ATP-Merchant] Registered as node_1bca3f083efc
+[2026-05-14T14:20:10.980Z] [ATP-Merchant] Published service: Evolver Agent - Code Evolution
+[2026-05-14T14:20:10.980Z] [ATP-Merchant] Polling for orders every 30000 ms

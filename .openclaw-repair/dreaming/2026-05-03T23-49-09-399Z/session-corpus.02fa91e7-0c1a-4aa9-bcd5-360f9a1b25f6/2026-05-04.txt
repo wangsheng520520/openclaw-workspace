@@ -1,0 +1,2 @@
+[main/sessions/0c0da939-55b9-4b9c-8bec-7944911e0e99.jsonl#L10] Assistant: Evolver 已在后台启动 (PID 66731)。
+[main/sessions/9710736a-0e75-4b47-b98d-cc4b61a25f39.jsonl#L8] Assistant: ✅ Evolver running (PID 66731)

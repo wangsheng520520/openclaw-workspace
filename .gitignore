@@ -1,0 +1,17 @@
+# .gitignore
+
+# Credentials
+.credentials/
+.env*
+
+# Sensitive
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.bak

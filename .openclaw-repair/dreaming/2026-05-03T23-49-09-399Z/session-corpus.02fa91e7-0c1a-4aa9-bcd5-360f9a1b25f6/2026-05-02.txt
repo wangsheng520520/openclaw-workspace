@@ -1,0 +1,28 @@
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L88] Assistant: Frequent heartbeats. MCP only.
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L90] Assistant: MCP 0, no issues. HEARTBEAT_OK. HEARTBEAT_OK
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L92] Assistant: Heartbeat poll at 3:00 AM. Quick MCP check.
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L94] Assistant: MCP count 0, no issues. HEARTBEAT_OK
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L33] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L34] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L35] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L36] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L44] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L45] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L46] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L47] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L55] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L56] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L57] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L58] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L66] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L67] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L68] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L69] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L77] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L78] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L79] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L80] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L102] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L103] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L104] Assistant: [assistant turn failed before producing content]
+[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L105] Assistant: [assistant turn failed before producing content]
