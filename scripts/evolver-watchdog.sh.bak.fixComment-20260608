@@ -1,0 +1,23 @@
+#!/bin/bash
+# Evolver 看门狗启动脚本
+# 连续环路模式 (带代理)
+# 使用 EVOMAP_PROXY=1 node index.js --loop
+
+set -e
+
+cd ~/.openclaw/workspace/skills/evolver
+
+# 加载环境变量
+export $(grep -v '^#' ~/.openclaw/workspace/.env 2>/dev/null | xargs)
+
+# Evolver 配置
+export EVOLVE_STRATEGY=balanced
+export EVOMAP_PROXY=1
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] 启动 Evolver 看门狗..."
+echo "  - 模式：EVOMAP_PROXY=1 node index.js --loop"
+echo "  - 策略：$EVOLVE_STRATEGY"
+echo "  - PID: $$"
+
+# 启动连续环路模式
+EVOMAP_PROXY=1 node index.js --loop

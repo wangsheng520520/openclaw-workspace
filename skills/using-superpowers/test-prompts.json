@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "prompt": "帮我分析一下最近系统的性能表现",
+    "expected": "先 invoke using-superpowers → 检查适用 skill（systematic-debugging 或 performance 相关）→ 宣告 → 执行 → 响应"
+  },
+  {
+    "id": 2,
+    "prompt": "系统最近经常超时，帮我排查",
+    "expected": "识别为需要 systematic-debugging skill → 宣告 → 执行排查流程"
+  },
+  {
+    "id": 3,
+    "prompt": "优化 using-superpowers",
+    "expected": "识别 darwin-skill 触发词 → 宣告 → 启动 darwin-skill 优化流程"
+  }
+]

@@ -48,6 +48,86 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 - **备用坐标**: 114.2858, 30.7089 (汉口北)
 - **检查频率**: 每天 2-4 次
 
+### 🔮 memory-lancedb 插件配置（硅基流动 BAAI/bge-m3）
+
+**场景**: 替换 memory-core 的 SQLite 向量存储，改用 LanceDB + 硅基流动嵌入模型，实现高效语义记忆召回。
+
+#### 背景
+
+- memory-lancedb 使用 LanceDB 向量数据库存储记忆
+- BAAI/bge-m3 输出 **1024 维**向量（插件内置映射，无需手动指定）
+- 硅基流动（SiliconFlow）提供 OpenAI-compatible API，baseUrl: `https://api.siliconflow.cn/v1`
+- 通过 `before_prompt_build` hook 自动召回，`agent_end` hook 自动捕获
+
+#### 配置步骤
+
+**第一步：在 openclaw.json 中添加 memory-lancedb 插件配置**
+
+在 `plugins.entries` 下添加：
+
+```json
+"memory-lancedb": {
+  "enabled": true,
+  "config": {
+    "embedding": {
+      "provider": "openai",
+      "model": "BAAI/bge-m3",
+      "baseUrl": "https://api.siliconflow.cn/v1",
+      "apiKey": "your-siliconflow-api-key"
+    },
+    "autoRecall": true,
+    "autoCapture": true,
+    "dreaming": { "enabled": true }
+  },
+  "hooks": { "allowConversationAccess": true }
+}
+```
+
+**关键点**：
+- `provider: "openai"` ← 插件用 OpenAI 兼容客户端，不支持 `"siliconflow"` 字符串
+- `model: "BAAI/bge-m3"` ← 插件内置 1024 维映射，**不要**写 `dimensions` 参数（2026-06-03 实测：写了会报 400 错误）
+- `baseUrl` 必须显式指向硅基流动端点，否则会打到 OpenAI 官方
+
+**第二步：在 plugins.enabled 中启用插件**
+
+```json
+"plugins": {
+  "enabled": ["memory-lancedb", ...],
+  "entries": { "memory-lancedb": { ... } }
+}
+```
+
+**第三步：重启 Gateway**
+```bash
+gateway restart
+```
+
+#### ⚠️ 已知陷阱
+
+| 陷阱 | 错误现象 | 解决方案 |
+|------|---------|---------|
+| 手动指定 `dimensions` 参数 | 400 错误，初始化失败 | 删除 `dimensions` 字段，插件根据 model 自动推导 1024 |
+| `provider` 写 `"siliconflow"` | 插件无法识别 | 改写 `"openai"`，baseUrl 覆盖端点即可 |
+| 缺失 `baseUrl` | API 请求打到 OpenAI 官方（无 key/配额） | 必须显式写出硅基流动 baseUrl |
+| 新 DB 路径无写权限 | LanceDB 初始化失败 | 确认路径可写（默认 `~/.openclaw/memory/lancedb`）|
+| DB 重建 | LanceDB 重新初始化会清空历史记忆 | 避免删 DB，记忆需重新导入 |
+
+#### 验证命令
+
+```bash
+gateway status
+# 检查 LanceDB 初始化日志
+gateway logs 2>&1 | grep -i lancedb
+# 测试记忆召回
+memory_recall query="测试"
+```
+
+#### 降级方案
+
+临时回退：设置 `enabled: false`，同时确保 memory-core（SQLite 向量版）已启用。
+
+---
+
 ### 📧 邮件检查
 
 **当前状态**: ✅ 已配置 (Himalaya CLI)

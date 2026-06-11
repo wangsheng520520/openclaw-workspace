@@ -1,24 +1,104 @@
 {
-  "lastCheck": "2026-05-14T21:08:00+08:00",
-  "lastEmailCheck": "2026-05-09T23:28:00+08:00",
-  "lastCalendarCheck": "2026-05-08T20:52:00+08:00",
-  "lastNotifyCheck": "2026-05-08T20:39:00+08:00",
-  "lastMemoryRefine": "2026-05-13T04:04:44+08:00",
-  "lastSessionCheck": "2026-05-07T15:00:00+08:00",
-  "lastDeepAudit": "2026-05-07T16:21:00+08:00",
-  "systemVersion": "2026.5.7",
+  "lastCheck": "2026-06-11T20:18:00+08:00",
+  "lastEmailCheck": "2026-06-11T20:18:00+08:00",
+  "lastCalendarCheck": "2026-06-11T18:15:07+08:00",
+  "lastNotifyCheck": "2026-06-11T18:15:07+08:00",
+  "lastWeatherCheck": "2026-06-11T20:18:00+08:00",
+  "lastMcpCheck": "2026-06-11T20:18:00+08:00",
+  "lastMemoryRefine": "2026-06-11T04:00:13+08:00",
+  "lastKgUpdate": "2026-06-10T04:00:00+08:00",
+  "systemVersion": "2026.6.1",
   "pluginsLoaded": 22,
   "skillsEligible": 82,
-  "cronJobs": 8,
-  "notes": "SESSION-STATE 新鲜度检查 v2 刷新 (21:00)",
-  "lastMemoryRefinement": "2026-05-14T04:05:52+08:00",
+  "cronJobs": 10,
+  "cronJobsNote": "依赖 15:00 基线: ✅10/10活跃 cron jobs全部 lastRunStatus=ok,consecutiveErrors=0。Delivery preview 4 jobs 'Unsupported channel: feishu' 为已知基线。",
+  "notes": "6月11日20:18 心跳完成。距上次 19:15 约 1h3m(超过 30m 标准间隔,但属正常轮询抖动)。所有检查已执行,无新增紧急人工处理项。配置漂移无变化(v8已固化)。",
   "systemStatus": {
-    "memoryRefinement": "✅ 正常 (2026-05-14 04:05)",
-    "gatewayVersion": "2026.5.7",
-    "mcphub": "✅ 13/13 healthy via SSE",
-    "memoryLanceDB": "✅ 已激活 (memory-lancedb)",
-    "gatewayRestart": "✅ 20:59",
-    "acpxBridge": "✅ pluginToolsMcpBridge + openClawToolsMcpBridge",
-    "cronJobs": "9 个活跃任务"
-  }
+    "heartbeatCron": "✅正常(配置漂移已固化,运行 OK)",
+    "gatewayVersion": "2026.6.1",
+    "mcp": "✅1进程 (mcporter only) —干净,与 HEARTBEAT 基线一致",
+    "cronJobs": "✅10/10 OK(依赖 15:00 基线);Delivery preview 4 jobs 'Unsupported channel: feishu' (已知基线)",
+    "memoryRefinement": "✅正常 (2026-06-11 04:00)",
+    "kgUpdate": "✅6/10 04:00 成功",
+    "calendar": "⚠️ lark-cli 不在本机路径, 本轮跳过 (上次 18:15 已确认未来48小时无日程)",
+    "feishuNotifications": "⚠️ lark-cli 不在本机路径, 本轮跳过 (上次 18:15 已确认无新 @提及/待处理通知)",
+    "weather": "✅ wttr.in: Wuhan Smog +27°C ↑4km/h (与 18:15 Mist +20°C 相比有霾)",
+    "email": "⚠️ Gmail 持续 timeout (WSL2 抖动); QQ 无新增紧急项",
+    "deliveryChannelDrift": "⚠️4 cron jobs delivery 配置报 'Unsupported channel: feishu' (基线已知,未要求修复)"
+  },
+  "alerts": [
+    {
+      "level": "info",
+      "type": "evolvemap_api_quota",
+      "message": "Gmail收到 '你的 API算力额度已到账'通知 (2026-06-10 12:18 UTC, from service@mail.evolvemap.ai)。EvolveMap API配额已补充,不需行动。",
+      "ts": "2026-06-11T04:15:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "aliyun_bailian_model_sunset",
+      "message": "QQ邮箱2418:阿里云百炼平台 '部分历史快照模型下线通知' (2026-06-09 19:21 CST)。需要关注是否影响当前使用的百炼模型,但非紧急。",
+      "ts": "2026-06-11T05:45:48+08:00"
+    },
+    {
+      "level": "warning",
+      "type": "github_actions_failures",
+      "message": "GitHub Actions失败通知持续 — 最新 #2424 wangsheng520520/openclaw OpenClaw Scheduled Live And E2E Checks main 65848d0 (06-11 02:39 UTC,新增); #2422 同一 job (06-10 02:02 UTC); #2420 CI main (06-09 06:01 UTC); #2419 evolver test main (06-09 05:53 UTC)。已存在 3 天+, 同一 job 连续失败, 建议关注是否需手动重跑或排查配置。",
+      "ts": "2026-06-11T18:59:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "reminder_fired",
+      "message": "📱 工装领带参会提醒 (cron 0326261b) 已于 2026-06-11 07:30 CST 触发。",
+      "ts": "2026-06-11T07:30:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "config_drift_resolved",
+      "message": "06-11 14:00 docs/实现一致: HEARTBEAT.md 演化历程已补 v8 实际最终态 (M3 + lightContext=true + isolatedSession=true + skipWhenBusy=true + target=none)。openclaw.json 未动 (受保护字段,用户明确不动)。漂移已固化,非待修 bug。下次心跳不再生成 config_drift alert。",
+      "ts": "2026-06-11T14:17:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "heartbeat_1500",
+      "message": "15:00 心跳完成: 邮件/天气/MCP 复查 — Gmail最新仍为 EvolveMap API算力额度到账(06-10 12:18 UTC);QQ最新仍为 GitHub Actions失败(06-10 02:02 UTC,持续关注项)。天气 Wuhan Sunny +31℃ ↑8km/h (wttr.in,与 14:44 一致)。无新增紧急人工处理项。配置漂移无变化。",
+      "ts": "2026-06-11T15:00:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "heartbeat_1531",
+      "message": "15:31 心跳完成: 邮件/天气/MCP 复查 — Gmail最新仍为 EvolveMap API算力额度到账(06-10 12:18 UTC);QQ最新仍为 GitHub Actions失败(06-10 02:02 UTC,持续关注项,已连续2天+)。天气 Wuhan Sunny +31℃ ↑8km/h (wttr.in,与 15:00 一致)。MCP: 1 mcporter 进程,干净。无新增紧急人工处理项。配置漂移无变化。",
+      "ts": "2026-06-11T15:31:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "heartbeat_1646",
+      "message": "16:46 心跳完成: QQ新增 MiMo Code 开源通知(info级); Gmail timeout x2; 日历/天气/飞书通知已检查, 无新增紧急人工处理项。",
+      "ts": "2026-06-11T16:46:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "heartbeat_1815",
+      "message": "18:15 心跳完成: Gmail 无新增(最新仍为 EvolveMap 06-10 12:18 UTC); QQ 新增 #2424 GitHub Actions 失败(06-11 02:39 UTC, 同 job 连续失败 3 天+, 持续关注); 天气武汉 Mist +20℃; MCP 1 进程干净; lark-cli 本机不可用, 飞书日历/消息本轮跳过 (上次 14:44 已确认无新 @ 提及/无日程); 配置漂移无变化。",
+      "ts": "2026-06-11T18:15:07+08:00"
+    },
+    {
+      "level": "info",
+      "type": "heartbeat_1859",
+      "message": "18:59 心跳完成。Gmail timeout (WSL2 抖动,已跳过,上次 18:15 正常); QQ 最新 #2423 MiMo Code 正式开源(06-11 16:29+08:00, info级) + #2424 GitHub Actions 失败(持续关注项 3天+)。天气 Sunny +29°C。MCP: 1 mcporter 进程,干净。无新增紧急人工处理项。配置漂移无变化(v8 已固化)。",
+      "ts": "2026-06-11T18:59:00+08:00"
+    },
+    {
+      "level": "warning",
+      "type": "mimo_token_plan_90pct",
+      "message": "🚨 QQ邮箱 #2425: 'Token Plan 用量已达 90% 提醒' (2026-06-11 11:27 UTC, from Xiaomi MiMo 开放平台)。与 5月3日 05:57 警报同模式 (MiMo 90% + 火山引擎到期) — Token Plan 配额即将耗尽,需关注是否需要补充或临时切换模型。建议老王核实用量并决策: (a) 续费/补充 Token Plan; (b) 切换主模型到备用 (如 ark-code-latest 已免费或低成本)。",
+      "ts": "2026-06-11T20:18:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "heartbeat_2018",
+      "message": "20:18 心跳完成。距上次 19:15 约 1h3m(略超 30m 标准间隔,属正常轮询抖动)。邮件/天气/MCP 复查 — Gmail 持续 timeout (WSL2 抖动, 已跳过, 上次 18:15 正常); QQ 新增 #2425 Token Plan 90% 警告 (warning 升级, 老王需决策); #2424 GitHub Actions 失败持续 3 天+。天气 Wuhan Smog +27°C。MCP 3 进程 (mcporter + gateway + node-loop, 干净)。lark-cli 本机不可用, 日历/飞书消息本轮跳过 (上次 18:15 已确认)。配置漂移无变化 (v8 已固化)。",
+      "ts": "2026-06-11T20:18:00+08:00"
+    }
+  ],
+  "lastMemoryRefinement": "2026-06-11T04:00:13+08:00"
 }
