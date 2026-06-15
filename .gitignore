@@ -31,3 +31,5 @@ logs/
 reports/
 backups/
 state/
+
+# Post-commit auto-sync to GitHub
