@@ -6,7 +6,7 @@
 
 ## 重复请求模式
 
-> **上次扫描**: 2026-06-05 10:00 (涵盖 05-29 ~ 06-05)
+> **上次扫描**: 2026-06-12 18:22 (涵盖 06-05 ~ 06-12)
 
 | # | 请求模式 | 出现次数 | 天数 | 建议自动化 | 状态 |
 |---|---------|----------|------|-----------|------|
@@ -39,10 +39,14 @@
 | **34** | **升级导致 Cron 全量丢失** | **2** | 04-26, 06-04 | 💡 升级前自动备份 | 🟡 **提议中** |
 | **35** | **MC Porter 独立 Daemon 架构** | 1 | 06-02 | ✅ 决策已固化 | ✅ |
 | **36** | **Memory-lancedb 400 错误** | 1 | 06-03 | ✅ 已文档化 | ✅ |
-| **37** | **安全审计 Warning 重复** | **6** | W17~W22 | 💡 提议白名单优化 | 🟡 **强烈推荐** |
+| **37** | **安全审计 Warning 重复** | **7** | W17~W23 | 💡 提议白名单优化 | 🟡 **强烈推荐** |
 | **38** | **Gmail IMAP 持续超时** | 3+ | 04-28, 05-15, 06-05 | 👁️ timeout 15 防护 | 👁️ |
-| **39** | **升级后插件/进程同步丢失** | 2+ | 04-25, 05-26, 06-04 | 💡 升级后基线对比 | 🟡 **提议中** |
-| **26** | **using-superpowers 纪律违反** | **5+** | 05-23~26 密集 | 🔴 行为问题，持续训练 | 🔴 **最高** |
+| **39** | **升级后插件/进程同步丢失** | 3+ | 04-25, 05-26, 06-04, 06-11 | 💡 升级后基线对比 | 🟡 **提议中** |
+| **40** | **Active-memory / memory 系统对齐与可见运行模板** | **6+** | 06-10~06-11 | ✅ alignment-check + BOOT/BOOTSTRAP + 记忆模板已落地 | ✅ **已标准化** |
+| **41** | **插件路径/信任/重复安装治理** | **4+** | 06-07, 06-11 | 💡 插件路径基线 + trusted 限制监控 | 🟡 **提议中** |
+| **42** | **OpenClaw v6.5 hot reload / restart 语义误判** | **3+** | 06-11 | ✅ 已文档化：hot reload 优先，restart/SIGUSR1 等价 | ✅ |
+| **43** | **using-superpowers 完美模板与纪律违反** | **10+** | 05-23~06-11 | 🔴 可见开头模板 + receiving-code-review 纠偏 | 🔴 **最高** |
+| **26** | **using-superpowers 纪律违反（历史旧编号）** | **5+** | 05-23~26 密集 | 🔴 已并入 P-43 追踪 | 🔴 **并入 P-43** |
 | **27** | **Cron Session Takeover** | 4+ 轮修复 | 05-23~24 | 🟢 已修复（重建任务）| ✅ |
 | **28** | **Gateway 内存增长** | 持续 2+ 周 | 始终偏高 | 🟡 提议每周重启 | 🟡 待实施 |
 | **29** | **Evolver 密集维护** | 5 操作 | 05-23~26 | 🟡 版本稳定，仍需监控 | 🟡 待监控 |
@@ -912,3 +916,119 @@
 - 本周日常记忆文件极少（仅 06-02），可能反映系统进入高度自动化阶段（无需主动记录）
 - 但 06-04 升级 + cron 重建是重大事件，已通过 heartbeat-state.json + 相关 memory 还原
 - OpenClaw v5.28→v6.1 升级是月度例行，本次有惊无险
+
+## 🆕 本周新模式分析 (06-05 ~ 06-12)
+
+### 🔴 模式 43: using-superpowers 完美模板与纪律违反（升级为最高优先级行为问题）
+
+| 项目 | 值 |
+|------|-----|
+| **出现次数** | 10+（05-23 起累计；06-11 当天至少 3 次新增纠偏） |
+| **本周证据** | `.learnings/LEARNINGS.md` 06-11 19:33；`.learnings/ERRORS.md` 06-11 18:15/18:22；`memory/2026-06-11-2022.md` 完美模板纠正 |
+| **触发场景** | 查文档、继续执行、收尾验证、被纠错时最容易跳过 |
+| **根因** | 把技能声明当作输出装饰，而非每个 turn 的第一动作 |
+
+**当前最佳实践模板**：
+```text
+收到 — **一句话概括用户意图**。
+Using [using-superpowers] to ...
+Using [secondary-skill] to ...（如需）
+```
+
+**自动化/治理建议**：
+- 不修改 AGENTS/SOUL 硬协议（用户曾明确不要求升级硬协议），但在 boot-md / BOOTSTRAP / daily memory 中继续保持可见模板。
+- 对纠错 turn 固定追加 `receiving-code-review`；对完成前固定追加 `verification-before-completion`。
+
+**优先级**：🔴 最高 — 这是行为可靠性问题，不是技术配置问题。
+
+---
+
+### 🟢 模式 40: Active-memory / memory 系统对齐与可见运行模板
+
+| 项目 | 值 |
+|------|-----|
+| **出现次数** | 6+ |
+| **本周证据** | 06-10 memoryFlush；06-11 active-memory/contextPruning/alignment-check/BOOTSTRAP；06-11 14:00~17:00 active-memory 可见运行模板复盘 |
+| **状态** | ✅ 已标准化 |
+
+**关键结论**：active-memory 不只是“后台”：它通过 `<relevant-memories>` 在聊天上下文可见，也在 gateway JSONL 日志中有 before_prompt_build start/done 证据。
+
+**已落地自动化/文件**：
+- `scripts/alignment-check.sh`：13/13 对齐检查
+- `scripts/memory-snapshot.sh`：记忆系统快照
+- `scripts/alignment-monitor.sh`：04:30 cron 监控
+- `BOOTSTRAP.md`：工作环境地图
+- `BOOT.md`：gateway restart 后 4 项健康检查
+
+**后续建议**：保持每日/每周对齐检查，不再把历史 memory 当真实状态，继续执行“三次交叉验证”。
+
+---
+
+### 🟡 模式 41: 插件路径/信任/重复安装治理
+
+| 项目 | 值 |
+|------|-----|
+| **出现次数** | 4+ |
+| **本周证据** | feishu-dedup trusted 限制；projects/global/user-level 三路径治理；4 个 global 插件卸载；feishu 统一到 user-level |
+| **根因** | OpenClaw 插件存在 user-level / global / projects 多路径；v6.5 对非 trusted 插件限制 `openKeyedStore` |
+
+**已解决部分**：
+- duplicate plugin id 警告从 6 条降至 2 条 state 基线。
+- acpx / diagnostics-otel / diffs / lobster / feishu 路径统一到 user-level。
+
+**仍存在**：
+- feishu-dedup 的 `openKeyedStore is only available for trusted plugins` 属 OpenClaw v6.5 core policy，用户侧无法彻底修，只能接受偶发重复通知或等待官方 trusted 列表调整。
+
+**自动化建议**：
+- 新增“插件路径基线检查”：列出每个 allow 插件的实际 manifestPath、版本、origin，若同 ID 多路径出现则告警。
+- 将 trusted 限制作为 doctor baseline 的一部分，避免每次冷启动误判为新事故。
+
+---
+
+### 🟢 模式 42: OpenClaw v6.5 hot reload / restart 语义误判
+
+| 项目 | 值 |
+|------|-----|
+| **出现次数** | 3+ |
+| **本周证据** | active-memory model 修改 1.5s hot reload；gateway tool restart 实际 SIGUSR1；systemctl restart 35s timeout 不等于失败 |
+| **状态** | ✅ 已文档化 |
+
+**关键结论**：
+- v6.5 改 `openclaw.json` 后优先等 file watcher hot reload，不要默认 SIGUSR1/restart。
+- `gateway restart` 工具语义偏 emit/SIGUSR1，不等同完整 systemd restart。
+- 完整 restart 用 `systemctl --user restart openclaw-gateway`，但 35s 超时可能只是工具等待超时，需用 PID/端口/journal 验证。
+
+**自动化建议**：
+- 在 BOOT.md / alignment-check 中保留“PID + 端口 + doctor + boot transcript”四层验证，避免单点误判。
+
+---
+
+### 📊 本周模式频率统计 (06-05 ~ 06-12)
+
+| 模式 | 本周新增/强化次数 | 状态 | 自动化判断 |
+|------|------------------|------|------------|
+| P-43 using-superpowers 完美模板 | 10+ | 🔴 最高 | 行为模板持续执行；不做强制协议改写 |
+| P-40 active-memory / memory 对齐 | 6+ | ✅ 已标准化 | alignment-check / memory-snapshot / BOOT 已落地 |
+| P-41 插件路径/信任治理 | 4+ | 🟡 提议中 | 建议插件路径基线检查 |
+| P-42 hot reload / restart 语义 | 3+ | ✅ 已文档化 | BOOT 4 项验证覆盖 |
+| P-37 安全审计 warning 重复 | 7 | 🟡 强烈推荐 | 仍建议白名单优化 |
+| P-39 升级后同步丢失 | 3+ | 🟡 提议中 | 仍建议升级后基线对比 |
+
+### 💡 自动化建议 #4: 插件路径基线检查 (P-41)
+
+**建议内容**：每日或升级后运行脚本，输出 allow 插件的 `pluginId / version / manifestPath / origin / trustedOfficialInstall`，检测同 ID 多路径与 trusted 限制。
+
+**预估复杂度**：simple-medium  
+**价值**：高（避免 feishu/acpx/diffs/lobster 这类路径重复再次演化为 doctor 噪音）
+
+### 💡 自动化建议 #5: 升级后 v6.5+ hot-reload 验证顺序 (P-42 / P-39)
+
+**建议内容**：升级或改配置后按固定顺序验证：
+1. 等 file watcher hot reload（日志 `config hot reload applied`）
+2. `config get` 查运行时值
+3. 触发业务路径（如 memory_recall）
+4. 仅在失败时 systemctl restart
+
+**预估复杂度**：simple  
+**价值**：中高（减少不必要 restart 与 feishu-dedup 冷启动噪音）
+

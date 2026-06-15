@@ -1,2 +1,0 @@
-[main/sessions/db05bd30-59a8-406e-8400-648994e0da33.jsonl#L8] Assistant: ✅ Evolver 运行中 (PID 3975)
-[main/sessions/e505c8ef-2cfc-48ca-8202-fbb30b70512e.jsonl#L8] Assistant: ✅ Evolver 运行中 (PID 3975)

@@ -18,14 +18,17 @@
 | 路径 | 用途 | 关键 |
 |------|------|------|
 | `~/.openclaw/workspace/` | 当前工作区 (cwd) | 一切对话/记忆/技能工作目录 |
-| `~/.openclaw/workspace/MEMORY.md` | 长期记忆主文件 (639 行) | 提炼的智慧, 用户偏好, 决策日志 |
+| `~/.openclaw/workspace/MEMORY.md` | 长期记忆主文件 (758 行) | 提炼的智慧, 用户偏好, 决策日志 |
+| `~/.openclaw/workspace/BOOTSTRAP.md` | 本文件 - 工作环境地图 | 8 个 bootstrap 文件之一 (会话启动总览) |
+| `~/.openclaw/workspace/BOOT.md` | gateway 重启自动检查 (06-11 新) | 4 项检查 (heartbeat/alignment/doctor/feishu) |
 | `~/.openclaw/workspace/memory/` | 日常记忆 (15 daily + .dreams/) | 自动捕获, 1638 行 |
 | `~/.openclaw/workspace/obsidian-vault/` | 软链 → `D:\Obsidian知识库文件` | 408 篇笔记, 7 主目录 |
 | `~/.openclaw/workspace/.learnings/` | 自我提升记录 (LEARNINGS/ERRORS/FEATURE) | 371 行 LEARNINGS |
 | `~/.openclaw/workspace/scripts/` | 运维脚本 (evolver-watchdog/memory-snapshot/alignment-check) | 3 个守护/观测脚本 |
 | `~/.openclaw/openclaw.json` | **主配置** (31KB, 1060+ 行) | 受保护字段需直接编辑 |
 | `~/.openclaw/secrets/default.json` | secrets 池 (apiKey 存储) | `secrets reload` 处理 drift |
-| `~/.openclaw/memory/lancedb/` | 向量索引 (2.2MB, BAAI/bge-m3 1024d) | `memory-lancedb` slot |
+| `~/.openclaw/memory/lancedb/` | 向量索引 (2.3MB, BAAI/bge-m3 1024d) | `memory-lancedb` slot |
+| `~/.openclaw/wiki/main/` | memory-wiki vault | wiki_status: ready |
 
 ---
 
@@ -111,7 +114,12 @@
 | 2026-05-13 | WSL2 `networkingMode=mirrored` 启用 |
 | 2026-06-03 | memory-lancedb 400 错误修复 (provider=openai+baseUrl) |
 | 2026-06-10 | "完美最佳实践对账" + 三件套实施 (memoryFlush/active-memory/观测脚本) |
-| 2026-06-11 | 本轮: temporalDecay/mmr/BOOTSTRAP.md |
+| 2026-06-11 14:00 | 火山方舟 API key 失效→active-memory 401→切换 Qwen2.5-7B |
+| 2026-06-11 15:30 | 新火山方舟 key + active-memory 永久策略 |
+| 2026-06-11 16:00 | 卸 projects/feishu + 卸 4 个 global 插件 (duplicate 警告) |
+| 2026-06-11 17:00 | 飞书插件统一到 user-level + plugins.load.paths 更新 |
+| 2026-06-11 20:40 | **方案 C 落地**：3 commits (f02f003/f049331/0d8e225) + BOOT.md 新建 (4 项 gateway 重启检查) + 13/13 alignment-check |
+| 2026-06-11 21:00 | **boot-md hook 启用 + 验证**：`openclaw hooks enable boot-md` (hot reload) + `systemctl --user restart` + boot session 真的跑 BOOT.md (4/4 ✅) |
 
 ---
 
@@ -143,6 +151,26 @@
 
 ---
 
-**最后记忆提炼**: 2026-06-11 01:13 (本轮) — B 方案落地: 删 MODEL-CONFIG.md (过期) + 移 --no-sandbox PNG 到 images/ + Gateway 重启 (PID 1020→33888) 验证
+**最后记忆提炼**: 2026-06-11 21:10 (本轮) — boot-md hook 启用 + 验证完成: hot reload 不需 restart，0 3-3. 4/4 BOOT.md 检查 ✅(含 feishu 长稳态 fallback) + boot session transcript 留底
 **维护节奏**: 每次大配置改动 (新增插件/模型/锁定决策) 时更新
 **对账状态**: 🟢 13/13 完美对齐 (每日 4:30 自动监控, 仅非 0 时飞书通知)
+**维护节奏**: 每次大配置改动 (新增插件/模型/锁定决策) 时更新
+**对账状态**: 🟢 13/13 完美对齐 (每日 4:30 自动监控, 仅非 0 时飞书通知)
+
+---
+
+## 🔄 06-11 方案 C 关键变更记录
+
+| 时间 | 操作 | 原因 | 影响 |
+|------|------|------|------|
+| 20:40 | 备份 BOOTSTRAP/.gitignore/skills-lock.json + openclaw.json | 方案 C 落地前快照 | `/tmp/workspace-backup-20260611-204016/` |
+| 20:42 | git commit `f02f003` (25 files, +3745/-420) | 5 层架构 + 6 个 bootstrap 文件 + scripts 同步到 06-11 | 工作区首 commit |
+| 20:43 | git commit `f049331` (125 files, -29301) | 删 .openclaw-repair/ 旧 dreaming session-corpus | workspace 释放 30K 行 |
+| 20:44 | git commit `0d8e225` (11 files, -4270) | 删过期 reports (MODEL-CONFIG/ada-personality-eval) | workspace 释放 4K 行 |
+| 20:45 | 新建 `BOOT.md` (135 行) | gateway 重启 4 项自动检查 (heartbeat/alignment/doctor/feishu) | 官方推荐 (agent-workspace.md) |
+| 20:50 | alignment-check 13/13 ✅ | 验证 | 持续监控 |
+| 20:55 | BOOT.md 4 项实际运行 | 验证 | 3✅+1⚠️(long-running) |
+
+**新文件**: `BOOT.md`（135 行, 4 项 gateway restart 检查）
+**未启用 boot-md hook**（避免 WSL2 + gateway restart 风险，按06-10 锁定决策）
+**保留**：`memory/.dreams/*.migrated`（memory-lancedb migration 06-11 03:00 重命名的真实数据，非清理目标）

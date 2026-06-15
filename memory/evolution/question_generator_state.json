@@ -1,0 +1,21 @@
+{
+  "lastAskedAt": "2026-06-15T13:22:13.104Z",
+  "lastUrgentAt": null,
+  "recentQuestions": [
+    "Agent is stuck in a repair loop (repair->fail->repair cycle) with genes: []. The underlying issue persists despite multiple attempts. What fundamentally different approach could break this cycle?",
+    "Recurring error in evolution cycle that auto-repair cannot resolve: LLM ERROR] {\"type\":\"error\",\"error\":{\"type\":\"api_error\",\"message\":\"unknown error, 999 (1000)\" -- What approaches or patches have worked for similar issues?",
+    "Capability gap detected in agent environment: **ASSISTANT**: [LLM ERROR] {\"type\":\"error\",\"error\":{\"type\":\"api_error\",\"message\":\"unknown error, 999 (1000)\"},\"request_id\":\"066d45a440bec809a999dc4c53 -- How can this be addressed or what alternative approaches exist?",
+    "No matching solution found in ecosystem for active problem (signals: ). Context: complex multi-signal issue -- What strategies, patterns, or tools address this class of problem?",
+    "Performance bottleneck detected: **ASSISTANT**: [LLM ERROR] LLM idle timeout (120s): no response from model -- What optimization strategies or architectural patterns address this?",
+    "Performance bottleneck detected: **ASSISTANT**: Gmail envelope list returned empty (timeout 15 protection working, no hang). QQ returned the same critical alerts as 22:17 baseline (#2 -- What optimization strategies or architectural patterns address this?",
+    "Agent evolution has plateaued (severe -- no improvement in recent cycles). Current gene pool and mutation strategies are exhausted. What novel approaches, architectural patterns, or paradigm shifts could restart progress?",
+    "Performance bottleneck detected: **ASSISTANT**: `openclaw memory status --index` 似乎超过预期，我再等一次；如果仍无输出，会切换到带 timeout 的单独诊断，避免卡住。 [TOOL: process] -- What optimization strategies or architectural patterns address this?",
+    "Performance bottleneck detected: **ASSISTANT**: Quick observations: - **Email**: Gmail back online ✅ (last check was timeout at 19:37, now 20:15 fetches OK). QQ #2433/#2431 GitHub Act -- What optimization strategies or architectural patterns address this?",
+    "Performance bottleneck detected: **ASSISTANT**: Gateway 重新接受了配置（`Invalid config` 不再出现），`/status` 显示 Gateway 仍在 18789 监听同一个 PID 1136，但 probe timeout 说明它在热重载刚结束、warm-up 中。我再等几秒重新探测和列模型。 -- What optimization strategies or architectural patterns address this?",
+    "Performance bottleneck detected: **ASSISTANT**: Gmail is fine (exit 0). The WSL2 flake is harmless — likely just slow but still completed within 15s. Quick checks: - **MCP**: ✅ MCPhub -- What optimization strategies or architectural patterns address this?",
+    "Performance bottleneck detected: **ASSISTANT**: Gmail session closed cleanly. MCP confirmed: mcporter PID 498 stable. Evolver main PID 35210 + socks5 bridge 34871 + gateway 10345 all  -- What optimization strategies or architectural patterns address this?",
+    "User requested a feature that may benefit from community solutions: **ASSISTANT**: Weather matches baseline: 武汉 多云 21-33°C. All checks done. No new emergencies vs prior state. The 04:14 state shows everything green. Th -- Are there existing implementations or best practices for this?",
+    "Performance bottleneck detected: **ASSISTANT**: Good - Gmail works on retry (just slow first time). The WSL2 IMAP network jitter is real. Let me also check Feishu notifications and ca -- What optimization strategies or architectural patterns address this?",
+    "User requested a feature that may benefit from community solutions: **ASSISTANT**: `git add -A` 超时被杀（目录太大）。换个轻量方案——直接打 tag： [TOOL: exec] -- Are there existing implementations or best practices for this?"
+  ]
+}

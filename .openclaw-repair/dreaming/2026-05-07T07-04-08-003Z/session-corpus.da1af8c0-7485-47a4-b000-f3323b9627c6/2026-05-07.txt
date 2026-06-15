@@ -1,2 +1,0 @@
-[main/sessions/f1a4cd26-290e-4e68-b40a-8edc17124666.jsonl#L8] Assistant: ✅ Evolver is running (PID 3975)
-[main/sessions/f71c3d26-6938-4e53-99db-6cedad525ee1.jsonl#L16] Assistant: Evolver 已启动 (PID 19799)。

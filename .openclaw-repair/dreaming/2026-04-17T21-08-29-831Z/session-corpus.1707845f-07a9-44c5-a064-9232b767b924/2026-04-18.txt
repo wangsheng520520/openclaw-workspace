@@ -1,4 +1,0 @@
-[main/sessions/1df37680-7731-4ac0-8b3c-08f9991e7b5c.jsonl#L5] User: [cron:ed6bd9e9-da68-4d63-b9a0-4b1722ed3653 Evolver Watchdog] 自主任务：Evolver 健康检查。运行一条命令即可，不需要多余输出。 工作目录: /home/wszmd520520/.openclaw/workspace/skills/evolver 运行: node src/ops/lifecycle.js status 如果 running=false，运行: node src/ops/lifecycle.js start 工作目录同上，环境变量: A2A_HUB_URL=htt
-[main/sessions/1df37680-7731-4ac0-8b3c-08f9991e7b5c.jsonl#L10] Assistant: ✅ Evolver 运行中 (PID: 73475)
-[main/sessions/213d8238-2031-45c4-b49a-dd88ceb9b35c.jsonl#L5] User: [cron:ed6bd9e9-da68-4d63-b9a0-4b1722ed3653 Evolver Watchdog] 自主任务：Evolver 健康检查。运行一条命令即可，不需要多余输出。 工作目录: /home/wszmd520520/.openclaw/workspace/skills/evolver 运行: node src/ops/lifecycle.js status 如果 running=false，运行: node src/ops/lifecycle.js start 工作目录同上，环境变量: A2A_HUB_URL=htt
-[main/sessions/213d8238-2031-45c4-b49a-dd88ceb9b35c.jsonl#L10] Assistant: ✅ Evolver 运行中 (PID 92329)

@@ -1,0 +1,7 @@
+{
+  "migrated_at_local": "2026-06-14 17:30 Asia/Shanghai",
+  "source": "/home/wszmd520520/.openclaw/workspace/skills/evolver/memory/evolution",
+  "target": "/home/wszmd520520/.openclaw/workspace/memory/evolution",
+  "source_cycleCount": 395,
+  "note": "Old skills/evolver memory/evolution overlaid into workspace memory/evolution; new-only files were preserved; backups are under /tmp/evolver-state-migration-20260614-173027."
+}

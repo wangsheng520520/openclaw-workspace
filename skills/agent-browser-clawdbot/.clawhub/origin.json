@@ -3,5 +3,6 @@
   "registry": "https://clawhub.ai",
   "slug": "agent-browser-clawdbot",
   "installedVersion": "0.1.0",
-  "installedAt": 1775894021790
+  "installedAt": 1775894021790,
+  "owner": "matrixy"
 }

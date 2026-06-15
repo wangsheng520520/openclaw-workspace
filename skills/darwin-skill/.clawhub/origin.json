@@ -3,5 +3,6 @@
   "registry": "https://clawhub.ai",
   "slug": "darwin-skill",
   "installedVersion": "1.0.0",
-  "installedAt": 1776922082879
+  "installedAt": 1776922082879,
+  "owner": "alchaincyf"
 }

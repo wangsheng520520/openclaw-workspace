@@ -2,13 +2,13 @@
   "version": 1,
   "current": {
     "type": "PersonalityState",
-    "rigor": 0.7,
-    "creativity": 0.35,
+    "rigor": 1,
+    "creativity": 1,
     "verbosity": 0.25,
     "risk_tolerance": 0.4,
     "obedience": 0.85
   },
   "stats": {},
   "history": [],
-  "updated_at": "2026-04-16T20:04:22.612Z"
+  "updated_at": "2026-06-15T13:26:47.356Z"
 }

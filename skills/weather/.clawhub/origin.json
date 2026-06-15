@@ -3,5 +3,6 @@
   "registry": "https://clawhub.ai",
   "slug": "weather",
   "installedVersion": "1.0.0",
-  "installedAt": 1776166589648
+  "installedAt": 1776166589648,
+  "owner": "steipete"
 }

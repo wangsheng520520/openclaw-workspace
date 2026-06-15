@@ -1,0 +1,15 @@
+{
+  "type": "GepPromptArtifact",
+  "at": "2026-06-04T10:29:04.044Z",
+  "cycle_id": "Cycle #0370",
+  "run_id": "run_1780568942891",
+  "prompt_path": "/home/wszmd520520/.openclaw/workspace/skills/evolver/memory/evolution/gep_prompt_Cycle_#0370_run_1780568942891.txt",
+  "meta": {
+    "agent": "main",
+    "drift_enabled": false,
+    "review_mode": false,
+    "dry_run": false,
+    "mutation_id": "mut_1780568938405",
+    "personality_key": "rigor=0.7|creativity=1.0|verbosity=0.3|risk_tolerance=0.4|obedience=0.9"
+  }
+}

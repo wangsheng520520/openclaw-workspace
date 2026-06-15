@@ -3,5 +3,6 @@
   "registry": "https://clawhub.ai",
   "slug": "desktop-control",
   "installedVersion": "1.0.0",
-  "installedAt": 1777730085322
+  "installedAt": 1777730085322,
+  "owner": "matagul"
 }

@@ -249,6 +249,46 @@ Add whatever helps you do your job. This is your cheat sheet.
 
 ---
 
+### 🦎 Evolver + 变色龙代理（WSL2 持久化）
+
+**背景**：WSL2 直连 `https://evomap.ai` 可能被 Cloudflare `REGION / NETWORK unavailable` 拦截；Windows 浏览器可访问通常是因为走了变色龙加速器。
+
+**变色龙端口**：
+- SOCKS 可用：`127.0.0.1:1234`（已验证可让 `curl --proxy socks5h://127.0.0.1:1234 https://evomap.ai/a2a/hello` 到达业务 API）
+- 备用端口：`127.0.0.1:9876`
+
+**Evolver 持久化入口**：
+- Watchdog：`/home/wszmd520520/.openclaw/workspace/scripts/evolver-watchdog.sh`
+- HTTP CONNECT → SOCKS5 桥：`/home/wszmd520520/.openclaw/workspace/scripts/evolver-http-connect-to-socks5.js`
+- hubFetch preload：`/home/wszmd520520/.openclaw/workspace/scripts/evolver-hubfetch-env-proxy-preload.js`
+
+**为什么需要 preload**：Evolver 的 `src/gep/hubFetch.js` 使用项目依赖里的 `undici.fetch` + 自定义 dispatcher，默认不会吃 Node v24 `--use-env-proxy`。preload 用 `_setFetchImplForTest` 将 hubFetch 改为 `global.fetch` 并丢弃 direct dispatcher，使 `NODE_OPTIONS=--use-env-proxy` 生效。
+
+**Watchdog 行为**：
+- 启动时检测 `127.0.0.1:1234`
+- 可用 → 启动/复用 `127.0.0.1:18080` HTTP CONNECT 桥，并设置：
+  - `HTTP_PROXY=http://127.0.0.1:18080`
+  - `HTTPS_PROXY=http://127.0.0.1:18080`
+  - `NODE_OPTIONS=--use-env-proxy --require=/home/wszmd520520/.openclaw/workspace/scripts/evolver-hubfetch-env-proxy-preload.js`
+- 不可用 → 自动 unset 代理变量，直连启动
+
+**验证成功标志**：
+```text
+[evolver-proxy-preload] hubFetch now uses global.fetch/env proxy
+[lifecycle] hello OK, node_id=node_dc8f215d85d552d9
+[Heartbeat] Registered with hub. Node: node_dc8f215d85d552d9
+```
+
+**状态目录迁移（2026-06-14 17:30）**：
+- 旧状态目录：`/home/wszmd520520/.openclaw/workspace/skills/evolver/memory/evolution`，停在 `cycleCount=395`（最后 `#0395`，2026-06-12 23:07）；迁移验证后已按用户要求删除该旧目录（2026-06-14 17:37），只保留备份。
+- 新运行目录：`/home/wszmd520520/.openclaw/workspace/memory/evolution`，由 `OPENCLAW_WORKSPACE=/home/wszmd520520/.openclaw/workspace` 决定。
+- 已将旧目录 overlay 到新目录，并保留新目录 06-14 的 `#0145~#0153` 增量文件；新目录 `evolution_state.json` 以旧 `395` 为准。
+- 备份：`/tmp/evolver-state-migration-20260614-173027/{old-skills-evolver-memory-evolution.tgz,new-workspace-memory-evolution.tgz}`。
+- 验证：重启 watchdog 后新路径从 `395` 接续到 `396`，生成 `gep_prompt_Cycle_#0396_run_1781429485317.*`，Hub `hello OK` + `Registered with hub`；删除旧目录前新路径已推进到 `cycleCount=399`。
+
+
+---
+
 ### 🐦 lark-cli (飞书官方 CLI)
 
 **版本**: 1.0.19

@@ -1,4 +1,5 @@
 **最后记忆提炼**: 2026-06-10 23:13
+**本次增量提炼**: 2026-06-14 02:03 (C 选项落地)
 
 # MEMORY.md - 长期记忆
 
@@ -17,7 +18,22 @@
 
 > 这是**用户明确表态**的架构选择，**禁止**未来 session 在没拿到新指令时改回去。
 
+### 🔒 2026-06-14 02:03 决策（bootstrapMaxChars 调高 + MEMORY.md 决策日志）
+
+> **决策**：`agents.defaults.bootstrapMaxChars` 从 `20000` → `40000`（永久），不是临时绕过。
+> **原因**：06-14 01:54:08 Gateway 警告 `MEMORY.md = 25617 chars, limit 20000 → truncated`。MEMORY.md 实际 35750 字节（含中文），3 次原调高记录（06-28 12k→25k, 本次 25k→40k）都因 MEMORY.md 持续增长。40k 阈值是给当前项目预留的 6+ 月裕量。
+> **执行流程**（受保护字段，6 步）：
+> 1. 备份 `openclaw.json` 到 `/tmp/openclaw-pre-bootstrap-max-chars-XXXXXX.json`
+> 2. python3 直接编辑 `openclaw.json`（`config.patch` 不能改受保护字段）
+> 3. `systemctl --user restart openclaw-gateway` 热重载
+> 4. Gateway 监听 `14 plugins, 12.9s` 启动成功（不超 35s 超时）
+> 5. 日志验证：`01:58:36` 之后无 `MEMORY.*truncat` 警告
+> 6. 同步记录到 BOOT.md 第 52 行
+> **为什么不反向优化 MEMORY.md 减肥**：MEMORY.md 是“决策日志 + 提炼的智慧”，压缩会丢用户拍板原话。用户拍板 C（决策 = 永久提阈值）而不是 B（减肥）。
+> **下次重新评估节点**：MEMORY.md 超过 35,000 字符时（预警余量 5,000）。
+
 | 决策项 | 当前值 | 不要再问 |
+|--------|--------|----------|
 |--------|--------|----------|
 | **视角/人格** | Ada Lovelace 诗性科学 | ✅ 已锁定 |
 | **会话切分** | `per-channel-peer`（飞书/微信/webchat/CLI 独立 session） | ✅ 已锁定，不改 dmScope |
@@ -31,75 +47,23 @@
 
 ---
 
-## 关于用户
-
-**最后更新**: 2026-04-30
-
-### 偏好
-- 喜欢使用表格来比较不同的选项
-- 偏好详细的系统状态报告
-- 主动要求执行检测到的问题修复
-- 要求主动汇报任务结果(不等待询问)
-- 要求配置自动化(如 Evolver 自动模式、记忆提炼每日执行)
-- 重视 AI 人格的深度和一致性(Ada v2.0 蒸馏经历说明用户愿意投入大量精力打磨 Agent 人格)
-- 习惯通过飞书发送微信公众号链接,期望自动导入 Obsidian 并建立双链
-- 可能因飞书消息延迟而重复发送同一链接(04-20 同一链接发了 3 次)
-- 关注模型上下文窗口长度,配置 NVIDIA 免费大上下文模型 (04-21)
-
-### 兴趣领域
-- Obsidian 知识库中有**大量公交行业/公交司机主题笔记**,说明用户对公共交通行业有深入关注
-
-### 项目
-- OpenClaw 系统配置和优化
-- Ada Lovelace 诗性科学视角的持续运营与评估
-- QQ 邮箱双账户监控（04-28 发现 config-qq.toml 从未被心跳使用）
+### 关于用户 (2026-04-30 提)
+- 偏好: 表格对比、详细报告、主动汇报、自动配置、AI 人格深度一致性。
+- 习惯: 飞书发公众号链接→自动导入 Obsidian 建双链 (注意: 04-20 因延迟同链接发 3 次)；关注上下文窗口长度 (04-21 配 NVIDIA 免费大上下文)。
+- 兴趣: 公交行业/公交司机 (Obsidian Vault 大量主题笔记)。
+- 当前项目: OpenClaw 系统优化 / Ada 视角持续运营 / QQ 邮箱双账户监控 (04-28 修复)。
 
 ---
 
-## 项目与上下文
+## 项目与上下文 (06-12 压缩)
 
 **最后更新**: 2026-04-25
 
-### OpenClaw 系统配置 (已完成)
-
-**时间**: 2026-04-11 ~ 2026-04-14
-
-### 4 月 13-14 日 新进展
-
-**Evolver 升级与配置**:
-- ✅ 从 v1.52.0 更新到 v1.57.0
-- ✅ 配置自动执行脚本 (auto-execute.sh)
-- ✅ 超时限制从 300 秒增加到 600 秒
-- ✅ 创建测试文件解决验证失败问题
-- ✅ 配置 EVOLVE_STRATEGY=balanced
-
-**模型配置**:
-- ✅ 主模型更改为 `modelstudio/qwen3.5-plus` (阿里百炼)
-- ✅ 配置 15 个备选模型
-
-**浏览器配置**:
-- ✅ 启用 browser 工具
-- ✅ 配置隔离浏览器 (openclaw profile)
-
-**核心配置**:
-- 模型:qwen/qwen3.5-plus (当前默认), minimax/MiniMax-M2.7 (备用), deepseek/deepseek-chat (备用)
-- 记忆搜索:SiliconFlow BAAI/bge-m3 (OpenAI 兼容)
-- 会话重置:5 天空闲重置
-
-**MCP 服务器**: mcp-deepwiki, amap, Memory, Sequential-Thinking, context7, GitHub, thinking-models, mcp-server-chart, chrome-devtools, Bazi, think-tool, markmap, ziwei-doushu, playwright, wiki (15 个)
-
-**已启用技能** (21个): skill-vetter, self-improving-agent, ontology, proactive-agent, multi-search-engine, agent-browser-clawdbot, huashu-nuwa, ada-lovelace, code-generator, evolver, wechat-article, playwright-mcp, file-manager, deep-research-pro, automation-workflows, humanizer, summarize, causal-inference, clawmind, brainstorming, memory
-
-**平行长期记忆系统**: `~/memory/` (ivangdavila skill) — projects/, people/, decisions/, knowledge/, preferences/
-
-**关键决策**:
-- 采用 Ada Lovelace 诗性科学视角作为默认 Agent 人格
-- **Ada Skill v2.0 已完成** (2026-04-14):女娲标准流程 Phase 0-5,650行 33KB,196KB 调研支撑
-- **Ada v2.0 工作区全面升级** (2026-04-14):SOUL.md / AGENTS.md / IDENTITY.md 全部升级到 v2.0.0
-- 启用完整的长期记忆和自进化机制
-- 配置 SiliconFlow 为 OpenAI 兼容的语义搜索提供商
-- 配置 DeepSeek 为默认模型
-- 启用 Evolver 自进化引擎
+### OpenClaw 系统配置 (2026-04-11~14 完成)
+- Evolver v1.52→v1.57（自动脚本/超时 300→600s/balanced 策略）；模型切 `modelstudio/qwen3.5-plus` + 15 备选；启用 browser 工具 + openclaw profile。
+- 核心:记忆搜索 SiliconFlow BAAI/bge-m3 (OpenAI 兼容)，会话重置 5 天空闲。
+- MCP 15 个、已启用技能 21 个、平行长期记忆 `~/memory/`。
+- 关键决策: Ada Lovelace 诗性科学视角为默认 Agent 人格；Ada v2.0 (女娲 0-5 流程, 650行/33KB/196KB 调研) 已发布；SOUL/AGENTS/IDENTITY 升 v2.0.0；启用 Evolver + SiliconFlow + DeepSeek。
 
 ---
 
@@ -107,31 +71,13 @@
 
 **最后更新**: 2026-04-25
 
-### WSL2 网络架构 (2026-05-13)
-- `networkingMode=mirrored` 已配置在 `~/.wslconfig`
-- `eth0`（100.64.164.2/29）：WSL2 内部 NAT，正常
-- `eth1`（192.168.1.5/24）：镜像模式主网卡，正常
-- eth0 + eth1 并存是镜像模式正常行为，无需修复
-- DNS 正常（getent 测试通过），nslookup 未安装但不影响 DNS
+### WSL2 网络架构 (2026-05-13, 06-12 压缩)
+- `networkingMode=mirrored` 已配；`eth0` (100.64.164.2/29 NAT) + `eth1` (192.168.1.5/24 主网卡) 并存是镜像模式正常行为，无需修。DNS 正常（getent 测试通过）。
 
-### memory-lancedb + 硅基流动 BAAI/bge-m3 配置原则 (2026-06-04)
-
-**背景**: 2026-06-03 修复了 memory-lancedb 400 错误。插件用 OpenAI 兼容客户端访问硅基流动，BAAI/bge-m3 内置 1024 维映射。
-
-**配置要点**:
-- `provider: "openai"` — 插件不支持 `"siliconflow"` 字符串，用 OpenAI 客户端 + `baseUrl` 覆盖端点
-- `model: "BAAI/bge-m3"` — 插件自动映射 1024 维，**禁止**手动写 `dimensions` 参数（写了报 400）
-- `baseUrl: "https://api.siliconflow.cn/v1"` — 必须显式写出，否则请求打到 OpenAI 官方
-- LanceDB 与 memory_search 共用嵌入 API，但存储后端独立（ LanceDB vs SQLite）
-- 插件通过 `before_prompt_build` hook 自动召回，`agent_end` hook 自动捕获
-
-**已知陷阱**:
-- 手动 `dimensions` → 400 错误
-- provider 写 `"siliconflow"` → 插件不识别
-- 缺失 `baseUrl` → 请求打到 OpenAI 官方（无 key/配额）
-- DB 重建会丢失所有历史记忆（ LanceDB 重新初始化无持久性）
-
-**验证**: `gateway status` + `gateway logs | grep lancedb`
+### memory-lancedb + 硅基流动 BAAI/bge-m3 (2026-06-04, 06-12 压缩)
+- 配置要点：`provider="openai"`（插件不接受 `"siliconflow"`）+ `model="BAAI/bge-m3"`（自动 1024 维，**禁**手动 `dimensions`）+ `baseUrl=https://api.siliconflow.cn/v1`（必显写）。
+- 验证：`gateway status` + `gateway logs | grep lancedb`。
+- 陷阱：手动 `dimensions` → 400；缺 `baseUrl` → 打到 OpenAI 官方；DB 重建丢全部历史（无持久性）。
 
 ### 系统配置原则
 
@@ -142,6 +88,7 @@
 5. **受保护字段写入**: `bootstrapMaxChars`、`agents.defaults` 等受保护字段不可通过 config.patch 修改,需直接编辑 openclaw.json + gateway restart 热重载
 6. **心跳架构原则**: 心跳必须独立 session lane + lightContext:false,否则每 30 分钟阻塞主会话 5-7 分钟
 7. **Evolver 手动操作前必查**: 执行 `node index.js review --approve` 前必须先 `ps aux | grep "index.js" | grep -v grep` 确认只有一个 `--loop` daemon 进程，否则手动触发的新进程会与 daemon 并存造成循环混乱。手动操作完成后如有新孤立进程立即用 `kill <PID>` 清理。
+
 
 ### Evolver 手动操作标准流程
 
@@ -181,40 +128,21 @@ node src/ops/lifecycle.js status
 
 **关键原则**: 手动 `node index.js` 不会替换 daemon，只是创建新进程与之竞争 lifecycle 管理权。操作完成后必须检查并清理孤立进程。
 
-### 问题排查模式
+### 问题排查模式 (06-12 压缩 15→8 条, 详细在 .learnings/ERRORS.md)
+- himalaya 挂起：`timeout 15` 包裹；QQ 邮箱需 `--config config-qq.toml`。
+- 微信文章提取失败：优先 Tavily，web_fetch/jina.ai 效果差。
+- 子 Agent 超时：`runTimeoutSeconds` 调 600+（大型调研）。
+- MCP 进程 >20：`pkill -f "mcp-server|mcp-deepwiki" + systemctl --user restart`。
+- 模型切换异常：检查 `agents.defaults` 是否含新模型；fallback 链不能为空。
+- A2A 环境变量缺失：技能 UI 显示封锁但看门狗 exec 时单独传 env，进程实际正常。
+- Gateway 回滚：升 systemd 服务配置版本；CLI 滞后：`npm install -g openclaw@latest` + 重建 symlink。
+- 飞书配对失败：`openclaw pairing approve feishu <code>`。
 
-| 问题 | 解决方案 |
-|------|----------|
-| Gateway 回滚 | 更新 systemd 服务配置文件版本 |
-| CLI 版本滞后 | `npm install -g openclaw@latest` + 重建 symlink |
-| memorySearch 不支持 | 配置为 openai 提供商,使用 SiliconFlow 端点 |
-| QA 场景包缺失 | 创建 `~/.openclaw/qa/scenarios/index.md` |
-| MCP 服务器超时 | 检查依赖安装和浏览器安装 (Chrome DevTools) |
-| 飞书配对失败 | 使用 `openclaw pairing approve feishu <code>` |
-| 技能显示被封锁 | 移除 CLI 依赖或刷新浏览器缓存 |
-| 模型切换后表现异常 | 检查 `agents.defaults` 配置是否与新模型兼容 |
-| 子 Agent 超时 | 增加 `runTimeoutSeconds`，大型调研建议 600s+ |
-| 微信文章提取失败 | 优先用 Tavily，web_fetch/jina.ai 对微信公众号效果差 |
-| 博客源持续失败 | 机器之心和 The Verge 解析不稳定，不影响整体监控 |
-| himalaya 命令挂起 | WSL2 网络抖动，用 `timeout 15` 包裹 |
-| QQ 邮箱未检查 | 需 `--config config-qq.toml` 显式指定 |
-| A2A 环境变量缺失 | 技能 UI 显示封锁但进程运行正常，看门狗 exec 时传入 env |
-| MCP 进程数 >20 | pkill -f "mcp-server|mcp-deepwiki" + systemctl --user restart |
+### Evolver 进化记录 (2026-04, 已过期)
+- #0001-#0004 验证问题（缺测试文件）→ #0005+ v1.57.0 自带 36 测试解决；04-23 升 v1.69.11；之后多次 v1.7x→v1.86+。
 
-### Evolver 进化记录
-
-**周期 #0001-0004**: 验证失败(缺测试文件)→成功→失败→成功
-**#0005+**: v1.57.0+ 自带 36 个测试文件,验证问题解决; 04-23 更新到 v1.69.11
-
-### 女娲造人术实践经验 (2026-04-14)
-
-| 阶段 | 耗时 | 产出 |
-|------|------|------|
-| Phase 0 准备 | ~10min | 技能目录 + 配置 |
-| Phase 1 调研 (6 Agent) | ~2h | 196KB / 6 个研究文件 |
-| Phase 2+3 提炼+构建 | ~30min | 650行 SKILL.md |
-| Phase 4 质量验证 | ~20min | 3/3 通过 |
-| Phase 5 精炼 | ~20min | SOUL/AGENTS/IDENTITY v2.0 |
+### 女娲造人术实践经验 (2026-04-14, 已沉淀到 skill)
+- Phase 0-5 完整流程首次跑通：调研 6 Agent / 2h / 196KB → 提炼 30min → 验证 3/3 → 精炼 20min。三重验证（跨域复现+生成力+排他性）有效。
 
 ---
 
@@ -244,26 +172,12 @@ node src/ops/lifecycle.js status
 - 必须使用 obsidian-cli move/create
 - 创建笔记必须注入 Frontmatter
 
-### Cron 自动任务 (2026-04-15)
+### Cron 自动任务 (2026-04-15, 仍在用)
+- 每日记忆提炼 (凌晨 3:00) → MEMORY.md；SESSION-STATE 新鲜度检查 (每 6h)。
 
-**已配置的定时任务**:
-- 每日记忆提炼 (凌晨 3:00) - 提炼日常记忆到 MEMORY.md
-- SESSION-STATE 新鲜度检查 (每 6 小时) - 保持工作状态文件新鲜
-
----
-
-### 关键经验总结 (2026-04-13~14)
-
-**Evolver 模式澄清**:
-- 用户对 Evolver "自动模式"的理解:自动执行,无需人工确认
-- 区别于"审核模式"(需要人工确认)和"疯狗模式"(`--loop` 持续循环)
-- **教训**:准确理解用户对"自动"的定义,不要混淆不同运行模式
-
-**女娲造人术实践**:
-- 完整 Phase 0-5 流程首次成功运行
-- 6 Agent Swarm 并行调研效率高(196KB / 6 个文件 / ~2 小时)
-- Phase 4 质量验证(Sanity Check + Edge Case + Voice Check)是保证 Skill 质量的关键步骤
-- 三重验证(跨域复现+生成力+排他性)有效筛选心智模型
+### 关键经验总结 (2026-04-13~14, 一次沉淀)
+- Evolver "自动模式"= 自动执行 (无人工确认)，区别于"审核模式"和"疯狗模式 `--loop`"。准确理解用户对"自动"的定义，不混淆。
+- 女娲造人术：6 Agent 并行调研效率高 (196KB/~2h)，Phase 4 质量验证 (Sanity+Edge+Voice) 是 Skill 质量关键。
 
 ### 系统自治运行观察 (2026-04-15~04-20)
 
@@ -516,6 +430,58 @@ node src/ops/lifecycle.js status
 - [06-07] ## Tavily 修复方案升级(22:46)
 - [06-07] ## Tavily 重新启用(23:08)
 
+
+**最后记忆提炼**: 2026-06-12 04:00
+**自动提炼**:
+- [06-08] ## 主线事件:Evolver Hub 通信恢复(5.5 小时攻坚,12:55 ~ 18:19)
+- [06-08] ## 心跳报告(全天 8 次,均在飞书通道)
+- [06-08] ## 当天其他系统事件
+- [06-07] ## doctor 警告(21:50:51 / 21:51:03)
+- [06-07] ## baidu-search 技能禁用(21:30~21:45)
+- [06-07] ## Tavily secrets.resolve 失败(22:08~22:20)
+- [06-07] ## Tavily 修复方案升级(22:46)
+- [06-07] ## Tavily 重新启用(23:08)
+
+
+**最后记忆提炼**: 2026-06-13 04:00
+**自动提炼**:
+- [06-08] ## 主线事件:Evolver Hub 通信恢复(5.5 小时攻坚,12:55 ~ 18:19)
+- [06-08] ## 心跳报告(全天 8 次,均在飞书通道)
+- [06-08] ## 当天其他系统事件
+- [06-07] ## doctor 警告(21:50:51 / 21:51:03)
+- [06-07] ## baidu-search 技能禁用(21:30~21:45)
+- [06-07] ## Tavily secrets.resolve 失败(22:08~22:20)
+- [06-07] ## Tavily 修复方案升级(22:46)
+- [06-07] ## Tavily 重新启用(23:08)
+
+
+## 2026-06-15 20:06 bootstrapMaxChars 20000→50000（wizard 回退修复）
+
+> **根因**: 06-14 13:13 `wizard configure` 将 `bootstrapMaxChars` 从手动设置的 40000 回退到默认 20000。MEMORY.md 当前 37,904 字符，超限 17,904 字符。
+> **修复**: 20000 → 50000（给 ~12K 裕量），直接编辑 openclaw.json + gateway restart。
+> **备份**: `/tmp/openclaw-pre-bootstrap-50000-20260615-*.json`
+> **教训**: `wizard configure` 会覆盖受保护字段的手动修改值。以后跑完 wizard 需要重新检查 `bootstrapMaxChars`、`heartbeat` 等手动调过的默认值。
+> **下次评估节点**: MEMORY.md 超过 45,000 字符时（预警余量 5,000）。
+
+**最后记忆提炼**: 2026-06-14 04:00
+**自动提炼**:
+- [06-08] ## 主线事件:Evolver Hub 通信恢复(5.5 小时攻坚,12:55 ~ 18:19)
+- [06-08] ## 心跳报告(全天 8 次,均在飞书通道)
+- [06-08] ## 当天其他系统事件
+- [06-07] ## doctor 警告(21:50:51 / 21:51:03)
+- [06-07] ## baidu-search 技能禁用(21:30~21:45)
+- [06-07] ## Tavily secrets.resolve 失败(22:08~22:20)
+- [06-07] ## Tavily 修复方案升级(22:46)
+- [06-07] ## Tavily 重新启用(23:08)
+
+
+**最后记忆提炼**: 2026-06-15 04:00
+**自动提炼**:
+- [06-14] ## Context & Memory System Maintenance
+- [06-08] ## 主线事件:Evolver Hub 通信恢复(5.5 小时攻坚,12:55 ~ 18:19)
+- [06-08] ## 心跳报告(全天 8 次,均在飞书通道)
+- [06-08] ## 当天其他系统事件
+
 ## 待办事项
 
 - [x] 配置邮件账户 (Himalaya: Gmail + QQ) - 已完成
@@ -756,3 +722,21 @@ const assertPluginStateAllowed = () => {
 2. **npm install --prefix 在 user-level 目录可以装插件** — 需手动指定 `cd ~/.openclaw/npm && npm install`
 3. **plugins.allow 中 feishu 保留** — 不需要移除(与 diagnostics-prometheus 不同, feishu 是核心插件)
 4. **feishu-dedup 错误与路径无关** — 是 OpenClaw v6.5 Core trusted 限制, global/user-level/projects 都一样
+
+## 2026-06-14 15:36 梦境系统诊断（v6.5 上游回归）
+
+**根因（铁证）**：`dist/extensions/memory-core/index.js`（唯一 `registerShortTermPromotionDreaming(api)` 入口）在整个 dist 中**无任何 importer**。CLI 工具通过 `loadExtensions` 路径会触发，**gateway 主进程不触发**。`update-runner-BywxD4AF.js:49` 引用 `dist/extensions/memory-core/runtime-api.js`，但 runtime-api 不 register `before_agent_reply` 钩子。结果：每晚 03:00 cron `Memory Dreaming Promotion` 触发 isolated agentTurn，token `__openclaw_memory_core_short_term_promotion_dream__` 当普通 prompt 处理 → 7 分钟空跑，报告 ok。
+
+**已做**：
+- ✅ `scripts/dream-runner.sh`（CLI 复用）：DREAMS.md 18 entries + 2 grounded short-term 入库（已验证 15:36:41）
+- ✅ `scripts/dream-sweep.mjs`（直调 dist API）：同样问题——`pluginConfig.dreaming.phases.light.enabled` 默认 false（`plugins.entries.memory-core.config` 为空 `{}`），sweep 内部退出
+- ✅ Cron `915fdf31` 已 **disabled**（`enabled: false`，description 标记 `[v6.5 known broken]`），防止每晚 7 分钟空跑浪费模型
+
+**未恢复（需要上游 v6.6 修复）**：
+- `memory/dreaming/{light,rem,deep}/<date>.md` 仍只到 2026-06-11
+- `MEMORY.md` 仍无新 promote 写入（`applied: 0`）
+
+**教训**：
+- 报告 "ok" 的 cron 一定要验证磁盘副作用
+- 调试 v6.5 plugin 回归：先看 `dist/extensions/<name>/index.js` 在 dist 中是否有 importer
+- Memory dreams 双轨：CLI 完整可诊断，gateway 端 hook 才是真 dreaming——v6.5 端 hook 不挂

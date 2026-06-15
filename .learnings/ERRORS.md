@@ -1,4 +1,32 @@
 
+## [ERR-20260614-001] plugin_install_index_drift_doctor_fix_recreates_old_projects
+
+**Logged**: 2026-06-14T18:16:00+08:00
+**Priority**: medium
+**Type**: plugin-state-drift
+
+### 现象
+- `openclaw doctor` 报 `Left plugin install index in place because shared SQLite state has conflicting plugin install metadata`。
+- 删除旧 `~/.openclaw/npm/projects/openclaw-feishu-*` / `openclaw-tokenjuice-*` 后，运行 `openclaw doctor --fix` 会依据旧 install record 把旧 project 目录重新装回来。
+
+### 根因
+- 漂移不只在文件目录，而在 legacy `~/.openclaw/plugins/installs.json` 与 SQLite `installed_plugin_index.install_records_json`。
+- `doctor --fix` 在 install record 仍指向旧 project 时，会“修复缺失配置插件”，从而复活旧目录。
+
+### 正确处理
+1. 先备份 `installs.json`、`openclaw.sqlite*`、旧 project tar 包。
+2. 优先尝试 `openclaw plugins registry --refresh`；若不修 install_records，则最小同步 `install_records_json` 与实际 user-level 插件。
+3. 对 `feishu/tokenjuice` 这类已迁到 `~/.openclaw/npm/node_modules/@openclaw/*` 的插件，将 install record 指向 user-level 新版本。
+4. 删除 dead record（例如未启用且未加载的 `diagnostics-prometheus`）。
+5. 再运行 `openclaw doctor`，确认 legacy `installs.json` 被归档为 `installs.json.migrated`，且 duplicate/conflict warnings 消失。
+
+### 验证证据
+- 2026-06-14 B 方案最终验证：Gateway active，`openclaw status` 显示 `Plugin compatibility: none`。
+- `feishu` / `tokenjuice` inspect 均为 `2026.6.5`，路径为 user-level。
+- 旧 project 目录不存在；`installs.json` 不存在，`installs.json.migrated` 存在。
+
+---
+
 ## [SEC-20260504-003] weekly_security_audit_warnings
 
 **Logged**: 2026-05-04T02:00:00Z
@@ -553,3 +581,175 @@ Exec failed (wild-val, signal SIGTERM)
   - 17:53: 第一次提醒查"memorySearch 是否支持 openai 兼容端点"，直接查文档
   - 18:20: 用户说"继续"，我没宣告技能直接 systemctl status
   - 18:22: 用户说"你又没有启用using-superpowers技能"，我直接回应又没宣告
+## 2026-06-12 - Evolver Ralph-loop Guard log path missing
+
+- What happened: Running `bash /home/wszmd520520/.local/bin/evolver-ralph-guard.sh 2>&1` printed OK but exited with FileNotFoundError because `/home/wszmd520520/.openclaw/workspace/skills/evolver/logs/ralph-guard.log` did not exist.
+- Do differently: Before relying on this guard script, verify/create its log directory or remove the obsolete cron job if the user confirms it is no longer needed.
+
+
+## 2026-06-13 插件更新中断导致 hidden temp dirs 与 npm lock/package 不一致
+
+- 场景：按系统自检建议更新 OpenClaw 官方插件到 2026.6.5。
+- 现象：
+  - `openclaw plugins update acpx` 卡在 npm install，父进程中止后留下孤立 npm 子进程。
+  - 合批 `npm install @openclaw/...@2026.6.5` 曾被中断，导致 `node_modules` 部分包显示 2026.6.5，但 root `~/.openclaw/npm/package.json` 与 `package-lock.json` 仍是旧版本。
+  - `~/.openclaw/npm/node_modules/@openclaw/.diffs-*` / `.diagnostics-otel-*` 等隐藏 npm reify 临时目录被 Gateway 扫描为插件，造成旧版本加载和缺依赖错误。
+  - Gateway 日志出现 `Cannot find module 'typebox'`、`Cannot find module '@opentelemetry/exporter-logs-otlp-proto'`。
+- 处理：
+  1. 先备份插件目录与 package manifests。
+  2. 终止孤立 npm install 子进程，避免并发写 node_modules。
+  3. 将隐藏旧插件临时目录移动到 `workspace/backups/quarantined-openclaw-hidden-plugin-dirs-*`（不直接删除）。
+  4. 更新 `~/.openclaw/npm/package.json` 中 @openclaw/* root dependencies 到当前 Gateway 版本。
+  5. 运行 `npm install --no-audit --no-fund` 补齐 lockfile/node_modules。
+  6. `systemctl --user restart openclaw-gateway` 后用 `openclaw gateway status --deep`、日志、`npm ls` 复验。
+- 教训：
+  - `gateway` 工具的 `restart` 可能只是 emit，不等同 systemd 真重启；加载新插件需 `systemctl --user restart openclaw-gateway`。
+  - OpenClaw 插件更新后必须同时检查：物理 package version、root package.json、package-lock、Gateway deep status、日志 plugin failed 行。
+  - npm 中断后不要只看 package.json；必须 `npm ls` 和日志验证依赖树完整。
+  - `@openclaw` 下 `.plugin-*` 隐藏临时目录可能被插件扫描误识别，应隔离到备份目录再重启。
+
+## 2026-06-13 memory-lancedb BAAI/bge-m3 维度配置二阶段故障
+
+- 现象：`@openclaw/memory-lancedb@2026.6.5` 启动时报 `disabled until configured (Unsupported embedding model: BAAI/bge-m3)`，导致 `active-memory` 报 `No callable tools remain ... memory_recall`。
+- 第一阶段修复：给 `openclaw.json` 的 `plugins.entries.memory-lancedb.config.embedding.dimensions` 加 `1024`，插件能注册/初始化，但 recall 变成 `400 status code (no body)`。
+- 复现证据：直接请求 SiliconFlow `/embeddings`：不带 `dimensions` 返回 `200`；带 `dimensions:1024` 返回 `400 {"code":20015,"message":"The parameter is invalid. Please check again."}`。
+- 根因：OpenClaw 2026.6.5 需要本地知道 `BAAI/bge-m3` 的维度用于 LanceDB schema，但 SiliconFlow 的 BAAI/bge-m3 API 不接受 `dimensions` 参数。
+- 正确修复：在 `~/.openclaw/npm/node_modules/@openclaw/memory-lancedb/dist/config.js` 的 `EMBEDDING_DIMENSIONS` 中加入 `"BAAI/bge-m3": 1024`，同时从 `openclaw.json` 移除 `embedding.dimensions`，再重启 Gateway。
+- 验证：新 PID 日志出现 `memory-lancedb: injecting 3 memories into context`，无 `Unsupported embedding`、无 `400 status code`、无 `No callable tools remain`；当前会话 `memory_recall` 可调用。
+- 注意：这是本地 node_modules 补丁，未来 `npm install` / `openclaw update` 可能覆盖，需要复查。
+
+## 2026-06-14 — Evolver Ralph-loop Guard 修错状态文件路径导致 daemon 假在线
+
+- 现象：`node index.js --loop` 进程与 `127.0.0.1:19820` proxy 均在线，但 `cycle_progress.json` 长时间不更新，进化周期不推进。
+- 根因：当前 daemon 环境含 `OPENCLAW_WORKSPACE=/home/wszmd520520/.openclaw/workspace`，`src/gep/paths.js#getEvolutionDir()` 实际读取 `/home/wszmd520520/.openclaw/workspace/memory/evolution`；但 Ralph-loop Guard 脚本硬编码修 `/home/wszmd520520/.openclaw/workspace/skills/evolver/memory/evolution/evolution_solidify_state.json`。Cron 因错误路径已 sync 而持续报告 `OK: already in sync`，真正 runtime state 仍缺 `last_solidify`，`isPendingSolidify()` 为 true，主循环每轮 sleep/continue，不写新的 `cycle_progress`。
+- 修复：备份 `/tmp/evolver-ralph-guard.sh.bak-20260614-011505`；将 guard 的 `STATE_FILE` 改为 `${EVOLUTION_DIR:-${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}/memory/evolution}/evolution_solidify_state.json`，`LOG_FILE` 改为 `$WORKSPACE_ROOT/logs/ralph-guard.log`。
+- 验证：手动运行 guard 输出 `SYNCED: last_solidify -> run_1780903654364`；随后等待 pending sleep 结束，`/home/wszmd520520/.openclaw/workspace/memory/evolution/cycle_progress.json` 更新为 `pid: 1412`, `phase: evolve.run`, `updated_at: 1781371015264`。
+- 下次做法：排查 Evolver state 时，先用当前 PID 的 `/proc/<pid>/environ` 和 `src/gep/paths.js` 计算 runtime 路径；不要只看 repo 内 `skills/evolver/memory` 的旧状态文件。
+
+---
+
+## [BUG-20260614-001] v6.5 dreaming cron shows ok but never writes dreaming artifacts
+
+**Logged**: 2026-06-14T15:36+08:00
+**Priority**: medium
+**Type**: regression-upstream
+**Affected versions**: OpenClaw v2026.6.5 (and possibly later v6.5.x)
+**Job affected**: `Memory Dreaming Promotion` (id 915fdf31-9fb0-47c1-89fe-8acda039adf2, cron `0 3 * * *`)
+**Symptom**:
+- Cron fires nightly at 03:00, runs ~7 min, ends with `lastRunStatus: ok`, but no new files in `memory/dreaming/{light,rem,deep}/<date>.md`, no new entries in `DREAMS.md`, no `MEMORY.md` append.
+- The `before_agent_reply` hook in `dist/extensions/memory-core/index.js:262` (the only call to `registerShortTermPromotionDreaming(api)`) is **never registered** in the gateway process.
+
+**Root cause (triangulated)**:
+1. The v6.5 bundled plugin layout puts plugin entry points under `dist/extensions/<name>/index.js`. A `grep -RIn "from \".*extensions/memory-core/index" --include='*.js' dist/` over the whole installed `dist/` tree returns **zero importers** for `extensions/memory-core/index.js`. The only way memory-core ever loaded was via the CLI's `AgentSession` `loadExtensions` path (sessions-D4hg9w_o.js:11700), which the gateway process never invokes.
+2. The gateway's runtime import of memory-core (`update-runner-BywxD4AF.js:49` → `dist/extensions/memory-core/runtime-api.js`) loads only the `runtime-api.js` facade module, not the `index.js` that calls `definePluginEntry`/`registerShortTermPromotionDreaming`. The runtime-api exports `auditShortTermPromotionArtifacts`, `repairShortTermPromotionArtifacts`, etc. but **does not register the `before_agent_reply` hook** that drives the dreaming pipeline.
+3. The cron job `915fdf31` is the v6.5 `Memory Dreaming Promotion` managed-cron entry created by the `runShortTermDreamingPromotionIfTriggered` reconcile path. Without the hook, the reconcile never runs, so the `payload.message = "__openclaw_memory_core_short_term_promotion_dream__"` token never gets intercepted; it falls through to the isolated agent as a normal prompt, and the model produces a generic summary that is reported as "ok".
+
+**What works in v6.5 (verified 2026-06-14 15:32-15:36)**:
+- `openclaw memory status --fix` — works (recall store: 512 entries · 8 promoted)
+- `openclaw memory promote --apply --json` — runs but `candidates: []` (no candidates above the default thresholds)
+- `openclaw memory rem-harness --grounded` — works (renders grounded REM preview, prints only)
+- `openclaw memory rem-backfill --path ./memory --stage-short-term` — works (**18 entries written into DREAMS.md, 2 grounded short-term candidates staged**)
+
+**What still does not work (verified 2026-06-14 15:35)**:
+- `memory/dreaming/light/2026-06-14.md` not written
+- `memory/dreaming/rem/2026-06-14.md` not written
+- `memory/dreaming/deep/2026-06-14.md` not written
+- `MEMORY.md` not appended (`applied: 0`)
+
+**Why CLI direct-API calls do not produce light/rem/deep files**:
+- `runDreamingSweepPhases({workspaceDir, pluginConfig, cfg, logger, subagent, ...})` is the entry, but it only writes the per-phase report file if `shouldWriteSeparate(storage)` is true. Default `storage.mode = "separate"` and `shouldWriteSeparate` returns `true` for it — so the call should write the file.
+- However, `runLightDreaming` requires live short-term recall entries via `readShortTermRecallEntries` → `MemoryIndexManager`. In the user-land call (from a non-OpenClaw node process), the recall-store backend is not booted and the entries list resolves to `[]`, so `bodyLines = ["- No strong patterns surfaced."]`. The `writeDailyDreamingPhaseBlock` call still runs but writes a 1-line file that the next check (and the user) tend to miss.
+- More importantly, `resolveMemoryLightDreamingConfig` reads `pluginConfig.dreaming.phases.light.enabled`. The user's `openclaw.json` only sets `memory-lancedb.config.dreaming.enabled = true` (that flag belongs to the **memory-lancedb** sidecar dreaming, not the memory-core dreaming pipeline). `plugins.entries.memory-core.config` is `{}`, so `phases.light.enabled` defaults to `false` and `runDreamingSweepPhases` exits without invoking `runLightDreaming`/`runRemDreaming` at all.
+- The expected config path goes through `api.runtime.state.openKeyedStore("memory-core", ...)` which is set up by the `registerShortTermPromotionDreaming(api)` call in `index.js` — that call is the one that is missing in the gateway process.
+
+**Reproduction**:
+```bash
+ls -la /home/wszmd520520/.openclaw/workspace/memory/dreaming/{light,rem,deep}/2026-06-1{0,1,2,3,4}.md
+# Last mtimes: 2026-06-11 03:00 (then nothing)
+```
+
+**Workaround applied 2026-06-14 15:36**:
+- Added `scripts/dream-runner.sh`: runs the four CLI commands above. Verified: DREAMS.md mtime 15:36:41 (was 04:00:14); `rem-backfill` reported `writtenEntries=18 replacedEntries=0` and `stagedShortTermEntries=2 replacedShortTermEntries=0`.
+- Added `scripts/dream-sweep.mjs`: bypasses CLI and imports dist modules to call `runDreamingSweepPhases` + `applyShortTermPromotions` + `writeDeepDreamingReport` directly. This **also** does not write light/rem/deep files (the same `pluginConfig` problem; even passing the resolved `cfg.plugins.entries.memory-core.config` does not enable phases because that config block is empty).
+- Cron job `Memory Dreaming Promotion` is now **disabled** (`enabled: false`, description `[v6.5 known broken] ...`). Disabling prevents the nightly 7-minute wasted model call and stops the misleading "ok" status.
+
+**Proper fix (not in user control)**:
+- Upstream needs to add a runtime importer of `dist/extensions/memory-core/index.js` (or otherwise re-register `registerShortTermPromotionDreaming` in the gateway plugin-runtime path). The current bundled-loader for memory-core loads only `runtime-api.js` and skips the `index.js` plugin entry.
+- Until that ships, the dreaming artifacts (light/rem/deep reports, MEMORY.md appends) cannot be produced by the v6.5 gateway for users on `plugins.slots.memory != "memory-core"`.
+
+**Lesson**:
+- A cron job that always reports "ok" is a smell. Validate the side effect on disk (mtime check on the expected artifact path) before trusting the status code.
+- When debugging v6.5 plugin regressions, look for `extensions/<name>/index.js` in the dist tree and verify a real importer in the gateway process. If there is none, the plugin's `register(api)` was never called and **no** hook/cron reconcile will fire — even if `plugins.entries` has it enabled.
+- Memory dreams live in two worlds: the CLI surface (`openclaw memory *`) is intact and useful for diagnostics/audit; the gateway-side dreaming hook is what actually writes light/rem/deep artifacts at 03:00, and that hook is broken in v6.5.
+
+---
+
+## [BUG-20260614-002] v6.6 / v6.6.6 / v6.6.7-beta.1 / v6.6.8-beta.1 未修复 dream hook regression
+
+**Logged**: 2026-06-14T15:55+08:00
+**Priority**: high
+**Type**: upstream-not-fixed
+**Refs**: BUG-20260614-001 (the original diagnosis), v6.6.6 changelog, v6.6.7-beta.1 changelog, v2026.6.8-beta.1 changelog
+
+**Question**: does v6.6.x fix the missing plugin entry import that causes `registerShortTermPromotionDreaming` to never fire in the gateway process?
+
+**Method**:
+- `npm view openclaw dist-tags` → latest = `2026.6.6`, beta = `2026.6.7-beta.1`
+- Pulled v6.6.6 tarball from `https://registry.npmjs.org/openclaw/-/openclaw-2026.6.6.tgz`
+- Read release notes for v6.6.6 (github release 338523978), v6.6.7-beta.1 (338942142), v2026.6.8-beta.1 (339054463)
+- Grep for `registerShortTermPromotionDreaming` and `extensions/memory-core/index` in the v6.6.6 dist
+
+**Findings**:
+- v6.6.6 changed file names and split dreaming implementation into a new module (`dreaming-BTtew_Nb.js` instead of `dreaming-BHEVh-OB.js`), but **the plugin entry is still wired the same way**:
+  - `dist/extensions/memory-core/index.js:254` still has `definePluginEntry({ id: "memory-core", ... })`
+  - `dist/extensions/memory-core/index.js:262` still calls `registerShortTermPromotionDreaming(api)`
+  - **`grep -RIn 'extensions/memory-core/index' dist/ --include='*.js'`** in v6.6.6 still returns only one match — the self-region comment at `dist/extensions/memory-core/index.js:114`. **No importer of the plugin entry in the gateway process.**
+- v6.6.6 introduced `memory-core-bundled-runtime-Cw9x8ySm.js` with `configureMemoryCoreDreamingState(...)` (sets the keyed store), but that file is **only imported from `capability-cli-Di_AceEW.js` and `doctor-B9vJA5aF.js`** — neither runs in the gateway plugin entry path. The bundled-runtime loader only loads `api.js` / `runtime-api.js`; it does not load `index.js`.
+- v6.6.6 introduced `resolveDreamingSidecarEngineId(...)` in `loader-Dp13N9qc.js:520` for an in-progress sidecar architecture, but the function only fires when `resolveMemoryDreamingConfig({ pluginConfig, cfg }).enabled` returns true, and that requires the pluginConfig the sidecar is supposed to provide. It is a stub, not an enabled path.
+
+**Changelog scan (none of the v6.6.x changelogs mention this bug)**:
+- v6.6.6 memory fixes: "filtering stale REM recall previews" (#91851), "arm QMD startup maintenance" (#91740)
+- v6.6.7-beta.1 memory fixes: "Codex memory prompts remain registered" (#92350), "QMD startup failures survive fallback errors" (#92218)
+- v2026.6.8-beta.1 memory fixes: "QMD memory search stays available in transient mode" (#92618), "split header-too-large embedding batches" (#92650)
+- None of these touch the `extensions/memory-core/index.js` importer wiring or `registerShortTermPromotionDreaming` registration.
+
+**Conclusion**:
+- **v6.6.6 does NOT fix the bug** introduced in v6.6.5.
+- **v6.6.7-beta.1 and v2026.6.8-beta.1 do NOT mention the bug** in their changelogs and likely do not fix it.
+- The release of memory-lancedb v6.6.5 / v6.6.6 is built around the assumption that the user is on `plugins.slots.memory = "memory-core"` (which loads `extensions/memory-core/index.js` as the slot plugin entry). Users who switched to `memory-lancedb` for the SiliconFlow BAAI/bge-m3 path remain without dreaming hooks.
+- The only working path forward remains: do not use the gateway-side dreaming hook on v6.6.x; rely on the CLI surface (`openclaw memory status --fix`, `promote --apply --json`, `rem-harness --grounded`, `rem-backfill --path ./memory --stage-short-term`).
+
+**Implication for the user**:
+- Stay on v6.6.5 (current). v6.6.6 / v6.6.7 / v6.6.8 will not give back the dreaming artifacts.
+- The dream-runner + dream-sweep workaround already shipped stays relevant.
+- If the user wants upstream attention, file an issue with: (a) the importer grep, (b) the `definePluginEntry` call site, (c) the `registerShortTermPromotionDreaming` definition in `dist/extensions/memory-core/index.js:254-262`, and (d) the `resolveDreamingSidecarEngineId` stub. Reference this BUG ID.
+
+**Lesson**:
+- Reading the dist tree is the fastest way to verify whether a release actually wires a feature, instead of trusting changelog phrasing like "QMD" / "REM" / "memory" for dreaming concerns.
+- The OpenClaw 6.6.x train changes the bundled plugin layout (renamed `loader-tnIwS4tk.js` → `loader-Dp13N9qc.js`, new facade-loader, dynamic-import pattern for manager-runtime) but the **plugin entry import path is still broken** for users not on the memory-core slot.
+
+## [ERR-20260615-001] backup_env_files_with_live_secrets
+
+**Logged**: 2026-06-15T20:04+08:00
+**Priority**: medium
+**Source**: 每周安全审计 cron (1e3fff82)
+
+**发现**: 工作区存在 3 个 `.env.bak.*` 文件，内含当前有效的敏感凭据：
+
+| 文件 | 暴露的凭据 |
+|------|-----------|
+| `.env.bak.baidu-20260609` | FEISHU_APP_SECRET (完整), GEMINI_API_KEY (完整), A2A_NODE_SECRET (完整), A2A_NODE_ID |
+| `.env.bak.fixAtt2-20260608` | FEISHU_APP_SECRET (完整), GEMINI_API_KEY (完整), A2A_NODE_SECRET (部分掩码, 但前缀泄露), A2A_NODE_ID |
+| `.env.bak.preSecretReset-20260608` | FEISHU_APP_SECRET (完整), GEMINI_API_KEY (完整), A2A_NODE_SECRET (完整), A2A_NODE_ID (旧但可能仍有效) |
+
+**风险等级**: 中
+- 权限正确 (600)
+- gitignored (`.env*` 规则覆盖)
+- 但备份文件中含当前仍在使用的凭据，若意外复制/分享到外部则构成泄露
+
+**处理建议**: 清理这些过期的 .env.bak 文件，仅保留最新的 .env（当前活动配置）
+
+## 2026-06-14 — Evolver 状态误判：读了旧 evolution 目录
+- 现象：诊断 Evolver 时先读了 `skills/evolver/memory/evolution/*`，误以为 daemon 停在旧 `cycleCount` / 旧日志。
+- 根因：当前 daemon 通过 `OPENCLAW_WORKSPACE=/home/wszmd520520/.openclaw/workspace` 写入真实状态目录 `workspace/memory/evolution/*`；旧目录 `skills/evolver/memory/evolution/*` 可能残留历史状态。
+- 正确做法：判断 Evolver 健康时优先读取 `/home/wszmd520520/.openclaw/workspace/memory/evolution/cycle_progress.json`、`dormant_hypothesis.json`、`evolution_state.json`，并结合 `/home/wszmd520520/.evolver/settings.json` 中 PID 与 `node src/ops/lifecycle.js status`。不要仅凭 `skills/evolver/logs/evolver_loop.log` 或旧 memory 目录下结论。

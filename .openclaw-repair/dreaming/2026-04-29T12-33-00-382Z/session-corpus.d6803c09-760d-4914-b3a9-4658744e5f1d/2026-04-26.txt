@@ -1,1 +1,0 @@
-[main/sessions/6b111996-66bf-43a1-941a-4de7d7cb1176.jsonl#L5] User: An async command completion event was triggered, but user delivery is disabled for this run. Handle the result internally and reply HEARTBEAT_OK only. Do not mention, summarize, or reuse command output. Current time: Sunday, April 26th, 2026 - 11:13 PM (Asia/Shanghai) / 202

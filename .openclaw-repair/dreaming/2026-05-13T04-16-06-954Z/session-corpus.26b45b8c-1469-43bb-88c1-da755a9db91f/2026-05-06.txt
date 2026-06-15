@@ -1,2 +1,0 @@
-[main/sessions/main/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L2939] User: Continue the OpenClaw runtime event.
-[main/sessions/main/10d41e61-2e83-4b50-b7a6-5589388f0e47.jsonl#L2944] User: 保持现状即可

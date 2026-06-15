@@ -1,2 +1,0 @@
-[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L311] Assistant: Quick heartbeat, check MCP only.
-[main/sessions/9bc84086-ae71-441d-b906-8616ce688a83.jsonl#L418] Assistant: MCP count 0, no issues. HEARTBEAT_OK

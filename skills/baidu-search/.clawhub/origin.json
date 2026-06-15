@@ -3,5 +3,6 @@
   "registry": "https://clawhub.ai",
   "slug": "baidu-search",
   "installedVersion": "1.1.4",
-  "installedAt": 1778146490064
+  "installedAt": 1778146490064,
+  "owner": "ide-rea"
 }

@@ -15,3 +15,19 @@ Thumbs.db
 # Temp
 *.tmp
 *.bak
+
+# Node
+node_modules/
+
+# Runtime logs
+logs/
+*.log
+
+# Temp / repair
+.openclaw-repair/
+.openclaw-install-backups/
+
+# Large generated artifacts
+reports/
+backups/
+state/

@@ -1,7 +1,8 @@
 {
   "version": 1,
-  "registry": "https://cn.clawhub-mirror.com",
+  "registry": "https://clawhub.ai",
   "slug": "answeroverflow",
   "installedVersion": "1.0.2",
-  "installedAt": 1776147209721
+  "installedAt": 1780757782466,
+  "owner": "rhyssullivan"
 }

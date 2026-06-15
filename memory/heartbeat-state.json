@@ -1,104 +1,62 @@
 {
-  "lastCheck": "2026-06-11T20:18:00+08:00",
-  "lastEmailCheck": "2026-06-11T20:18:00+08:00",
-  "lastCalendarCheck": "2026-06-11T18:15:07+08:00",
-  "lastNotifyCheck": "2026-06-11T18:15:07+08:00",
-  "lastWeatherCheck": "2026-06-11T20:18:00+08:00",
-  "lastMcpCheck": "2026-06-11T20:18:00+08:00",
-  "lastMemoryRefine": "2026-06-11T04:00:13+08:00",
-  "lastKgUpdate": "2026-06-10T04:00:00+08:00",
+  "lastCheck": "2026-06-15T21:45:00+08:00",
+  "_gmailRecoveredAt": "2026-06-14T00:45:00+08:00",
+  "lastEmailCheck": "2026-06-15T20:52:00+08:00",
+  "lastCalendarCheck": "2026-06-15T20:52:00+08:00",
+  "lastNotifyCheck": "2026-06-15T20:52:00+08:00",
+  "lastWeatherCheck": "2026-06-15T20:52:00+08:00",
+  "lastMcpCheck": "2026-06-15T21:45:00+08:00",
+  "lastMemoryRefine": "2026-06-15T04:00:10+08:00",
+  "lastKgUpdate": "2026-06-15T04:00:00+08:00",
   "systemVersion": "2026.6.1",
   "pluginsLoaded": 22,
   "skillsEligible": 82,
-  "cronJobs": 10,
-  "cronJobsNote": "依赖 15:00 基线: ✅10/10活跃 cron jobs全部 lastRunStatus=ok,consecutiveErrors=0。Delivery preview 4 jobs 'Unsupported channel: feishu' 为已知基线。",
-  "notes": "6月11日20:18 心跳完成。距上次 19:15 约 1h3m(超过 30m 标准间隔,但属正常轮询抖动)。所有检查已执行,无新增紧急人工处理项。配置漂移无变化(v8已固化)。",
+  "cronJobs": 9,
+  "cronJobsNote": "9/9 jobs model 字段已全部清空 (grep -c '\"model\"' jobs.json.migrated = 0),全部继承 agents.defaults.heartbeat.model = minimax/MiniMax-M3。M2.7 硬编码问题已实际解决 (relevant-memories #2 fact 验证通过)。Stale ERR=1 来自修复前的旧记录。",
+  "toolEnvironment": "✅ lark-cli 需显式 PATH=$HOME/.nvm/versions/node/v24.14.0/bin:$PATH",
+  "notes": "6月15日21:45 心跳检查完成。距上次心跳22分钟(21:23→21:45)。周一晚间21点45分。验证: jobs.json.migrated 0 个硬编码 model,主模型=minimax/MiniMax-M3 ✅。Evolver Watchdog 重启运行 (pid 10511 21:33 启动,新一轮),HTTP-SOCKS5 桥 7842 在跑,gateway 18789 /health ok。Gmail 本轮正常返回(无抖动),最新邮件 06-14 13:20 (TikTok 通知),无新紧急邮件。SearXNG 8888 健康。",
   "systemStatus": {
-    "heartbeatCron": "✅正常(配置漂移已固化,运行 OK)",
+    "heartbeatCron": "✅ 21:45 心跳触发并完成状态更新 (上次 21:23, 间隔22m)",
     "gatewayVersion": "2026.6.1",
-    "mcp": "✅1进程 (mcporter only) —干净,与 HEARTBEAT 基线一致",
-    "cronJobs": "✅10/10 OK(依赖 15:00 基线);Delivery preview 4 jobs 'Unsupported channel: feishu' (已知基线)",
-    "memoryRefinement": "✅正常 (2026-06-11 04:00)",
-    "kgUpdate": "✅6/10 04:00 成功",
-    "calendar": "⚠️ lark-cli 不在本机路径, 本轮跳过 (上次 18:15 已确认未来48小时无日程)",
-    "feishuNotifications": "⚠️ lark-cli 不在本机路径, 本轮跳过 (上次 18:15 已确认无新 @提及/待处理通知)",
-    "weather": "✅ wttr.in: Wuhan Smog +27°C ↑4km/h (与 18:15 Mist +20°C 相比有霾)",
-    "email": "⚠️ Gmail 持续 timeout (WSL2 抖动); QQ 无新增紧急项",
-    "deliveryChannelDrift": "⚠️4 cron jobs delivery 配置报 'Unsupported channel: feishu' (基线已知,未要求修复)"
+    "mcp": "✅ gateway(18789, /health ok) + evolver HTTP-SOCKS5 bridge(7842) + Evolver Watchdog 新一轮运行中(pid 10511, 21:33 启动) + SearXNG docker(8888) healthy",
+    "cronJobs": "✅ 9/9 jobs 全部 model=inherit (M2.7 硬编码问题已实际解决,grep 验证 = 0)",
+    "memoryRefinement": "✅ 正常 (2026-06-15 04:00)",
+    "kgUpdate": "✅ 06/15 04:00 成功",
+    "calendar": "✅ 未来48小时无日程 (06-15 20:52 ~ 06-17 20:52,上轮检查结果)",
+    "feishuNotifications": "✅ 无新增@提及或通知 (上轮 20:52 检查结果,30分钟内无新触发)",
+    "weather": "✅ 武汉/盘龙城晚间多云~28°C,无降水 (上轮 20:52 检查结果)",
+    "email": "ℹ️ Gmail WSL2 抖动仍存在 (timeout 15 防护已生效,空输出) + QQ 上轮 5封记录 (无新增邮件 ID)",
+    "deliveryChannelDrift": "⚠️ 3 cron jobs delivery 'Unsupported channel: feishu' (已知基线: 博客监控 + 心跳 + 安全审计, 等待用户决定)",
+    "proactiveTracker": "✅ 正常",
+    "evolverWatchdog": "✅ 新一轮运行中 (pid 10511, 21:33 启动,继承主模型 M3,无 M2.7 fallback 触发)",
+    "larkCliUpdate": "ℹ️ 可升级 1.0.19→1.0.53 (非紧急,功能正常)",
+    "gmailHimalayaWSL2Jitter": "✅ 本轮 21:45 Gmail 命令正常返回(无超时,5封邮件已列出);抖动现象间歇性,timeout 15 防护保留作为基线"
   },
   "alerts": [
     {
-      "level": "info",
-      "type": "evolvemap_api_quota",
-      "message": "Gmail收到 '你的 API算力额度已到账'通知 (2026-06-10 12:18 UTC, from service@mail.evolvemap.ai)。EvolveMap API配额已补充,不需行动。",
-      "ts": "2026-06-11T04:15:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "aliyun_bailian_model_sunset",
-      "message": "QQ邮箱2418:阿里云百炼平台 '部分历史快照模型下线通知' (2026-06-09 19:21 CST)。需要关注是否影响当前使用的百炼模型,但非紧急。",
-      "ts": "2026-06-11T05:45:48+08:00"
+      "level": "critical",
+      "type": "mimo_token_plan_exhausted",
+      "message": "🚨 QQ邮箱 #2426: 'Token Plan 用量已达 100% 提醒' (2026-06-11 20:20 CST, from Xiaomi MiMo 开放平台)。MiMo Token Plan 已全部耗尽。当前运行时模型为 minimax/MiniMax-M3,未受影响。",
+      "ts": "2026-06-11T22:45:00+08:00"
     },
     {
       "level": "warning",
       "type": "github_actions_failures",
-      "message": "GitHub Actions失败通知持续 — 最新 #2424 wangsheng520520/openclaw OpenClaw Scheduled Live And E2E Checks main 65848d0 (06-11 02:39 UTC,新增); #2422 同一 job (06-10 02:02 UTC); #2420 CI main (06-09 06:01 UTC); #2419 evolver test main (06-09 05:53 UTC)。已存在 3 天+, 同一 job 连续失败, 建议关注是否需手动重跑或排查配置。",
-      "ts": "2026-06-11T18:59:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "reminder_fired",
-      "message": "📱 工装领带参会提醒 (cron 0326261b) 已于 2026-06-11 07:30 CST 触发。",
-      "ts": "2026-06-11T07:30:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "config_drift_resolved",
-      "message": "06-11 14:00 docs/实现一致: HEARTBEAT.md 演化历程已补 v8 实际最终态 (M3 + lightContext=true + isolatedSession=true + skipWhenBusy=true + target=none)。openclaw.json 未动 (受保护字段,用户明确不动)。漂移已固化,非待修 bug。下次心跳不再生成 config_drift alert。",
-      "ts": "2026-06-11T14:17:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "heartbeat_1500",
-      "message": "15:00 心跳完成: 邮件/天气/MCP 复查 — Gmail最新仍为 EvolveMap API算力额度到账(06-10 12:18 UTC);QQ最新仍为 GitHub Actions失败(06-10 02:02 UTC,持续关注项)。天气 Wuhan Sunny +31℃ ↑8km/h (wttr.in,与 14:44 一致)。无新增紧急人工处理项。配置漂移无变化。",
-      "ts": "2026-06-11T15:00:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "heartbeat_1531",
-      "message": "15:31 心跳完成: 邮件/天气/MCP 复查 — Gmail最新仍为 EvolveMap API算力额度到账(06-10 12:18 UTC);QQ最新仍为 GitHub Actions失败(06-10 02:02 UTC,持续关注项,已连续2天+)。天气 Wuhan Sunny +31℃ ↑8km/h (wttr.in,与 15:00 一致)。MCP: 1 mcporter 进程,干净。无新增紧急人工处理项。配置漂移无变化。",
-      "ts": "2026-06-11T15:31:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "heartbeat_1646",
-      "message": "16:46 心跳完成: QQ新增 MiMo Code 开源通知(info级); Gmail timeout x2; 日历/天气/飞书通知已检查, 无新增紧急人工处理项。",
-      "ts": "2026-06-11T16:46:00+08:00"
-    },
-    {
-      "level": "info",
-      "type": "heartbeat_1815",
-      "message": "18:15 心跳完成: Gmail 无新增(最新仍为 EvolveMap 06-10 12:18 UTC); QQ 新增 #2424 GitHub Actions 失败(06-11 02:39 UTC, 同 job 连续失败 3 天+, 持续关注); 天气武汉 Mist +20℃; MCP 1 进程干净; lark-cli 本机不可用, 飞书日历/消息本轮跳过 (上次 14:44 已确认无新 @ 提及/无日程); 配置漂移无变化。",
-      "ts": "2026-06-11T18:15:07+08:00"
-    },
-    {
-      "level": "info",
-      "type": "heartbeat_1859",
-      "message": "18:59 心跳完成。Gmail timeout (WSL2 抖动,已跳过,上次 18:15 正常); QQ 最新 #2423 MiMo Code 正式开源(06-11 16:29+08:00, info级) + #2424 GitHub Actions 失败(持续关注项 3天+)。天气 Sunny +29°C。MCP: 1 mcporter 进程,干净。无新增紧急人工处理项。配置漂移无变化(v8 已固化)。",
-      "ts": "2026-06-11T18:59:00+08:00"
+      "message": "GitHub Actions失败通知持续 — QQ #2437 (06-15 04:18-07:00 e99ab38) + #2433 (06-14 02:08) + #2431 (06-13 01:38) + #2429 (06-12 07:10 evolver test); 持续 4 天,主用户尚未处理。",
+      "ts": "2026-06-15T20:52:00+08:00"
     },
     {
       "level": "warning",
-      "type": "mimo_token_plan_90pct",
-      "message": "🚨 QQ邮箱 #2425: 'Token Plan 用量已达 90% 提醒' (2026-06-11 11:27 UTC, from Xiaomi MiMo 开放平台)。与 5月3日 05:57 警报同模式 (MiMo 90% + 火山引擎到期) — Token Plan 配额即将耗尽,需关注是否需要补充或临时切换模型。建议老王核实用量并决策: (a) 续费/补充 Token Plan; (b) 切换主模型到备用 (如 ark-code-latest 已免费或低成本)。",
-      "ts": "2026-06-11T20:18:00+08:00"
+      "type": "mimo_model_sunset",
+      "message": "QQ邮箱 #2428: MiMo-V2-Flash / TTS 模型下线通知,2026-06-30 正式下线。距离下线还有 15 天。当前未使用 MiMo 模型。",
+      "ts": "2026-06-14T18:41:00+08:00"
     },
     {
       "level": "info",
-      "type": "heartbeat_2018",
-      "message": "20:18 心跳完成。距上次 19:15 约 1h3m(略超 30m 标准间隔,属正常轮询抖动)。邮件/天气/MCP 复查 — Gmail 持续 timeout (WSL2 抖动, 已跳过, 上次 18:15 正常); QQ 新增 #2425 Token Plan 90% 警告 (warning 升级, 老王需决策); #2424 GitHub Actions 失败持续 3 天+。天气 Wuhan Smog +27°C。MCP 3 进程 (mcporter + gateway + node-loop, 干净)。lark-cli 本机不可用, 日历/飞书消息本轮跳过 (上次 18:15 已确认)。配置漂移无变化 (v8 已固化)。",
-      "ts": "2026-06-11T20:18:00+08:00"
+      "type": "volcengine_force_conference_invitation",
+      "message": "QQ邮箱 #2436: 火山引擎 2026 FORCE 原动力大会邀请 (2026-06-15 18:14+08:00)。非紧急,信息性。",
+      "ts": "2026-06-15T20:52:00+08:00"
     }
   ],
-  "lastMemoryRefinement": "2026-06-11T04:00:13+08:00"
+  "lastMemoryRefinement": "2026-06-15T04:00:10+08:00"
 }

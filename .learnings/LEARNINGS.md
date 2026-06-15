@@ -732,3 +732,90 @@ Using **using-superpowers** to correct the workflow miss and align the next-turn
 - 不把它升级成 AGENTS.md / SOUL.md 的硬性 self-check 协议（用户已明确禁止）。
 - 但在实际对话中，把它作为当前用户偏好的可见开场风格执行。
 - 复杂任务可追加第二个技能说明，但第一入口仍应先清楚呈现 using-superpowers。
+
+## 2026-06-11 — 完美最佳实践对账方案 C 落地 (4 commits)
+
+**情境**: 老王要求用 using-superpowers 完美模板跑"对齐 OpenClaw 官方 v2026.6.5 文档的上下文与记忆系统梳理"。
+
+**操作**:
+1. 备份 → `/tmp/workspace-backup-20260611-204016/` (BOOTSTRAP.md, .gitignore, skills-lock.json, openclaw.json)
+2. 3 个 git commits 清理 137 文件 (-33791 行):
+   - `f02f003` 5 层架构 + 6 个 bootstrap 文件同步到 06-11
+   - `f049331` 删 .openclaw-repair/ 旧 dreaming session-corpus (Evolver 04-14~04-17)
+   - `0d8e225` 删过期 reports (MODEL-CONFIG/ada-personality-eval)
+3. 新建 `BOOT.md` (135 行, 4 项 gateway restart 检查) — 官方 `agent-workspace.md` 推荐
+4. 更新 `BOOTSTRAP.md` 标注 06-11 方案 C 落地 (关键日期 + 文件结构表)
+5. 第 4 commit: `06e660f` (BOOT.md + BOOTSTRAP.md)
+
+**经验**:
+- ✅ **深读官方文档优先于 "我以为"**: 之前不知道 `BOOT.md` 是官方推荐文件，agent-workspace.md 一查就明白
+- ✅ **jq 不存在 → 改 python**: WSL2 默认无 jq, BOOT.md 检查 1 必须用 `python3 -c "import json;..."`
+- ✅ **XDG_RUNTIME_DIR**: openclaw-gateway 是 user-level systemd, journalctl 必须先 `export XDG_RUNTIME_DIR="/run/user/$(id -u)"` 再用 `--user`
+- ✅ **submodule 损坏时不要 `git add -A`**: 之前 skills/evolver 子模块内部 git 损坏, 改用 `git add <specific files>` 避开
+- ✅ **.migrated 文件是真实数据**: 06-11 03:00 memory-lancedb migration 把文件 rename 加 .migrated 后缀, 不能误删
+- ✅ **3 轮实测**才稳: BOOT.md 检查 1→2→3 逐步修复 (jq→python, journal→user-journal, baseline 1→2)
+- ⚠️ **未启用 boot-md hook**: 06-10 锁定"重启 gateway 是最后手段" + WSL2 + bonjour 经验 → 保持 reference-only, 手动 `bash <BOOT.md sections>` 执行
+
+**可复用**: 
+- 对齐流程: 备份 → 清点 → 对比 → 补齐 → 验证 (5 步)
+- 验证清单: alignment-check 13/13 + 8/8 bootstrap files + 4/4 health checks + openclaw doctor
+- 文档: `/tmp/workspace-backup-20260611-204016/` 完整保留 4 份关键文件
+
+
+## 2026-06-11 21:10 — boot-md hook 启用 + 验证成功 (4/4 ✅)
+
+**情境**: 老王说"启用 boot-md hook"。先在 gateway 启动时跑 BOOT.md 4 项检查。
+
+**操作**:
+1. 备份 openclaw.json → `/tmp/openclaw.json.bak.pre-boot-md-20260611-205946`
+2. `openclaw hooks enable boot-md` → openclaw.json 加 `"boot-md": {"enabled": true}`
+3. `openclaw hooks info boot-md` → "🚀 boot-md ✓ Ready" (确认 hook 注册成功)
+4. `systemctl --user restart openclaw-gateway` → PID 65378→75102, 35s downtime
+5. 查 journal 发现 `[agent/embedded] ... sessionKey=agent:main:boot` + boot session transcript
+6. 4 项检查实际跑: ✅ ✅ ✅ ⚠️ (检查 4 长稳态)
+7. **发现问题**: ⚠️ 触发飞书告警 → 06-11 21:10 修复 BOOT.md (长稳态 fallback) → 重测 4/4 ✅
+
+**boot session transcript 行为** (19 行, 28404 字节):
+```
+ASSISTANT: Using [using-superpowers](SKILL.md) to enforce the required skill-check discipline before running BOOT.md.
+ASSISTANT: Using BOOT.md to run the four startup health checks in order.
+[执行 BOOT.md 4 项]
+TOOLRESULT: ✅ 检查 1 heartbeat fresh (47 min)
+TOOLRESULT: ✅ 检查 2 alignment 13/13
+TOOLRESULT: ✅ 检查 3 doctor 警告 2 块
+TOOLRESULT: ⚠️ 检查 4 feishu (长稳态, last start 24h内)
+ASSISTANT: NO_REPLY
+```
+
+**关键经验**:
+- ✅ **`openclaw hooks enable` 走 hot reload** — gateway PID 不变, 但 hook 已注册到 entries. 
+- ✅ **boot session 真的启动** — 看到 `agent:main:boot` sessionKey, 19 行 transcript
+- ✅ **使用 using-superpowers** — boot agent 也走 skill-check 纪律 (read using-superpowers/SKILL.md 一次)
+- ✅ **使用 NO_REPLY** — handler 设计的 silent reply (4 项都过 / 不发到主对话)
+- ⚠️ **race condition 必修**: 检查 4 "5s 内 ready" 不对, 因为 boot hook 跑在 feishu 启动前 (06-11 21:04:22 hook start vs 21:04:08 feishu WS start — 实际是 hook 之前 feishu 启动先完成, 但 boot agent 处理 BOOT.md 的 prompt 还要 30s+, 期间 feishu "最近 30s" 已经是 21:04 之后)
+- ⚠️ **不要在 BOOT.md 异常处理里对长稳态告警** — 那样每次 restart 都飞书噪音
+- ⚠️ **gateway 启动 → feishu WS 启动需要 5-8s** (06-11 多次实测: 17:28:24, 17:30:52, 18:00:12, 18:19:09, 21:04:08)
+- ⚠️ **journalctl 必须 `export XDG_RUNTIME_DIR=/run/user/$(id -u)` + `--user`** (user-level systemd)
+
+**可复用**:
+- 验证 hook 工作: 查 journal 看 `sessionKey=agent:main:boot` + boot-* session transcript
+- 验证 BOOT.md 跑通: cat ~/.openclaw/agents/main/sessions/boot-*.jsonl 找 NO_REPLY
+- 长稳态 fallback 设计: "30s 内启动 OR 24h 内有启动记录"
+
+**备份位置**:
+- `/tmp/openclaw.json.bak.pre-boot-md-20260611-205946` (hook enable 前)
+- boot session: `~/.openclaw/agents/main/sessions/boot-2026-06-11_13-04-22-847-e91e550b.jsonl`
+
+## 2026-06-13 - Repeated using-superpowers discipline violation
+
+- Category: correction
+- What happened: User again corrected me: “你又没有启用使用超能力技能”. In the previous port-correction turn I did announce and read `receiving-code-review` / `systematic-debugging`, but I skipped the mandatory first `using-superpowers` skill invocation required by AGENTS.md for every user message.
+- Do differently: For every user message, first announce and load `using-superpowers` before any secondary skill, tool use, or substantive reply. Then chain task-specific skills such as `receiving-code-review`, `systematic-debugging`, or `verification-before-completion`.
+
+## 2026-06-14 - memory_search provider identity drift can require both reindex and Gateway refresh
+
+- Category: best_practice
+- Context: Built-in `memory_search` reported `index was built for provider openai, expected openai-compatible` after config/provider normalization.
+- What happened: `openclaw memory index --force --agent main` rebuilt the SQLite vector index. The command was silent for ~15 minutes and exited via timeout 124, but `openclaw memory status --index --agent main` later showed `Memory index complete`, `Dirty: no`, `Provider: openai-compatible`, `Vector dims: 1024`. CLI search worked immediately, while the OpenClaw tool-layer `memory_search` still had stale identity until Gateway refresh.
+- Do differently: For provider identity drift, run official reindex with a long timeout, then verify with `openclaw memory status --index --agent main` and CLI search. If tool-layer recall still reports old identity, refresh/restart Gateway and verify `memory_search` tool output directly before claiming completion.
+- Extra caution: Reindex may leave `main.sqlite.tmp-*` candidates after interrupted/timeout runs; do not delete them without explicit user approval and a current backup.
