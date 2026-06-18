@@ -753,3 +753,57 @@ ls -la /home/wszmd520520/.openclaw/workspace/memory/dreaming/{light,rem,deep}/20
 - 现象：诊断 Evolver 时先读了 `skills/evolver/memory/evolution/*`，误以为 daemon 停在旧 `cycleCount` / 旧日志。
 - 根因：当前 daemon 通过 `OPENCLAW_WORKSPACE=/home/wszmd520520/.openclaw/workspace` 写入真实状态目录 `workspace/memory/evolution/*`；旧目录 `skills/evolver/memory/evolution/*` 可能残留历史状态。
 - 正确做法：判断 Evolver 健康时优先读取 `/home/wszmd520520/.openclaw/workspace/memory/evolution/cycle_progress.json`、`dormant_hypothesis.json`、`evolution_state.json`，并结合 `/home/wszmd520520/.evolver/settings.json` 中 PID 与 `node src/ops/lifecycle.js status`。不要仅凭 `skills/evolver/logs/evolver_loop.log` 或旧 memory 目录下结论。
+
+## 2026-06-18 — Evolver Watchdog `set -e` 预检误杀启动分支
+
+- **现象**: Evolver cron `Evolver Watchdog` 显示 lastRunStatus=ok，但 diagnostics 有 `bash ~/.openclaw/workspace/scripts/evolver-watchdog.sh failed`；实际 19820 端口未监听，`node src/ops/lifecycle.js status` 返回 `{ running:false }`，`evolution_state.json` 仍写 `status: running` 但 lastRun 停在 2026-06-17 22:12。
+- **根因**: `scripts/evolver-watchdog.sh` 开头 `set -e`，新增预检写成 `EVOLVER_STATUS=$(_check_evolver_alive)`；当 daemon 未运行时函数返回 1，脚本在赋值处直接退出，永远到不了 `case DOWN -> 启动` 分支。
+- **修复**: 改为 `EVOLVER_STATUS=$(_check_evolver_alive || true)`，保留 DOWN 文本并继续执行分支；手动验证后 daemon 恢复，19820 LISTEN，Hub `hello OK` + `Heartbeat Registered with hub`。
+- **教训**: Bash 中 `set -e` 会让失败的 command substitution/赋值提前中断脚本。任何“检查函数允许失败并返回状态文本”的写法都必须 `|| true` 或临时 `set +e`。
+- **验证命令**:
+  - `timeout 20 bash scripts/evolver-watchdog.sh` 在 daemon 已运行时输出 `OK (precheck: ALIVE_PORT:401)` 且退出 0。
+  - `ss -tlnp | grep 127.0.0.1:19820`
+  - `node src/ops/lifecycle.js status`
+
+## 2026-06-18 — Evolver 归一化整理中的宽泛 pgrep 误匹配
+
+- **现象**: 暂停 Evolver 时使用 `pgrep -f 'node.*index.js.*--loop|bash .*evolver-watchdog.sh'`，匹配到了当前检查命令自己的 shell，导致检查 shell 被 SIGKILL。
+- **影响**: 实际 Evolver daemon/watchdog 已停止成功，HTTP CONNECT 桥未受影响；后续用精确端口/CWD 校验继续完成 v1.89.13 归一化。
+- **教训**: 管理 Evolver 进程时不要用宽泛 `pgrep -f` 直接 kill。应优先用端口、PID 文件、`/proc/$pid/cwd` 和精确 cmdline 二次确认，并排除当前 shell/exec 命令。
+- **更安全方式**: 枚举 PID 后检查 `cwd == ~/.openclaw/workspace/skills/evolver` 且 `cmd == node index.js --loop`，只杀该 PID；watchdog 同理检查脚本路径而非整段当前 shell。
+
+---
+
+## [ERR-20260618-006] using-superpowers_skill_announced_but_not_enforced_5_violations
+
+**Logged**: 2026-06-18T20:32:00+08:00
+**Priority**: high
+**Type**: discipline-failure (meta-skill)
+
+### 现象
+- 收到用户消息后，直接执行 `exec/read/write/memory_*`，从未在第一动作就宣告 `Using [skill] to [purpose]`
+- 5 次违反：2026-05-23, 05-27, 06-03, 06-09, 06-18
+- 每次用户问"是不是又忘了启用"，我都会回应"是的"，但**没有结构性修复**
+- 知识灌输式纠正（读 100 次 SKILL.md）无效
+
+### 根因
+- "宣告" 被当作**输出后缀**而非**思维第一动作**
+- 没有 update_plan 强制位
+- 没有运行时钩子验证合规
+- 没有 dreaming trigger 把关键字转为强制重读
+
+### 修复（三层并发，2026-06-18 20:32 实施）
+1. **人格层**: AGENTS.md 写"第零定律"硬性规则 + 历史违反记录（不可重蹈）
+2. **脚本层**: `scripts/skill-preflight.sh` 提供 `skill_preflight_check` / `self_audit` / `dreaming_trigger` 三个函数
+3. **Dreaming 触发器**: 任何含 "using-superpowers"/"硬性规则"/"宣告 Using" 文本，强制提醒重读 SKILL.md
+
+### 验证
+- 2026-06-18 20:25 重新检查：`openclaw skills check` 显示 using-superpowers ✓ ready, Visible to model=true
+- 技能一直开着，是我不遵守
+- 验证脚本：执行 `skill-preflight.sh "帮我设计 X"` 应返回 brainstorming 候选
+- 验证脚本：执行 `skill-preflight.sh --audit "Using X to Y"` 应返回 ✅ 合规
+
+### 教训
+- 技能加载 ≠ 技能被遵守
+- "知识灌输式纠正"对**纪律性技能**无效，必须用结构化运行时钩子
+- 用户指令"重新检查"应理解为"用 fresh tools 验证，不要凭印象"——按此执行验证脚本路径
