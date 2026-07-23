@@ -494,5 +494,37 @@ bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> --restore
 **Hub 完整文档**：`https://evomap.ai/a2a/skill?topic=publish` + `topic=structure` + `topic=envelope`。Hub 错误响应都会给 `correction.fix` 与 `example`，错误信息结构清晰。
 
 **同步客户端期望**：`node index.js sync --scope=published` 可能显示 `published: 0`（listing 索引未及时更新），但 `/a2a/skill/store/{asset_id}/download` 返回 401 是**真存**的证明。
+
+### 🧬 2026-07-23 第二次 publish：语义正确的 dependency-scanner 资产（从零手构 Gene+Capsule）
+
+**背景**：第一次 publish 的 `capsule_1784811443658` 是借 daemon 的 `gene_gep_optimize_tool_usage` 语义固化出来的——diff 对（漏洞扫描器代码），但 summary/trigger/gene 全是“工具使用优化 + 微信文章提取”的标签——**贴错标签**。老王在 evomap.ai/account/assets 手动下架，重新发布语义正确的 `gene_dependency_vulnerability_scan` + `capsule_dependency_vulnerability_scan`。
+
+**最终结果**：`published-by-me page 1: 2 (total 2)` —— 两个语义正确资产已在 Hub 账户名下（bundle_705c8e17d15fa34e，status=accepted）。
+
+**手构 Gene+Capsule 的四个关键字段陷阱**（逐轮 Hub 反馈撞出）：
+
+1. **Gene 必须有 `summary`（字符串）+ `constraints`（object 非 array）**。参照能过的 gene：`constraints: {"max_files": 3, "forbidden_paths": [...]}`。缺 summary → `invalid_type expected string`；constraints 写成 array → `expected object`。
+
+2. **`schema_version` 必须 = 当前 SCHEMA_VERSION（实测 1.8.0，非旧文档写的 1.6.0）**。用 `require('./src/gep/contentHash').SCHEMA_VERSION` 取真值。它是 canonical hash 的一部分。
+
+3. **`epigenetic_marks` / `learning_history` 不能是空数组**——这是 `gene_asset_id_verification_failed` 的**真正根因**！空 `[]` 时 Hub 端 canonical hash 与客户端 `computeAssetId` 结果不一致（尽管本地 `verifyAssetId` 自测通过）。解决：镜像一个能过的 gene 的非空 `learning_history`/`epigenetic_marks` 结构。`epigenetic_marks` 是 **array**（不是 object），元素形如 `{context,boost,reason,created_at}`。
+
+4. **Capsule 的 `gene` 字段引 gene_id 字符串（如 `gene_dependency_vulnerability_scan`），不是 Gene 的 sha256 asset_id**。对照组：optimize gene 的 capsule `gene->gene_gep_optimize_tool_usage`（字符串）被 Hub 接受。
+
+**asset_id 算法验证**：客户端 `computeAssetId` 与 Hub 文档的 canonical（sort keys + sha256）**一致**（实测 optimize gene 两者 hash 相等）。不用自己 sort keys，直接 `require('./src/gep/contentHash').computeAssetId(asset)` 算。每改一个字段都要 `delete asset.asset_id` 后重算。
+
+**构造新资产的正确姿势**（node 脚本）：
+```js
+const ch = require('./src/gep/contentHash');
+// Gene: 镜像一个能过的 gene 的完整字段集（type,id,category,signals_match,preconditions,
+//   strategy,constraints{object},validation,summary,schema_version,routing_hint,
+//   learning_history[非空],epigenetic_marks[非空]）
+gene.schema_version = ch.SCHEMA_VERSION;
+delete gene.asset_id; gene.asset_id = ch.computeAssetId(gene);
+// Capsule: gene 引 gene_id 字符串
+capsule.gene = 'gene_xxx';
+delete capsule.asset_id; capsule.asset_id = ch.computeAssetId(capsule);
+```
+然后 `bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> --dry-run` 验证 `valid:true, dry_run:true`，再去 --dry-run 真发。
 - 排查身份类问题：`grep` 全盘找某个 id 若无文件命中，说明它是**运行进程内存里的陈旧值**（systemctl show 读的是进程环境快照，非文件）。
 - ⚠️ `pkill -f "index.js --loop"` 会误杀含该字样的自身 shell 命令，用 `ps -eo pid,args | grep 'node.*index.js --loop' | grep -v bash` 精确取 PID。
