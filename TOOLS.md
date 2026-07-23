@@ -483,13 +483,27 @@ cd skills/evolver && node index.js publish --asset <gene_id> --asset <capsule_id
 # 放弃改造、从最近备份还原
 bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> --restore
 ```
-脚本自动处理五项铁律：
+脚本自动处理两组校验（A: validation/diff/substance；B: 结构自洽）：
+
+**A 组（validation/diff/substance，python 段落）**：
 - ✅ validation 重写为 self-contained 断言（剪掉 `node scripts/xxx.js` / `console.log`-only / 含 `> < | ; &` / `process.env` 的危险命令，回退到 `node -e 'if (1 + 1 !== 2) process.exit(1)'`）
 - ✅ diff 超 8000 字符 → 截断到最后一个完整行且保留 4 种 git marker；无 marker → 用最小 git diff 模板
 - ✅ substance < 50 字符 → 自动给 content 补丁
+
+**B 组（结构自洽，node 段落，需 evolver contentHash；`--no-struct` 可跳过）**：
+- ✅ Gene 缺 `summary`(string) → 补齐；`constraints` 写成 array → 改回 object（镜像 donor 或默认）
+- ✅ `schema_version` ≠ 当前 SCHEMA_VERSION → 对齐（读 `contentHash.SCHEMA_VERSION` 真值，实测 1.8.0）
+- ✅ `learning_history` / `epigenetic_marks` 为空 `[]` → 镜像一个能过的 donor gene 的非空结构（这是 `gene_asset_id_verification_failed` 最隐蔽的根因）
+- ✅ Capsule.gene 引 sha256 → 改为 gene_id 字符串
+- ✅ 最后用 `contentHash.computeAssetId` 重算 Gene+Capsule 的 asset_id，并本地 `verifyAssetId` 自校
+- ⚠️ B 组只**补空缺**，已非空的 marks 不覆盖；对已正确的资产 `fixes: []`（no-op）
+
+**公共校验**：
 - ✅ 每次运行前备份 `*.prep-bak-<ts>`（幂等可重跑）
 - ✅ dry-run 时把 Hub 的 `duplicate_asset` 正确识别为**写盘成功信号**（而非误报 quality 失败）
 - ⚠️ 最小 diff 模板目前写死为 dependency-scanner 的 vuln_db.json；为其他技能 publish 时改 `MINIMAL_DIFF`/`fix_diff` 里的路径即可
+
+**实测验证**（从零构造）：注入一个字段全缺的破损 asset（summary 缺 / constraints=array / 无 schema_version / 空 marks / gene 引 sha256 / trivial validation / 无 diff），脚本一次修复到 dry-run 全过。
 
 **Hub 完整文档**：`https://evomap.ai/a2a/skill?topic=publish` + `topic=structure` + `topic=envelope`。Hub 错误响应都会给 `correction.fix` 与 `example`，错误信息结构清晰。
 

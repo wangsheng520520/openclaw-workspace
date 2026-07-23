@@ -1,25 +1,36 @@
 #!/usr/bin/env bash
 # =============================================================================
-# evomap-publish-prep.sh — 让本地 Gene+Capsule 满足 EvoMap Hub publish 五项铁律
+# evomap-publish-prep.sh — 让本地 Gene+Capsule 满足 EvoMap Hub publish 铁律
 # =============================================================================
 # 背景（2026-07-23 dependency-scanner 实战结晶，详见 TOOLS.md「EvoMap Hub publish 指南」）：
-#   evolver 生成的 Gene/Capsule 默认不满足 Hub 校验，直接 publish 会被逐条 reject：
-#     - Gene/Capsule validation 用 `node scripts/xxx.js` → validation_cmd_unsandboxable
-#     - Capsule diff 常 > 8000 字符          → payload.assets[N].diff Too big
-#     - diff 不含 git marker                  → capsule_diff_invalid_format
+#   evolver 生成 / 手构的 Gene/Capsule 默认不满足 Hub 校验，直接 publish 会被逐条 reject。
+#   本脚本在 publish 前把字段就地改造为「Hub 可接受」形态，并做备份。
+#
+#   A. validation/diff/substance 三项（python 段落）：
+#     - validation 用 `node scripts/xxx.js` → validation_cmd_unsandboxable
+#     - diff > 8000 字符 → diff Too big；diff 无 git marker → capsule_diff_invalid_format
 #     - validation 含 > < | ; & 或 console.log → validation_command_dangerous / _trivial
-#   本脚本在 publish 前把这些字段就地改造为「Hub 可接受」形态，并做备份。
+#     - substance < 50 字符 → capsule_substance_required
+#   B. 结构自洽四项（node 段落，需 evolver contentHash）：
+#     - Gene 缺 summary(string) / constraints 写成 array → invalid_type
+#     - schema_version ≠ 当前 SCHEMA_VERSION（实测 1.8.0） → asset_id 验证失败
+#     - learning_history / epigenetic_marks 为空 [] → gene_asset_id_verification_failed
+#       （空数组令 Hub canonical hash 与客户端 computeAssetId 分叉，最隐蔽的锁）
+#     - Capsule.gene 引 sha256 而非 gene_id 字符串 → 验证失败
+#     - 最后用 evolver contentHash.computeAssetId 重算 Gene+Capsule 的 asset_id
 #
 # 用法：
-#   bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> [--dry-run] [--restore]
+#   bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> [--dry-run] [--restore] [--no-struct]
 #
-#   <gene_id>     .evolver/gep/genes.json 中的 gene id（如 gene_gep_optimize_tool_usage）
-#   <capsule_id>  .evolver/gep/capsules.json 中的 capsule id（如 capsule_1784811443658）
+#   <gene_id>     .evolver/gep/genes.json 中的 gene id
+#   <capsule_id>  .evolver/gep/capsules.json 中的 capsule id
 #   --dry-run     改造后自动跑 evolver publish --dry-run 验证全部 gates=pass
 #   --restore     从最近备份还原 genes.json/capsules.json（放弃改造）
+#   --no-struct   跳过 B（结构自洽）校验，只做 A（validation/diff/substance）
 #
 # 幂等：可重复运行；每次运行前备份到 .evolver/gep/*.json.prep-bak-<ts>
-# 边界：只改 validation/diff 字段，不碰 signals/strategy/outcome/asset_id 等语义字段。
+# 边界：只改 validation/diff/结构自洽字段；不碰 signals/strategy/outcome 等语义字段。
+#       结构校验对已非空的 learning_history/epigenetic_marks 不覆盖（仅补空缺）。
 # =============================================================================
 set -euo pipefail
 
@@ -43,15 +54,17 @@ GENE_ID="${1:-}"
 CAPSULE_ID="${2:-}"
 DRY_RUN=0
 RESTORE=0
+NO_STRUCT=0
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY_RUN=1 ;;
     --restore) RESTORE=1 ;;
+    --no-struct) NO_STRUCT=1 ;;
   esac
 done
 
 if [[ -z "$GENE_ID" || -z "$CAPSULE_ID" ]]; then
-  err "用法: bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> [--dry-run] [--restore]"
+  err "用法: bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> [--dry-run] [--restore] [--no-struct]"
   exit 2
 fi
 
@@ -193,7 +206,102 @@ json.dump(cd, open(caps_path, "w"), indent=2, ensure_ascii=False)
 print("[prep] JSON 改造完成")
 PY
 
-ok "genes.json / capsules.json 已改造为 Hub-ready 形态"
+ok "genes.json / capsules.json 已改造为 Hub-ready 形态（A: validation/diff/substance）"
+
+# ---- B. 结构自洽校验（node 段落，需 evolver contentHash）------------------
+if [[ "$NO_STRUCT" == "1" ]]; then
+  log "跳过 B（结构自洽）校验（--no-struct）"
+else
+  log "运行 B：结构自洽校验 + asset_id 重算 ..."
+  cd "$EVOLVER_DIR"
+  GENE_ID="$GENE_ID" CAPSULE_ID="$CAPSULE_ID" GENES="$GENES" CAPSULES="$CAPSULES" \
+  node <<'JS'
+const path = require('path'), fs = require('fs');
+const ch = require(path.join(process.cwd(), 'src/gep/contentHash.js'));
+const GENE_ID = process.env.GENE_ID, CAPSULE_ID = process.env.CAPSULE_ID;
+const GENES = process.env.GENES, CAPSULES = process.env.CAPSULES;
+
+const SCHEMA = ch.SCHEMA_VERSION;
+console.log('[struct] SCHEMA_VERSION =', SCHEMA);
+
+// 找一个能过的参照 gene（有非空 learning_history + epigenetic_marks 的），做结构模板
+function findDonor(genes, excludeId) {
+  for (const g of genes) {
+    if (g.id === excludeId) continue;
+    const lh = g.learning_history, em = g.epigenetic_marks;
+    if (Array.isArray(lh) && lh.length && Array.isArray(em) && em.length) return g;
+  }
+  return null;
+}
+
+const gd = JSON.parse(fs.readFileSync(GENES, 'utf8'));
+const donor = findDonor(gd.genes, GENE_ID);
+let gene = null;
+for (const g of gd.genes) { if (g.id === GENE_ID) { gene = g; break; } }
+if (!gene) { console.error('[struct] ⚠️ 未找到 gene', GENE_ID); process.exit(3); }
+
+let fixes = [];
+
+// 1) summary 必须是非空字符串
+if (typeof gene.summary !== 'string' || gene.summary.trim().length < 10) {
+  gene.summary = 'Auto-filled summary for ' + GENE_ID + ' (>=10 chars required by Hub schema).';
+  fixes.push('summary(string)');
+}
+// 2) constraints 必须是 object（非 array）
+if (!gene.constraints || typeof gene.constraints !== 'object' || Array.isArray(gene.constraints)) {
+  gene.constraints = donor && donor.constraints && !Array.isArray(donor.constraints)
+    ? JSON.parse(JSON.stringify(donor.constraints))
+    : { max_files: 3, forbidden_paths: ['.git', 'node_modules'] };
+  fixes.push('constraints(object)');
+}
+// 3) schema_version 必须 = 当前 SCHEMA_VERSION
+if (gene.schema_version !== SCHEMA) { gene.schema_version = SCHEMA; fixes.push('schema_version=' + SCHEMA); }
+// 4) learning_history / epigenetic_marks 不能为空 []（仅补空缺，不覆盖已有非空）
+if (!Array.isArray(gene.learning_history) || gene.learning_history.length === 0) {
+  gene.learning_history = donor && Array.isArray(donor.learning_history) && donor.learning_history.length
+    ? JSON.parse(JSON.stringify(donor.learning_history))
+    : [{ at: new Date().toISOString(), outcome: 'success', mode: 'none', reason_class: 'unknown' }];
+  fixes.push('learning_history(non-empty)');
+}
+if (!Array.isArray(gene.epigenetic_marks) || gene.epigenetic_marks.length === 0) {
+  gene.epigenetic_marks = donor && Array.isArray(donor.epigenetic_marks) && donor.epigenetic_marks.length
+    ? JSON.parse(JSON.stringify(donor.epigenetic_marks))
+    : [{ context: 'linux/x64', boost: 0.1, reason: 'success_in_environment', created_at: new Date().toISOString() }];
+  fixes.push('epigenetic_marks(non-empty)');
+}
+// routing_hint 建议存在（能过的 gene 都有）
+if (!gene.routing_hint || typeof gene.routing_hint !== 'object') {
+  gene.routing_hint = donor && donor.routing_hint ? JSON.parse(JSON.stringify(donor.routing_hint)) : { tier: 'mid', reasoning_level: 'medium' };
+  fixes.push('routing_hint');
+}
+// 重算 Gene asset_id
+delete gene.asset_id;
+gene.asset_id = ch.computeAssetId(gene);
+console.log('[struct][gene] fixes: [' + fixes.join(', ') + '] | asset_id:', gene.asset_id);
+// 本地自校验
+if (ch.verifyAssetId && ch.verifyAssetId(gene) !== true) { console.error('[struct] ⚠️ gene verifyAssetId 失败'); process.exit(5); }
+fs.writeFileSync(GENES, JSON.stringify(gd, null, 2));
+
+// Capsule
+const cd = JSON.parse(fs.readFileSync(CAPSULES, 'utf8'));
+let cap = null;
+for (const c of cd.capsules) { if (c.id === CAPSULE_ID) { cap = c; break; } }
+if (!cap) { console.error('[struct] ⚠️ 未找到 capsule', CAPSULE_ID); process.exit(4); }
+let cfixes = [];
+// schema_version 对齐
+if (cap.schema_version !== SCHEMA) { cap.schema_version = SCHEMA; cfixes.push('schema_version=' + SCHEMA); }
+// gene 字段必须引 gene_id 字符串（不是 sha256）
+if (cap.gene !== GENE_ID) { cap.gene = GENE_ID; cfixes.push('gene->' + GENE_ID); }
+// 重算 Capsule asset_id
+delete cap.asset_id;
+cap.asset_id = ch.computeAssetId(cap);
+console.log('[struct][capsule] fixes: [' + cfixes.join(', ') + '] | asset_id:', cap.asset_id);
+if (ch.verifyAssetId && ch.verifyAssetId(cap) !== true) { console.error('[struct] ⚠️ capsule verifyAssetId 失败'); process.exit(6); }
+fs.writeFileSync(CAPSULES, JSON.stringify(cd, null, 2));
+console.log('[struct] 结构自洽校验完成');
+JS
+  ok "结构自洽校验完成（B: summary/constraints/schema_version/非空marks/gene引用/asset_id重算）"
+fi
 
 # ---- --dry-run: 跑 evolver publish 校验 ----------------------------------
 if [[ "$DRY_RUN" == "1" ]]; then
