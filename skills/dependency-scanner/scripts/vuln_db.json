@@ -1,0 +1,50 @@
+{
+  "_note": "Offline vulnerability advisory DB for dependency-scanner. Minimal curated set for deterministic testing; extend from OSV.dev exports.",
+  "advisories": [
+    {
+      "id": "GHSA-jf85-cpcp-j695",
+      "package": "lodash",
+      "ecosystem": "npm",
+      "introduced": "0.0.0",
+      "fixed": "4.17.12",
+      "severity": "high",
+      "summary": "Prototype pollution in lodash < 4.17.12"
+    },
+    {
+      "id": "GHSA-p6mc-m468-83gw",
+      "package": "lodash",
+      "ecosystem": "npm",
+      "introduced": "0.0.0",
+      "fixed": "4.17.21",
+      "severity": "moderate",
+      "summary": "Command injection / ReDoS in lodash < 4.17.21"
+    },
+    {
+      "id": "GHSA-93q8-gq69-wqmw",
+      "package": "axios",
+      "ecosystem": "npm",
+      "introduced": "0.0.0",
+      "fixed": "0.21.2",
+      "severity": "high",
+      "summary": "SSRF and credential leak in axios < 0.21.2"
+    },
+    {
+      "id": "PYSEC-2021-59",
+      "package": "urllib3",
+      "ecosystem": "PyPI",
+      "introduced": "0.0.0",
+      "fixed": "1.26.5",
+      "severity": "high",
+      "summary": "CRLF injection / auth leak in urllib3 < 1.26.5"
+    },
+    {
+      "id": "PYSEC-2023-62",
+      "package": "requests",
+      "ecosystem": "PyPI",
+      "introduced": "0.0.0",
+      "fixed": "2.31.0",
+      "severity": "moderate",
+      "summary": "Proxy-Authorization leak in requests < 2.31.0"
+    }
+  ]
+}
