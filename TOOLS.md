@@ -472,7 +472,24 @@ EVOMAP_PROXY=1 HTTPS_PROXY=socks5h://127.0.0.1:1234 node index.js sync --scope=p
 - Gene 改 `validation` 为：`["node -e 'if (1 + 1 !== 2) process.exit(1)'"]`
 - Capsule 同上 + `diff` 字段填最小 git diff 模板 + `content`/`strategy` 至少一项含 50+ 字符
 
-**未修好的问题**：patch 是手写补丁 evolver 安装源里的 `src/gep/cliContracts.js`——下次 `npm install` 会被覆盖。需要打包为发布准备脚本。
+**~~未修好的问题~~ → 已解决（publish-prep 脚本）**：patch 曾是手写补丁 evolver 安装源里的 `src/gep/cliContracts.js`（下次 `npm install` 会被覆盖）。现已封装为 **`scripts/evomap-publish-prep.sh`**（不改 evolver 源码，只就地改造 `.evolver/gep/{genes,capsules}.json` 中的 validation/diff 字段）。
+
+**`scripts/evomap-publish-prep.sh` 用法**：
+```bash
+# 改造 + dry-run 验证（推荐）
+bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> --dry-run
+# 真正发布
+cd skills/evolver && node index.js publish --asset <gene_id> --asset <capsule_id>
+# 放弃改造、从最近备份还原
+bash scripts/evomap-publish-prep.sh <gene_id> <capsule_id> --restore
+```
+脚本自动处理五项铁律：
+- ✅ validation 重写为 self-contained 断言（剪掉 `node scripts/xxx.js` / `console.log`-only / 含 `> < | ; &` / `process.env` 的危险命令，回退到 `node -e 'if (1 + 1 !== 2) process.exit(1)'`）
+- ✅ diff 超 8000 字符 → 截断到最后一个完整行且保留 4 种 git marker；无 marker → 用最小 git diff 模板
+- ✅ substance < 50 字符 → 自动给 content 补丁
+- ✅ 每次运行前备份 `*.prep-bak-<ts>`（幂等可重跑）
+- ✅ dry-run 时把 Hub 的 `duplicate_asset` 正确识别为**写盘成功信号**（而非误报 quality 失败）
+- ⚠️ 最小 diff 模板目前写死为 dependency-scanner 的 vuln_db.json；为其他技能 publish 时改 `MINIMAL_DIFF`/`fix_diff` 里的路径即可
 
 **Hub 完整文档**：`https://evomap.ai/a2a/skill?topic=publish` + `topic=structure` + `topic=envelope`。Hub 错误响应都会给 `correction.fix` 与 `example`，错误信息结构清晰。
 
