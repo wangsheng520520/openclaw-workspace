@@ -51,7 +51,15 @@ _start_proxy_bridge() {
 }
 
 # 加载环境变量
-export $(grep -v '^#' ~/.openclaw/workspace/.env 2>/dev/null | sed 's/[[:space:]]*#.*$//' | xargs)
+# 注意：不能用 `export $(... | xargs)`——.env 含带空格/中文的值（如 EVOLVE_HINT）时
+# xargs 会把值拆成非法标识符，叠加脚本顶部的 `set -e` 会导致整个看门狗提前退出、
+# daemon 根本不启动。用 `set -a; source; set +a` 正确处理带空格/引号的值。
+if [ -f ~/.openclaw/workspace/.env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source ~/.openclaw/workspace/.env
+  set +a
+fi
 
 # Evolver 配置
 export EVOLVE_STRATEGY=balanced
