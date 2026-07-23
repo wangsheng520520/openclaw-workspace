@@ -279,6 +279,18 @@ Add whatever helps you do your job. This is your cheat sheet.
 [Heartbeat] Registered with hub. Node: node_dc8f215d85d552d9
 ```
 
+**⚠️ .env 加载陷阱（2026-07-23 修复）**：
+- 旧版 line 54 用 `export $(grep -v '^#' .env | xargs)` —— `.env` 含带空格/中文/逗号的值（如 `EVOLVE_HINT`）时，xargs 把值拆成非法标识符（`export: 'notes,': not a valid identifier`），叠加脚本顶部 `set -e` → **整个看门狗提前退出，daemon 静默不启动**。
+- 修复：改用 `if [ -f .env ]; then set -a; source .env; set +a; fi`（正确处理带空格/引号的值）。
+- 教训：`set -e` + `export $(...xargs)` 是静默杀手；daemon “不启动”先查 watchdog 日志有无 `not a valid identifier`。
+
+**🧬 EvoMap 验证者角色（2026-07-23 激活）**：
+- 开关：`.env` 的 `EVOLVER_VALIDATOR_ENABLED`（三层优先级：env > persisted flag > 默认 ON）。曾被设为 `false` 导致质押了 500 积分却不干活。
+- 生效链：`--loop` daemon 启动 `startValidatorDaemon()` → 首 tick 延迟 30s → 每 60s 拉一次分配给本节点的验证任务（`tasks_only` 不扣 GDI）→ 沙箱跑 validation 命令 → 提交 ValidationReport → 共识成功发 +10~30 积分 + 声誉。
+- **preflight 门**：沙箱若不能 spawn `node <script>` → 静默自禁（`_preflightDisabled`）避免刷屏 env_fail 报告。本机实测 preflight `ok:true, 68ms`。
+- 成功日志：`[ValidatorDaemon] started` + `validator_stake phase:success (stake_amount:500, status:active, owner_bound:true)` + `[Validator] Processed 2/5 validation task(s)`。
+- 验证者 daemon 独立于主 evolve loop（自己的 timer），不受主代理前台负载 idle gating 影响。关：`EVOLVER_VALIDATOR_ENABLED=false`。
+
 **状态目录迁移（2026-06-14 17:30）**：
 - 旧状态目录：`/home/wszmd520520/.openclaw/workspace/skills/evolver/memory/evolution`，停在 `cycleCount=395`（最后 `#0395`，2026-06-12 23:07）；迁移验证后已按用户要求删除该旧目录（2026-06-14 17:37），只保留备份。
 - 新运行目录：`/home/wszmd520520/.openclaw/workspace/memory/evolution`，由 `OPENCLAW_WORKSPACE=/home/wszmd520520/.openclaw/workspace` 决定。
