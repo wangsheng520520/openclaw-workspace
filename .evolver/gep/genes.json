@@ -207,7 +207,7 @@
         ]
       },
       "validation": [
-        "node -e 'if (1 + 1 !== 2) process.exit(1)'"
+        "node scripts/gep-validate-noop.js"
       ],
       "routing_hint": {
         "tier": "mid",
@@ -230,18 +230,84 @@
             "tool_bypass",
             "hub_search_miss_with_problem"
           ]
+        },
+        {
+          "at": "2026-07-26T12:36:23.208Z",
+          "outcome": "failed",
+          "mode": "soft",
+          "reason_class": "validation",
+          "retryable": true,
+          "learning_signals": [
+            "problem:reliability",
+            "action:repair",
+            "problem:performance",
+            "action:optimize",
+            "problem:stagnation",
+            "action:innovate",
+            "area:orchestration",
+            "risk:validation"
+          ]
+        },
+        {
+          "at": "2026-07-26T12:36:39.102Z",
+          "outcome": "failed",
+          "mode": "soft",
+          "reason_class": "validation",
+          "retryable": true,
+          "learning_signals": [
+            "problem:reliability",
+            "action:repair",
+            "problem:performance",
+            "action:optimize",
+            "problem:stagnation",
+            "action:innovate",
+            "area:orchestration",
+            "risk:validation"
+          ]
         }
       ],
       "epigenetic_marks": [
         {
           "context": "linux/x64/v24.15.0",
-          "boost": 0.1,
-          "reason": "success_in_environment",
-          "created_at": "2026-07-23T12:57:41.793Z"
+          "boost": -0.1,
+          "reason": "suppressed_by_failure",
+          "created_at": "2026-07-26T12:36:39.104Z"
         }
       ],
       "schema_version": "1.8.0",
-      "asset_id": "sha256:50420e482f37b3ca1e696e402597623457945e0f4d8bbf53a50bf575c2d97c6c"
+      "anti_patterns": [
+        {
+          "at": "2026-07-26T12:36:23.209Z",
+          "mode": "soft",
+          "reason_class": "validation",
+          "learning_signals": [
+            "problem:reliability",
+            "action:repair",
+            "problem:performance",
+            "action:optimize",
+            "problem:stagnation",
+            "action:innovate",
+            "area:orchestration",
+            "risk:validation"
+          ]
+        },
+        {
+          "at": "2026-07-26T12:36:39.102Z",
+          "mode": "soft",
+          "reason_class": "validation",
+          "learning_signals": [
+            "problem:reliability",
+            "action:repair",
+            "problem:performance",
+            "action:optimize",
+            "problem:stagnation",
+            "action:innovate",
+            "area:orchestration",
+            "risk:validation"
+          ]
+        }
+      ],
+      "asset_id": "sha256:58f5508d988b6609df7ca369db5689b33249660c3bd23f636d298f39ac996850"
     },
     {
       "type": "Gene",

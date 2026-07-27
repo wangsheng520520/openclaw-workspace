@@ -1,0 +1,13 @@
+{
+  "name": "dependency-scanner",
+  "version": "1.2.0",
+  "description": "Safe offline-first dependency vulnerability scanner (report-only, npm + PyPI)",
+  "main": "index.js",
+  "bin": {
+    "dependency-scanner": "index.js"
+  },
+  "scripts": {
+    "test": "python3 scripts/test_dep_scan.py"
+  },
+  "license": "MIT"
+}

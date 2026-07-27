@@ -115,12 +115,29 @@ def load_local_db() -> list[dict]:
 def _version_in_range(ver: str, introduced: str, fixed: str) -> bool:
     def key(v: str):
         return [int(x) for x in re.findall(r"\d+", v)] or [0]
+
+    def cmp(a: list[int], b: list[int]) -> int:
+        # Pad to equal length so 1.2 and 1.2.0 compare as equal (avoids
+        # falsely flagging a dep pinned exactly at the fixed version).
+        n = max(len(a), len(b))
+        a = a + [0] * (n - len(a))
+        b = b + [0] * (n - len(b))
+        return (a > b) - (a < b)
+
     kv = key(ver)
-    if introduced and kv < key(introduced):
+    if introduced and cmp(kv, key(introduced)) < 0:
         return False
-    if fixed and kv >= key(fixed):
+    if fixed and cmp(kv, key(fixed)) >= 0:
         return False
     return True
+
+
+def summarize_by_severity(hits: list[dict]) -> dict[str, int]:
+    """Count hits per severity (useful for CI gating / dashboards)."""
+    counts = {"critical": 0, "high": 0, "moderate": 0, "low": 0, "unknown": 0}
+    for h in hits:
+        counts[_norm_sev(h.get("severity"))] += 1
+    return counts
 
 
 def match_local(deps: dict[str, str], ecosystem: str, db: list[dict]) -> list[dict]:
@@ -181,7 +198,11 @@ def main(argv: list[str]) -> int:
     hits, n_manifests = scan(root, args.threshold)
 
     if args.json:
-        print(json.dumps({"manifests_scanned": n_manifests, "vulnerabilities": hits}, indent=2))
+        print(json.dumps({
+            "manifests_scanned": n_manifests,
+            "vulnerabilities": hits,
+            "summary_by_severity": summarize_by_severity(hits),
+        }, indent=2))
     else:
         print(f"Scanned {n_manifests} manifest(s) under {root}")
         if not hits:

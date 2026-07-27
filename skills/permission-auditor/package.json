@@ -1,0 +1,7 @@
+{
+  "name": "permission-auditor",
+  "version": "1.0.0",
+  "description": "Report-only auditor for agent tool-usage patterns (bypass, loops, high-risk).",
+  "main": "index.js",
+  "license": "MIT"
+}

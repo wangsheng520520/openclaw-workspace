@@ -45,6 +45,33 @@
       "fixed": "2.31.0",
       "severity": "moderate",
       "summary": "Proxy-Authorization leak in requests < 2.31.0"
+    },
+    {
+      "id": "GHSA-vh95-rmgr-6w4m",
+      "package": "minimist",
+      "ecosystem": "npm",
+      "introduced": "0.0.0",
+      "fixed": "1.2.6",
+      "severity": "critical",
+      "summary": "Prototype pollution in minimist < 1.2.6"
+    },
+    {
+      "id": "GHSA-r683-j2x4-v87g",
+      "package": "node-fetch",
+      "ecosystem": "npm",
+      "introduced": "0.0.0",
+      "fixed": "2.6.7",
+      "severity": "high",
+      "summary": "Exposure of sensitive information via redirect in node-fetch < 2.6.7"
+    },
+    {
+      "id": "PYSEC-2020-176",
+      "package": "pyyaml",
+      "ecosystem": "PyPI",
+      "introduced": "0.0.0",
+      "fixed": "5.4",
+      "severity": "critical",
+      "summary": "Arbitrary code execution via full_load / FullLoader in PyYAML < 5.4"
     }
   ]
 }

@@ -56,6 +56,24 @@ def main() -> int:
         if any(v["severity"] == "moderate" for v in data["vulnerabilities"]):
             print("FAIL: threshold=high leaked moderate results"); failures += 1
 
+        # summary_by_severity present and consistent with vuln list
+        code, out = run(root, "--json")
+        data = json.loads(out)
+        summ = data.get("summary_by_severity")
+        if not isinstance(summ, dict):
+            print("FAIL: summary_by_severity missing from JSON output"); failures += 1
+        elif sum(summ.values()) != len(data["vulnerabilities"]):
+            print("FAIL: summary_by_severity counts do not match vuln list"); failures += 1
+
+        # exact-version boundary: dep pinned AT the fixed version is NOT vulnerable
+        boundary = root / "boundary"
+        boundary.mkdir()
+        (boundary / "package.json").write_text(
+            '{"name":"b","dependencies":{"minimist":"1.2.6"}}')
+        code, _ = run(boundary)
+        if code != 0:
+            print(f"FAIL: dep at exact fixed version flagged (got exit {code})"); failures += 1
+
     if failures:
         print(f"\n{failures} test(s) FAILED")
         return 1
