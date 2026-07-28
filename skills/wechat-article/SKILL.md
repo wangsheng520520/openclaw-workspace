@@ -28,15 +28,20 @@ metadata: { "openclaw": { "emoji": "📰", "requires": { "bins": ["python3"], "e
 
 ### Step 2: 提取内容（按优先级尝试）
 
+> ⚠️ **实测经验（务必遵守）**：微信公众号文章提取**优先用 Tavily**。
+> web_fetch 与 r.jina.ai 对 `mp.weixin.qq.com` 效果差、易被拦截，仅作备用。
+
 | 优先级 | 方式 | 命令 | 说明 |
 |--------|------|------|------|
-| 1️⃣ | **r.jina.ai** | `web_fetch "https://r.jina.ai/<公众号URL>"` | 推荐，成功率最高 |
+| 1️⃣ | **Tavily** | `tavily_extract urls=["<公众号URL>"]`（或 `tavily_search`） | 实测最佳，成功率最高 |
 | 2️⃣ | **Python 脚本** | `python3 skills/wechat-article/scripts/wechat_article.py '<URL>'` | 本地提取 |
-| 3️⃣ | **web_fetch** | `web_fetch "<URL>"` | 直接抓取，可能被拦截 |
-| 4️⃣ | **浏览器** | 用 browser/playwright 打开页面提取 | 最后手段 |
+| 3️⃣ | **r.jina.ai** | `web_fetch "https://r.jina.ai/<公众号URL>"` | 效果不稳定，仅备用 |
+| 4️⃣ | **web_fetch** | `web_fetch "<URL>"` | 微信文章效果差，易被拦截 |
+| 5️⃣ | **浏览器** | 用 browser/playwright 打开页面提取 | 最后手段 |
 
 **失败处理**：
-- 方式 1 失败 → 自动尝试方式 2
+- 方式 1（Tavily）失败 → 自动尝试方式 2（本地脚本）
+- 逐级降级尝试后续方式
 - 所有方式失败 → 告知用户"该文章有反爬保护，建议手动复制内容"
 
 ### Step 3: 格式化输出
@@ -74,7 +79,7 @@ python3 skills/wechat-article/scripts/wechat_article.py "https://mp.weixin.qq.co
 
 - 微信公众号有反爬虫机制，部分文章可能无法获取
 - 需要验证码的文章无法自动处理
-- r.jina.ai 是第三方服务，敏感内容建议用本地方式
+- **Tavily 是微信文章提取的首选**（实测成功率最高）；r.jina.ai/web_fetch 对微信效果差，仅作备用
 - 提取的内容可能丢失图片（微信图片有防盗链）
 
 ## 限制
