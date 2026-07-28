@@ -1,0 +1,7 @@
+{
+  "name": "low-end-device-optimizer",
+  "version": "1.0.0",
+  "description": "Report-only advisor that profiles host resources and recommends CPU-only / low-RAM agent optimizations (quantized model tier, heartbeat cadence, swap/zram, context size).",
+  "main": "index.js",
+  "license": "MIT"
+}

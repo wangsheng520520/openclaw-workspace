@@ -291,6 +291,14 @@ Add whatever helps you do your job. This is your cheat sheet.
 - 成功日志：`[ValidatorDaemon] started` + `validator_stake phase:success (stake_amount:500, status:active, owner_bound:true)` + `[Validator] Processed 2/5 validation task(s)`。
 - 验证者 daemon 独立于主 evolve loop（自己的 timer），不受主代理前台负载 idle gating 影响。关：`EVOLVER_VALIDATOR_ENABLED=false`。
 
+**🛡️ 常驻双保险监督进程（2026-07-29 重建，旧 [WD] 监督进程 07-27 后丢失）**：
+- 脚本：`scripts/evolver-watchdog-supervisor.sh`；日志：`logs/evolver-watchdog-supervisor.log`
+- 启动：`cd ~/.openclaw/workspace && setsid nohup bash scripts/evolver-watchdog-supervisor.sh >> logs/evolver-watchdog-supervisor.log 2>&1 < /dev/null &`
+- 行为：每 30s 巡检；进程+端口 19820 双失败 → 5s 二次确认（容忍 suicide-respawn 轮换间隙）→ 走标准入口 `evolver-watchdog.sh` 拉起 → 60s 退避验证。flock `/tmp/evolver-watchdog-supervisor.lock` 防重；SIGTERM 只杀监督进程自身，不转发 daemon（与旧版行为差异）。
+- 三层兜底：① daemon 内部 suicide-respawn（`index.js spawnReplacementProcess`，RSS/周期超限自动轮换，**~7.5 分钟 PID 轮换是正常行为不是崩溃**）② 本监督进程（秒级）③ cron healthcheck `658e9e67`（2h 级）。
+- ⚠️ 已知盲点：healthcheck 的 21 字节 cmdline md5（`node\0index.js\0--loop\0`）永远匹配不上 suicide-respawn 的全路径 cmdline（`process.execPath`+`__filename`）→ 每 2h 固定误报 "0 daemons" 并拉起 watchdog（撞 Singleton 秒退、端口 ✅ 故无害，exit 1）。修复方向：探测改 `pgrep -f 'index\.js --loop'`+端口（脚本来自 workshop proposal，改前需用户批准）。
+- ⚠️ 非持久化：监督进程是孤儿进程，Gateway 重启存活、**WSL 重启即死**（cron 会救 daemon 但不会救监督进程）。如需全持久化：建 systemd user unit（待批准）。
+
 **状态目录迁移（2026-06-14 17:30）**：
 - 旧状态目录：`/home/wszmd520520/.openclaw/workspace/skills/evolver/memory/evolution`，停在 `cycleCount=395`（最后 `#0395`，2026-06-12 23:07）；迁移验证后已按用户要求删除该旧目录（2026-06-14 17:37），只保留备份。
 - 新运行目录：`/home/wszmd520520/.openclaw/workspace/memory/evolution`，由 `OPENCLAW_WORKSPACE=/home/wszmd520520/.openclaw/workspace` 决定。
