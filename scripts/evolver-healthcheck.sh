@@ -9,6 +9,11 @@
 #   exit 3 = spawn 后 8s 内 19820 未监听
 # fix(2026-07-27): 参照 cmdline hash 用 printf 产生真实 NUL 字节
 #  (原稿 echo -n 'node\0...' 输出字面反斜杠，md5 永远不匹配 → 误判 0 daemon)
+# fix(2026-07-29): md5 指纹法整体废弃 → pgrep 模式 + 排除 shell comm + 端口兜底。
+#  daemon 自重启 (index.js spawnReplacementProcess) 用 process.execPath+__filename
+#  全路径 cmdline, 21 字节指纹永远不匹配 (每 2h 固定误报 0 daemon 并无效拉起);
+#  daemon 的 comm 可能是 node 或自设 title (MainThread), 故用排除式过滤;
+#  修剪逻辑加 60s 轮换窗口保护, 避免误杀 suicide-respawn 的接替进程。
 
 set -euo pipefail
 
@@ -21,24 +26,45 @@ log() { echo "[$(date '+%Y-%m-%dT%H:%M:%S%z')] $*" | tee -a "$HEALTHCHECK_LOG" >
 exec 9>"$LOCK_FILE" || { log "FATAL: cannot open $LOCK_FILE"; exit 2; }
 flock -n 9 || { log "WARN: another healthcheck running, exiting 2"; exit 2; }
 
-# 找 daemon 进程:cmdline 必须恰好 21 字节 'node\0index.js\0--loop\0'
-REF_MD5=$(printf 'node\0index.js\0--loop\0' | md5sum | awk '{print $1}')
+# 找 daemon 进程: cmdline 含 'index.js --loop', 排除 shell 包装进程
+#  (cron agent 的 bash -c 命令行本身含此模式串; daemon comm 可能是
+#   node 或进程自设 title 如 MainThread, 故用排除式而非包含式过滤)
 DAEMONS=()
-for pid in $(pgrep -f "node index.js --loop" 2>/dev/null); do
-    if [ -r "/proc/$pid/cmdline" ]; then
-        md5=$(md5sum "/proc/$pid/cmdline" 2>/dev/null | awk '{print $1}')
-        if [ "$md5" = "$REF_MD5" ]; then
-            DAEMONS+=("$pid")
-        fi
-    fi
+for pid in $(pgrep -f 'index\.js --loop' 2>/dev/null); do
+    comm=$(cat "/proc/$pid/comm" 2>/dev/null || true)
+    case "$comm" in
+        bash|sh|dash|zsh|systemd*) continue ;;
+    esac
+    DAEMONS+=("$pid")
 done
 
-# 多 daemon → 修剪到 1 个(保留最旧)
+# 端口兜底: 进程探测为空但 19820 在监听 → 视为健康, 不误拉第二个 daemon
+if [ ${#DAEMONS[@]} -eq 0 ] && ss -tln 2>/dev/null | grep -q '127.0.0.1:19820'; then
+    log "OK: no process matched but 19820 LISTEN, treating as healthy (cmdline anomaly)"
+    exit 0
+fi
+
+# 多 daemon → 修剪到 1 个(保留最旧), 但放过 suicide-respawn 轮换窗口:
+# 接替进程刚 detached 出来时新旧并存 <60s, 此时修剪会误杀接替者 → 双亡
 if [ ${#DAEMONS[@]} -gt 1 ]; then
-    log "WARN: ${#DAEMONS[@]} daemons running, trimming to 1 (oldest)"
-    oldest=$(printf '%s\n' "${DAEMONS[@]}" | sort -n | head -1)
+    youngest_age=999999
     for pid in "${DAEMONS[@]}"; do
-        [ "$pid" != "$oldest" ] && kill -TERM "$pid" 2>/dev/null && log "  killed PID $pid"
+        age=$(ps -o etimes= -p "$pid" 2>/dev/null | tr -d ' ')
+        [ -n "$age" ] && [ "$age" -lt "$youngest_age" ] && youngest_age=$age
+    done
+    if [ "$youngest_age" -lt 60 ]; then
+        log "INFO: ${#DAEMONS[@]} daemons but youngest only ${youngest_age}s old (rotation window), not trimming"
+        exit 0
+    fi
+    # 保留端口持有者(真 daemon); 无端口持有者时退回保留最旧
+    #  (旧版固定保留最旧 → 会误杀健康 daemon、留下卡死的僵尸前辈)
+    keeper=$(ss -tlnp 2>/dev/null | grep '127.0.0.1:19820' | sed -nE 's/.*pid=([0-9]+).*/\1/p' | head -1)
+    if [ -z "$keeper" ] || ! printf '%s\n' "${DAEMONS[@]}" | grep -qx "$keeper"; then
+        keeper=$(printf '%s\n' "${DAEMONS[@]}" | sort -n | head -1)
+    fi
+    log "WARN: ${#DAEMONS[@]} daemons running, trimming to 1 (keeper=$keeper, 端口持有者优先)"
+    for pid in "${DAEMONS[@]}"; do
+        [ "$pid" != "$keeper" ] && kill -TERM "$pid" 2>/dev/null && log "  killed PID $pid"
     done
     exit 0
 fi
@@ -62,7 +88,9 @@ if [ ${#DAEMONS[@]} -eq 0 ]; then
         exit 2
     fi
     log "  spawning: $SCRIPT"
-    nohup "$SCRIPT" >/tmp/evolver-watchdog-spawn-$(date +%s).log 2>&1 &
+    # 9>&-: 关闭继承的 flock fd, 否则 spawn 出的 watchdog 会替 healthcheck 持锁
+    #  (2026-07-29 07:26 事故: watchdog 变 daemon 后僵留, 持锁 2.5h+ 瘫痪 cron 层)
+    nohup "$SCRIPT" >/tmp/evolver-watchdog-spawn-$(date +%s).log 2>&1 9>&- &
     sleep 8
     if ss -tln 2>/dev/null | grep -q '127.0.0.1:19820'; then
         log "  ✅ 19820 LISTEN after spawn, exit 1"

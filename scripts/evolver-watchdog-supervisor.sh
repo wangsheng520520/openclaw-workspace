@@ -71,6 +71,8 @@ while true; do
     fi
   fi
   # 后台 sleep + wait: 保证 trap 能立即打断等待
-  sleep "$CHECK_INTERVAL" &
+  # 9>&-: 后台子进程不得继承 flock fd, 否则本进程退出后
+  # 孤儿 sleep 会继续持锁最多 30s, 阻塞监督进程接管 (2026-07-29 实测)
+  sleep "$CHECK_INTERVAL" 9>&- &
   wait $!
 done
