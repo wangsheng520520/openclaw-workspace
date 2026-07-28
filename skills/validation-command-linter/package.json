@@ -1,0 +1,7 @@
+{
+  "name": "validation-command-linter",
+  "version": "1.0.0",
+  "description": "Lints proposed GEP/Hub validation commands to predict safety-gate rejections before submission.",
+  "main": "index.js",
+  "license": "MIT"
+}
