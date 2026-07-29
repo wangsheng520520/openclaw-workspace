@@ -200,9 +200,8 @@ def parse_jina_content(content: str) -> dict:
     # 清理正文
     body = "\n".join(body_lines).strip()
     
-    # 尝试提取发布时间和公众号
-    publish_time = ""
-    account = ""
+    # 尝试提取发布时间和公众号（实测：从正文中用正则回捞元数据）
+    publish_time, account = _extract_metadata(content)
     
     return {
         "title": title,
@@ -210,6 +209,34 @@ def parse_jina_content(content: str) -> dict:
         "publish_time": publish_time,
         "account": account
     }
+
+
+def _extract_metadata(content: str) -> tuple:
+    """
+    从文章原始内容中回捞发布时间与公众号名。
+    返回 (publish_time, account)，任一提取失败则为空字符串。
+    支持中文日期（2026年07月29日）与 ISO 日期（2026-07-29）。
+    """
+    publish_time = ""
+    account = ""
+    if not content:
+        return publish_time, account
+
+    # 发布时间：优先中文日期，其次 ISO 日期
+    cn_date = re.search(r"(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日", content)
+    if cn_date:
+        publish_time = f"{cn_date.group(1)}-{int(cn_date.group(2)):02d}-{int(cn_date.group(3)):02d}"
+    else:
+        iso_date = re.search(r"(20\d{2})-(\d{1,2})-(\d{1,2})", content)
+        if iso_date:
+            publish_time = f"{iso_date.group(1)}-{int(iso_date.group(2)):02d}-{int(iso_date.group(3)):02d}"
+
+    # 公众号名：常见格式"公众号：XXX"或"来源：XXX"
+    acct_match = re.search(r"(?:公众号|来源|作者)\s*[：:]\s*([^\n\r，,。]{1,30})", content)
+    if acct_match:
+        account = acct_match.group(1).strip()
+
+    return publish_time, account
 
 
 def wechat_article(url: str) -> dict:
