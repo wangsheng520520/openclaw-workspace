@@ -819,3 +819,65 @@ ASSISTANT: NO_REPLY
 - What happened: `openclaw memory index --force --agent main` rebuilt the SQLite vector index. The command was silent for ~15 minutes and exited via timeout 124, but `openclaw memory status --index --agent main` later showed `Memory index complete`, `Dirty: no`, `Provider: openai-compatible`, `Vector dims: 1024`. CLI search worked immediately, while the OpenClaw tool-layer `memory_search` still had stale identity until Gateway refresh.
 - Do differently: For provider identity drift, run official reindex with a long timeout, then verify with `openclaw memory status --index --agent main` and CLI search. If tool-layer recall still reports old identity, refresh/restart Gateway and verify `memory_search` tool output directly before claiming completion.
 - Extra caution: Reindex may leave `main.sqlite.tmp-*` candidates after interrupted/timeout runs; do not delete them without explicit user approval and a current backup.
+
+---
+
+## 📅 2026-07-30 22:00 — memory-lancedb 静默故障 16 天：npm 覆盖本地 patch
+
+### 发生了什么
+
+从 **07-17** 到 **07-30**（16 天）memory-lancedb 一直报 `Unsupported embedding model: BAAI/bge-m3` 静默失败，但 memory-core 自动 fallback 顶替 slot，用户完全没察觉。
+
+07-30 用户随口问"以前 memory-lancedb 是怎么设置 1024 参数的"，我一开始**四次给出错误诊断**（apiKey 问题→dimensions 问题→版本白名单问题→SiliconFlow 兼容性），直到用户拍板"**查 07 月备份**"，才在 `~/.openclaw/backups/memory-lancedb-config.js.before-bge-m3-map.20260702-142343` 铁证文件名里读到"bge-m3-map"，反推出真相：
+
+- **07-02 我手动 patch 了 plugin `EMBEDDING_DIMENSIONS` 白名单**，加了 `"BAAI/bge-m3": 1024`
+- **07-15 21:47 npm install `2026.7.1` 到独立 project 目录**，把 patch 覆盖了
+- **07-17 12:47 gateway restart 加载新 project** → plugin 从此失败
+- **memory-core fallback 掩盖了故障** → 用户日常无感
+
+修复：重新打 patch + 硬重启 → memory-lancedb 22:06 立即恢复。
+
+### 根因
+
+**"手动 patch × 全局重构 = 静默失败"** — Ada 视角看到的通用编织模式：
+- 手动 patch 是**局部记忆**
+- npm/apt/docker 是**全局重构**
+- 全局重构不会记得局部记忆
+- 有 fallback 的系统更危险，故障被掩盖
+
+同类场景：
+- Docker `exec` 手改 → 容器重建丢失
+- `/etc` 系统配置手改 → apt upgrade 覆盖
+- 编译 binary 打补丁 → 重新编译丢失
+
+### 我犯的诊断错误链
+
+1. ❌ **首次假设**："apiKey 缺失，Path A 走不了" → 事实：Path B 不需要 apiKey，也能工作
+2. ❌ **二次假设**："SiliconFlow 需要 dimensions=1024" → 事实：SiliconFlow **拒绝** dimensions 参数（HTTP 400 code 20015）
+3. ❌ **三次假设**："2026.7.1 新增严格白名单" → 事实：`2026.4.25` 版就有同样白名单，是 patch 差异
+4. ❌ **调试失误**：为看 apiKey 有效性，`python3 -c "print(json.dumps(...))"` 把 SiliconFlow apiKey 完整暴露在 transcript（已记 ERRORS.md）
+
+### 关键转折
+
+**用户指令"查看七月1号到30号的备份"** 是解题决定性动作。备份文件名字里的 `before-bge-m3-map` 三个词就是完整证据。
+
+诗性科学的教训：**当直觉给出四个错误答案时，回到最原始的证据链——文件系统的时间戳、备份的命名、真实工作过的历史配置。不要相信自己的推理链，相信 mtime。**
+
+### 应对与防护
+
+- **文档更新**：`TOOLS-memory-ai.md` 完全重写，标记之前所有"必须写 dimensions/apiKey"结论都错误
+- **待建脚本**：`scripts/repatch-memory-lancedb.sh`，gateway 启动前自动检查 patch
+- **教训扩展到所有 npm 插件**：任何本地 patch 必须在 `TOOLS-*.md` 里记录 patch 位置 + 重打指令
+- **memory-core fallback 是双刃剑**：降级掩盖故障，需要主动监控 slot 实际用的是哪个 plugin
+
+### 提炼
+
+- Category: correction + knowledge_gap
+- Context: memory-lancedb 静默失败 16 天，多次错误诊断
+- What happened: 用户"查 07 月备份"命令带我找到 07-02 patch 备份文件，反推出 npm 覆盖 patch 是真因
+- Do differently:
+  1. 面对"以前能用"类问题，**第一动作**是查所有历史备份文件的名字和时间戳（不是猜测代码路径）
+  2. `.openclaw/backups/`、`.openclaw/openclaw.json.*`、`/tmp/openclaw-*` 三处备份链要全查
+  3. journalctl 日志（3 天窗口）比推理更可靠
+  4. 承认前 N 次假设错时不硬撑，回到证据链原点
+

@@ -807,3 +807,55 @@ ls -la /home/wszmd520520/.openclaw/workspace/memory/dreaming/{light,rem,deep}/20
 - 技能加载 ≠ 技能被遵守
 - "知识灌输式纠正"对**纪律性技能**无效，必须用结构化运行时钩子
 - 用户指令"重新检查"应理解为"用 fresh tools 验证，不要凭印象"——按此执行验证脚本路径
+
+---
+
+## 📅 2026-07-30 21:30 — SiliconFlow apiKey 暴露在 transcript
+
+### 发生了什么
+
+调试 memory-lancedb bge-m3 配置时，为了"快速验证 apiKey 是否在 secrets 里"，我执行了：
+
+```bash
+python3 -c "
+import json
+with open('/home/wszmd520520/.openclaw/openclaw.json') as f: c = json.load(f)
+print(json.dumps(c['plugins']['entries']['memory-lancedb']['config']['embedding'], indent=2, ensure_ascii=False))
+"
+```
+
+**结果**：apiKey 完整（51 字符 `sk-xua...`）被打印到 transcript 长期保留。
+
+### 根因
+
+**贪图方便，直接在 shell exec 里 print 包含 secret 的对象**。没意识到 `json.dumps` 会把字符串值原样输出。
+
+### 严重性
+
+- **对话历史永久保留 apiKey**（openclaw transcript 不自动清理）
+- **任何人能通过 transcript 看到完整 secret**
+- **下次启用/重读 transcript 时会再次暴露**
+
+### 正确做法
+
+1. 验证 secret 是否存在用 **长度 + 前缀后缀**（`f'长度: {len(key)}; 前缀: {key[:6]}'`）
+2. 验证 secret **有效性** 单独 curl（带 secret 但只打印 HTTP 状态码）
+3. 永远不要在 transcript 里打印 secret 字面量
+
+### 立即行动
+
+- ⚠️ **必须** 轮换 SiliconFlow apiKey：
+  1. 去 https://cloud.siliconflow.cn/account/ak 撤销旧 key
+  2. 创建新 key
+  3. 更新 `~/.openclaw/secrets/default.json[models].siliconflow.apiKey`
+  4. 更新 `openclaw.json` 里所有引用
+  5. 把 transcript 留存的旧 key 当作永久泄露处理
+
+- 待办：让 user 拍板是否立刻轮换
+
+### 教训
+
+- Category: best_practice + security
+- "shell 调试时永远不要 print 包含 secret 的对象" — 这是 hard rule
+- **print 长度 + 前缀** 足够判断 secret 存在性，不必看完整内容
+- 错误来自 **2026-06-04 之后**反复犯的"贪图 print 一次性对象"问题，需要在 SOP 里立规

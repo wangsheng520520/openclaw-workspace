@@ -132,7 +132,9 @@
 4. 发现知识错误？→ `LEARNINGS.md` (category: knowledge_gap)
 5. 找到更好方法？→ `LEARNINGS.md` (category: best_practice)
 
-跨文件模式 → `AGENTS.md` / 行为模式 → `SOUL.md` / 工具技巧 → `TOOLS.md`
+跨文件模式 → `AGENTS.md` / 行为模式 → `SOUL.md` / 工具技巧 → `TOOLS.md` (+ `TOOLS-lark-cli.md` / `TOOLS-evolver-evomap.md` / `TOOLS-memory-ai.md` 按主题拆分，2026-07-30 起)
+
+> **TOOLS.md 拆分说明**：主 TOOLS.md 只保留日常快速参考（天气/邮件/日历/通知/定时）+ 子文件索引。Evolver/lark-cli/memory 等专题内容已拆分到 `TOOLS-*.md` 文件，按需 `read` 加载（OpenClaw bootstrap 只匹配精确 basename，所以拆分文件不会自动注入）。
 
 ---
 
