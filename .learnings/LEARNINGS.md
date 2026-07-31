@@ -969,3 +969,49 @@ B+A 修复 + cron 注册完后，用户问"推送 github 可以使用 mcp 啊？
 - GitHub main: `https://github.com/wangsheng520520/openclaw-workspace/blob/main/scripts/preflight-superpowers.sh` ✅
 - GitHub main: `https://github.com/wangsheng520520/openclaw-workspace/blob/main/.learnings/LEARNINGS.md` ✅
 - 本地与远程同步完成 (commit ad81dc95)
+
+---
+
+## 📅 2026-07-31 10:14 — 第 8 次违反 using-superpowers + 修复闭环（AGENTS.md 补火 + mcp fallback）
+
+### 发生了什么
+
+第 7 次违反（mcp 推送）后，用户说"现在就改 AGENTS.md 加一条：'宣告后，必须读 available_tools 段落和 fallback 链顺序和改 preflight-superpowers.sh 加一段"网络失败优先 mcp"的 fallback 逻辑'"。
+
+**我立刻按指令执行了 3 项修改**：
+1. AGENTS.md 加第 6 步（读 available_tools）
+2. AGENTS.md 加 fallback 链顺序段
+3. preflight-superpowers.sh 加 mcp fallback 提示
+
+但**过程中又出现两个细节违反**：
+- **第 8a 违反**：第一次 edit AGENTS.md 时用了双引号 `"不等于"查工具"` 在 oldText 里，导致 edit 工具成功但实际**没改**（mtime 没变）。我必须用 apply_patch 重新做才生效。
+- **第 8b 违反**：第一次 awk `int(0.01*60) = 0` 的浮点 bug 没发现，测试时 "lookback 0.01h → 0 session → 早退 → exit 0"，看起来"通过"但其实 bug。
+
+### 根因
+
+- **8a**: edit 工具的 oldText 匹配规则在多行复杂内容时脆弱；中文引号 vs 西文引号容易混淆
+- **8b**: 测试设计不够严格——只看 exit code，没看 mtime 验证真的改了
+
+### 教训
+
+| 教训 | 类别 | 适用 |
+|------|------|------|
+| 多行复杂 edit 后**必须 stat mtime 验证** | best_practice | 任何 edit 操作 |
+| 中文引号 vs 西文引号在 oldText 里极容易乱；用 apply_patch 替代 edit 更可靠 | best_practice | 中文内容编辑 |
+| 测试不能只看 exit code，要看"是否真的触发了被测代码路径" | knowledge_gap | 任何 linter/hook 验证 |
+| AGENTS.md 第零定律补火**第一次就生效**需要更多反向测试（造 0 宣告场景） | correction | 行为治理 |
+
+### 闭环
+
+- ✅ AGENTS.md 第零定律补火 commit `853bb96` 已落本地
+- ✅ preflight-superpowers.sh v2.3 已落本地（修 awk 浮点 + mcp fallback）
+- ✅ 全部 6 个文件已 mcp push 到 GitHub main `d22d85a8`
+- ✅ 验证：4 次宣告 → exit 0，0 次宣告（造 fake session）→ exit 1
+- ⚠️ cron 593fec6b 仍在跑（30min 自动 check-only）
+
+### 下次再违反时的预期
+
+下次 cron 自动跑 → 0 宣告 → 写 MEMORY.md → git commit → 通知用户
+如果 git push 失败（Chameleon 1234 阻塞）→ 提示 "调 mcp__github__push_files"
+如果用户主动 ping → 立即走 "Using using-superpowers + skill-creator" 完整流程
+
