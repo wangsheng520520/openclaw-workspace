@@ -1015,3 +1015,86 @@ B+A 修复 + cron 注册完后，用户问"推送 github 可以使用 mcp 啊？
 如果 git push 失败（Chameleon 1234 阻塞）→ 提示 "调 mcp__github__push_files"
 如果用户主动 ping → 立即走 "Using using-superpowers + skill-creator" 完整流程
 
+
+---
+
+## 📅 2026-07-31 20:31 — 第 9 次违反：GEP 自动生成 skill 被无意推送
+
+### 发生了什么
+
+老王问"我看见你远程推送时发现 evolver 技能的推送了，帮我看看怎么回事"。
+
+**我之前 9:50 推送 commit d22d85a8 时的 commit message**：
+
+> feat(AGENTS+scripts): 第零定律补火 — 加 available_tools 扫描 + mcp fallback 链
+
+**但 commit 实际包含 6 个文件**：
+- AGENTS.md（我加的）
+- scripts/preflight-superpowers.sh（我加的）
+- skills/gep-failure-postmortem/SKILL.md **（GEP Cycle #3459 生成的）**
+- skills/gep-failure-postmortem/index.js **（GEP Cycle #3459 生成的）**
+- skills/gep-failure-postmortem/package.json **（GEP Cycle #3459 生成的）**
+- skills/gep-failure-postmortem/test_postmortem.js **（GEP Cycle #3459 生成的）**
+
+我**完全没意识到**自己 commit 了一个 GEP 生成的 skill，更没意识到 mcp push 把它们也带到了 GitHub main。
+
+### 根因
+
+1. **GEP Cycle #3459 (2026-07-31 14:14)** 通过 cron 自动执行 → 成功创建了 gep-failure-postmortem skill
+2. 该 skill 文件**被自动 git add**（Evolver 协议规范要求）
+3. 我今早 9:50 用 `git status --short` 看到 `A  skills/gep-failure-postmortem/...` 时**没注意**这是 GEP 生成的文件
+4. 我的 commit `853bb96` 用 `git add AGENTS.md scripts/preflight-superpowers.sh` → **但 853bb96 实际有 6 个文件**，说明当时 working tree 里 gep-failure-postmortem 已经被 stage + commit
+5. mcp push 时一并把它们推到了 main
+
+### 关键事实
+
+| 事实 | 数据 |
+|------|------|
+| gep-failure-postmortem 作者 | `evolver-cycle-3648`（package.json author 字段） |
+| 创建 cycle | #3459 (2026-07-31 14:14 GMT+8) |
+| 关联 commit | `853bb96` (但 commit author 是 `Evolver <evolver@openclaw>`) |
+| 推到 GitHub commit | `d22d85a8` |
+| 当前状态 | 已在 GitHub main 上 4 个文件（SKILL.md / index.js / package.json / test_postmortem.js） |
+| skill 实际内容 | 320 行 Node.js 工具，10/10 tests pass，纯 stdlib 无依赖，分析 GEP 失败 cycle |
+| 是否重复 | 已有 `validation-command-linter` / `evolver-overseer` / `systematic-debugging` 等相关 skill |
+
+### 教训
+
+| 教训 | 类别 | 适用 |
+|------|------|------|
+| **git add 前必须 `git status --short` 列出所有文件 + 标注每个文件来源**（用户手写 vs GEP 生成 vs 工具自动） | best_practice | 任何 workspace commit |
+| **commit message 必须列所有文件**（不仅是用户提到的） | best_practice | 透明度 |
+| **mcp push 前必须核对 files 列表**（GitHub REST API 不会自动过滤） | best_practice | mcp 推送 |
+| **GEP 创造 skill 默认会落 git**，但 GEP 没有自动推送授权门 | knowledge_gap | evolver 集成 |
+| **第 9 次违反** = 同样的"宣告当装饰" 模式：宣告了 using-superpowers 但**没用 skill-vetter 审查新 skill 是否合规** | correction | 长期行为治理 |
+
+### 后续行动（待你拍板）
+
+**选项 1：接受 + 验证**（推荐）
+- gep-failure-postmortem 是 320 行 read-only 工具、10/10 tests pass、无网络/无副作用
+- 与现有 skill 互补（postmortem 视角，validation-command-linter 是预防视角）
+- 保持 GitHub main 上
+
+**选项 2：删除 GitHub 但保留本地**
+- 用 mcp delete GitHub 4 个文件 → 仅本地的 GEP 生成物
+
+**选项 3：完全删除**
+- 改 GEP 配置禁止生成 skill，或删除 gep-failure-postmortem 整个 skill
+
+**选项 4：加 GEP 推送授权门**
+- 修改 preflight-superpowers.sh 或单独 skill，让 GEP 生成的 skill 必须**用户先 review + 显式同意**才能 commit/push
+
+### 验证
+
+- GitHub main 4 个文件：<https://github.com/wangsheng520520/openclaw-workspace/tree/main/skills/gep-failure-postmortem>
+- 本地 working tree 已 commit
+- GEP cycle #3459 evidence: GEP memory graph 中 `Innovation chosen: A new read-only observability skill that did not overlap any existing skill`
+
+### 关联违规
+
+- 第 6 次违反（preflight-superpowers.sh 蒸发）—— 同一 session
+- 第 7 次违反（mcp 推送认知盲区）—— 同一 session
+- 第 8 次违反（AGENTS.md edit mtime / awk 浮点）—— 同一 session
+- **第 9 次违反（commit 误带 4 个 GEP 文件）—— 同一 session**
+
+**5 个违反都在 7-31 一天的同一会话**——这是"长期违规 + 即时多次违反"的混合型危机，需要**比 cron 30min 自动跑更强的硬性约束**（建议下条加 GEP 推送授权门）。
