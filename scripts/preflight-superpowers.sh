@@ -70,12 +70,15 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+# lookback 转整数（支持 0.5 这类）
+LOOKBACK_MIN=$(awk -v h="$LOOKBACK_HOURS" 'BEGIN{print int(h*60)}')
+
 # ===== 环境校验 =====
 [ -d "$SESSIONS_DIR" ] || { err "找不到 sessions dir: $SESSIONS_DIR"; exit 3; }
 [ -f "$MEMORY_FILE" ] || { err "找不到 memory file: $MEMORY_FILE"; exit 3; }
 
 # ===== 找最近 sessions =====
-mapfile -t SESSIONS < <(find "$SESSIONS_DIR" -name "*.jsonl" -mmin -$(( LOOKBACK_HOURS * 60 )) 2>/dev/null | head -50)
+mapfile -t SESSIONS < <(find "$SESSIONS_DIR" -name "*.jsonl" -mmin -"$LOOKBACK_MIN" 2>/dev/null | head -50)
 SESSION_COUNT=${#SESSIONS[@]}
 [ "$SESSION_COUNT" -eq 0 ] && { warn "lookback ${LOOKBACK_HOURS}h 内 0 session"; exit 0; }
 
@@ -86,10 +89,12 @@ SESSION_COUNT=${#SESSIONS[@]}
 # 排除元讨论（"讨论 using-superpowers"不算宣告）
 USING_COUNT=0
 TOTAL_TURNS=0
-# 严格 regex — 兼容两种宣告格式:
+# 严格 regex — 兼容所有宣告格式:
 #   1) "Using [using-superpowers](path) to ..."
 #   2) "Using `using-superpowers` to ..." (markdown 反引号)
-PATTERN='^\*?\*?Using[[:space:]]+[`\*]*\[?using-superpowers\]?[`\]]'
+#   3) "**Using `using-superpowers` to ...**" (双星包加粗)
+#   4) "**Using [using-superpowers] to**" (双星 + 方括号)
+PATTERN='^[\*`[:space:]]*Using[[:space:]]+[`\*]*\[?using-superpowers\]?[`\*\]]'
 
 for f in "${SESSIONS[@]}"; do
     while IFS= read -r line; do
