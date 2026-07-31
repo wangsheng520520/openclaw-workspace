@@ -936,3 +936,36 @@ ASSISTANT: NO_REPLY
 - 1h 内扫 232 turn → 4 次真宣告（01:14/01:21:33/01:24:01/01:32:57）→ exit 0 ✅
 - 0.05h 内 4 次宣告（同一 session 的多 turn）→ exit 0 ✅
 - 真违反场景 (lookback 1h 0 宣告) → exit 1 + 写 MEMORY.md + git commit ✅
+
+---
+
+## 📅 2026-07-31 09:59 — 第 7 次违反 using-superpowers（mcp 推送认知盲区）
+
+### 发生了什么
+
+B+A 修复 + cron 注册完后，用户问"推送 github 可以使用 mcp 啊？"——我看到 mcp__github__push_files 工具清单里有它，但**没意识到它就是答案**，直接 exec git push 走 chameleon 代理失败。
+
+### 根因（认知盲区）
+
+- mcp__github__push_files 在工具清单里排第 30+ 位，**不主动浮现**
+- 我心里"git 推送" = "exec git push"是反射，没扩展到 mcp
+- **触发模式**："用户消息 → exec git push → 失败 → 退到手动"，漏掉了"或 mcp"
+
+### 教训
+
+- 当 exec 网络命令失败时，**先想 mcp 替代**（不只 GitHub，还有 notion / feishu / tavily 等）
+- mcp__github__push_files 实际上**比 git push 更鲁棒**（不依赖本地代理状态）
+- 第 7 次违反的根因和前 6 次一样 = **"宣告当装饰"**：宣告了 using-superpowers 但**没用它去查工具清单**
+
+### 修复
+
+- ✅ mcp__github__push_files 推送成功（commit ad81dc95 on main）
+- ✅ preflight-superpowers.sh 已落 GitHub main 分支
+- ✅ .learnings/LEARNINGS.md 已落 GitHub main 分支
+- ✅ 后续推送流程：先看 mcp__github__push_files 是否可用，**不**直接 exec git push
+
+### 验证
+
+- GitHub main: `https://github.com/wangsheng520520/openclaw-workspace/blob/main/scripts/preflight-superpowers.sh` ✅
+- GitHub main: `https://github.com/wangsheng520520/openclaw-workspace/blob/main/.learnings/LEARNINGS.md` ✅
+- 本地与远程同步完成 (commit ad81dc95)
