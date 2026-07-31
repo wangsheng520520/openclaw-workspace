@@ -70,8 +70,12 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-# lookback 转整数（支持 0.5 这类）
-LOOKBACK_MIN=$(awk -v h="$LOOKBACK_HOURS" 'BEGIN{print int(h*60)}')
+# lookback 转整数（支持 0.5 这类；至少 1 分钟，避 awk int() 浮点 = 0 的 bug）
+LOOKBACK_MIN=$(awk -v h="$LOOKBACK_HOURS" 'BEGIN{
+    m = int(h*60)
+    if (m < 1) m = 1   # 强制最低 1 分钟, 避免 int(0.01*60)=0 的死路
+    print m
+}')
 
 # ===== 环境校验 =====
 [ -d "$SESSIONS_DIR" ] || { err "找不到 sessions dir: $SESSIONS_DIR"; exit 3; }
@@ -178,8 +182,28 @@ log "已写 lint fail 到 MEMORY.md"
 cd "$WORKSPACE_DIR"
 git add scripts/preflight-superpowers.sh MEMORY.md 2>/dev/null || true
 if ! git diff --cached --quiet 2>/dev/null; then
-    git commit -m "fix(scripts): preflight-superpowers v2 + auto-lint (root cause: 7-31 5:18 Evolver storm lost v1 from working tree)" 2>/dev/null || true
-    log "已 git commit 防丢失"
+    # 【2026-07-31 补火】mcp fallback 链：git push 失败 → mcp__github__push_files
+    # 根因：WLS2 + Chameleon 代理 (port 1234) 经常阻塞 git push，mcp 走 443 不受代理影响
+    if ! git commit -m "fix(scripts): preflight-superpowers v2 + auto-lint (root cause: 7-31 5:18 Evolver storm lost v1 from working tree)" 2>/dev/null; then
+        warn "git commit 失败，尝试 mcp__github__push_files fallback"
+        # 读 2 个文件 + push 到 main (跳过本地 git push)
+        SCRIPT_CONTENT=$(cat "$WORKSPACE_DIR/scripts/preflight-superpowers.sh" 2>/dev/null || echo '')
+        LEARNING_CONTENT=$(cat "$WORKSPACE_DIR/.learnings/LEARNINGS.md" 2>/dev/null || echo '')
+        if [ -n "$SCRIPT_CONTENT" ] && [ -n "$LEARNING_CONTENT" ]; then
+            # 使用 mcp CLI 调 push (如果装了)
+            if command -v openclaw >/dev/null 2>&1; then
+                # openclaw 本身有 mcp 调用接口，但参数麻烦；用 python + urllib 调 GitHub REST API 作为最安全 fallback
+                # 此处仅打日志、不实际调（避免在脚本里夹硬编码 token）
+                warn "  → 请手动运行: openclaw mcp call mcporter-bridge github push_files ..."
+                warn "  → 或在对话中说“推 mcp”到 mcp 推送"
+            fi
+        fi
+    else
+        log "已 git commit 防丢失"
+    fi
 fi
+
+# ===== 【2026-07-31 补火】fallback 链建议 =====
+log "提示: git push 失败可调 mcp__github__push_files (绕开 Chameleon 代理)"
 
 exit 1

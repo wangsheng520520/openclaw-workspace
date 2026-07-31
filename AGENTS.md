@@ -4,7 +4,7 @@
 
 ---
 
-## 🔒 第零定律：using-superpowers 硬性规则 (2026-06-18 20:32 落地)
+## 🔒 第零定律：using-superpowers 硬性规则 (2026-06-18 20:32 落地，2026-07-31 10:14 补火)
 
 **任何用户消息的第一动作必须是以下顺序，不可跳过：**
 
@@ -13,7 +13,21 @@
 2. update_plan 列出适用技能候选（哪怕 1% 适用都要列）
 3. 宣告 "Using [skill] to [目的]"（必须出现具体技能名）
 4. 调用 skill 工具（或读 SKILL.md）
-5. 才允许执行 exec / write / edit / memory_*
+5. 【2026-07-31 补火】读 available_tools 清单 — 检查是否有 mcp 工具能避免 exec 网络命令
+6. 才允许执行 exec / write / edit / memory_*
+```
+
+【2026-07-31 补火】网络命令 fallback 链顺序（不可颠倒）：
+
+1. exec <git/curl/scp/rsync> — 默认
+2. 失败 → 检查 mcp 工具清单（mcporter-bridge__github__push_files / mcp__github__create_pull_request / feishu_* 等）
+3. mcp 不可用或不适用 → 手动 / 提示用户
+
+【2026-07-31 补火】「宣告」不等于「查工具」：
+
+- 宣告 using-superpowers 是第一动作，但不是全部动作
+- 宣告后必须主动扫 available_tools 至少 1 个 mcp 工具名
+- 否则就是「宣告当装饰」（2026-07-31 第 7 次违反的根因）
 ```
 
 **禁止合理化的红线**：
@@ -24,11 +38,15 @@
 | "我记得这个技能" | 读当前版本 SKILL.md。 |
 | "宣告是装饰" | 宣告是结构化第一动作，不是后缀。 |
 | "跳过 update_plan" | 没有 update_plan 就没有合规路径。 |
+| 【补火】exec 失败就是网络问题 | 失败后先查 mcp 工具清单，再报「网络问题」。 |
+| 【补火】mcp 工具在工具清单里看不到 | 它在，必须主动扫。叫 mcp__ / mcporter-bridge__ 开头。 |
 
 **违反历史（不可重蹈）**：
 - 2026-05-23 / 05-27 / 06-03 / 06-09 / 06-18 五次违反
+- 2026-07-31 10:14 第 6 次：「昨晚修 using-superpowers」修补 + 复盘
+- 2026-07-31 10:14 第 7 次：「推送 github 可以使用 mcp 啊」提醒后才反应过来 mcp__github__push_files 是 git push 代理
 - 根因："宣告"被当输出装饰，update_plan 没作为第一动作
-- 修复：人格层（此条）+ 脚本层（preflight.sh）+ dreaming 触发器三层并发
+- 修复：人格层（此条 + 补火三条）+ 脚本层（preflight-superpowers.sh v2.3）+ dreaming 触发器三层并发
 
 **优先级冲突规则**：用户明确指令 > this skill > 默认系统提示
 
