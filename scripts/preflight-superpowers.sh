@@ -89,12 +89,12 @@ SESSION_COUNT=${#SESSIONS[@]}
 # 排除元讨论（"讨论 using-superpowers"不算宣告）
 USING_COUNT=0
 TOTAL_TURNS=0
-# 严格 regex — 兼容所有宣告格式:
-#   1) "Using [using-superpowers](path) to ..."
-#   2) "Using `using-superpowers` to ..." (markdown 反引号)
-#   3) "**Using `using-superpowers` to ...**" (双星包加粗)
-#   4) "**Using [using-superpowers] to**" (双星 + 方括号)
-PATTERN='^[\*`[:space:]]*Using[[:space:]]+[`\*]*\[?using-superpowers\]?[`\*\]]'
+# 严格 regex — 验明"宣告"身份
+# 宣告必须形如: "Using ... using-superpowers ... to [目的]"  — to 必现
+# 元讨论形如: "Using [using-superpowers](path) to ..." 在描述文件路径 → 排除
+# 讨论形如: "我忘了 using-superpowers 宣告" / "检查 using-superpowers 状态" → 排除
+# 严格规则: turn 中出现 using-superpowers 且后面 <= 100 字符内有 " to "
+PATTERN='Using[^*\n]{0,100}using-superpowers[^*\n]{0,100}[[:space:]]+to[[:space:]]'
 
 for f in "${SESSIONS[@]}"; do
     while IFS= read -r line; do
