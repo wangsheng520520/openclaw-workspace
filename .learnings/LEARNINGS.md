@@ -881,3 +881,58 @@ ASSISTANT: NO_REPLY
   3. journalctl 日志（3 天窗口）比推理更可靠
   4. 承认前 N 次假设错时不硬撑，回到证据链原点
 
+
+## 📅 2026-07-31 09:50 — preflight-superpowers.sh 丢失根因 + 修复（Using-superpowers 失效的 5 次违反后的第 6 次）
+
+### 发生了什么
+
+5 次违反历史（2026-05-23/27、06-03/09、06-18）后，第 6 次出现：
+用户问"昨晚到今早 5 点是否关过 using-superpowers"，我答"没有，证据是 SKILL.md mtime 24 天前"。
+用户纠正"该技能长期没有正常使用，关掉 30 加技能也是修复 using-superpowers 技能的一部分，还有脚本"。
+
+### 根因（4 层，systematic-debugging 全 4 阶段）
+
+**Phase 1: 证据收集**
+- f7d5b030 session (07-30 22:30 ~ 07-31 05:28, 954 行) 真的写了 preflight-superpowers.sh
+- 5 个测试都通过（"🎯 全部 5 个测试通过"）
+- **但 git ls-files scripts/ 没有 preflight-superpowers.sh**——从未 git add/commit
+
+**Phase 2: 重建时间线**
+- 5:17 openclaw.json 被改（从 .bak 1.0 → 30k 字符预算）
+- 5:18 Gateway 硬重启（pid 1505067 启动时间）
+- **5:18 ~ 5:33 Evolver daemon 反复死 7 次**（B7: PID 跳了 7 次, 端口 19820 双失败）
+- 5:28 f7d5b030 session 触发 compaction event
+- 5:29 session 关闭
+
+**Phase 3: 根因**
+- f7d5b030 session 写脚本但**未 git add**（看 L876 write 工具返回"Successfully wrote 4895 bytes"，但 git index 始终没记录）
+- 5:18~5:33 链式崩溃 + compaction event 触发 working tree 清理
+- **未 tracked 的 .sh 文件蒸发**
+
+**Phase 4: 修复**
+1. v2 重写 `scripts/preflight-superpowers.sh` (6655 字节)
+2. 立即 git add + commit (commit e36425d)
+3. 立即加 cron `593fec6b` 每 30min 自动跑 --check-only
+4. v2.2 修正 regex: 用 `Using ... using-superpowers ... to [目的]` 模式（"to" 必现），正确识别反引号/方括号/加粗等格式
+
+### 关键教训
+
+| 教训 | 类别 | 适用 |
+|------|------|------|
+| 写 workspace 文件后**必须立即 git add + commit**，不能等 | best_practice | 任何 subagent / assistant 写 .sh/.js/.py |
+| Evolver 链式崩溃 + compaction 期间，未 tracked 的文件可能蒸发 | knowledge_gap | 5:18-5:33 风暴期间 |
+| "宣告 Using X" 我常误以为 turn 开头就是，但实际是"包含"，regex 须用 `Using ... X ... to [目的]` 模式 | best_practice | 任何 using-superpowers 自动检测 |
+| 第 6 次违反根因仍是"宣告被当装饰" — 5 次没学会的事 = **架构层兜底** (cron 30min 自动跑) | correction | 长期行为治理 |
+
+### 防再次发生
+
+- ✅ cron `593fec6b` 每 30min 自动跑 `preflight-superpowers.sh --check-only`
+- ✅ 脚本本身被 git tracked (e36425d) — 重启/崩溃不会丢
+- ✅ v2.2 regex 严格模式，4 种宣告格式都能识别
+- ✅ v2.2 输出 lint-fail 写到 MEMORY.md 时会自动 git add+commit
+
+### 验证
+
+- 1h 内扫 232 turn → 4 次真宣告（01:14/01:21:33/01:24:01/01:32:57）→ exit 0 ✅
+- 0.05h 内 4 次宣告（同一 session 的多 turn）→ exit 0 ✅
+- 真违反场景 (lookback 1h 0 宣告) → exit 1 + 写 MEMORY.md + git commit ✅
