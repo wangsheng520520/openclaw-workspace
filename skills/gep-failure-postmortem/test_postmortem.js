@@ -35,27 +35,41 @@ function run() {
   assert.strictEqual(s.failure_mode, FAILURE_MODES.STAGNATION, 'expected stagnation');
   assert.strictEqual(s.recommendation.action, 'switch_intent');
 
-  // Test 5: detectLoop with 2-element array (should be false)
+  // Test 5: submodule_invisible (new in v0.2.0)
+  const sub = analyze(samples[4].record);
+  assert.strictEqual(sub.failure_mode, FAILURE_MODES.SUBMODULE_INVISIBLE, 'expected submodule_invisible');
+  assert.strictEqual(sub.recommendation.action, 'relocate_or_auditor_patch');
+  assert.strictEqual(sub.recommendation.next_intent_hint, 'optimize');
+  assert.ok(/submodule/i.test(sub.recommendation.rationale), 'rationale should mention submodule');
+
+  // Test 6: detectLoop with 2-element array (should be false)
   assert.strictEqual(detectLoop({ recent_genes: ['a', 'a'] }), false, 'loop detection requires >= 3 entries');
 
-  // Test 6: detectLoop with all-distinct
+  // Test 7: detectLoop with all-distinct
   assert.strictEqual(detectLoop({ recent_genes: ['a', 'b', 'c'] }), false, 'loop should not be detected when genes differ');
 
-  // Test 7: extractGene from raw text
+  // Test 8: extractGene from raw text
   const rawOnly = analyze({ raw_text: 'some text gene_gep_innovate_from_opportunity more text' });
   assert.strictEqual(rawOnly.gene_used, 'gene_gep_innovate_from_opportunity');
 
-  // Test 8: signals_correlated is an array
+  // Test 9: signals_correlated is an array
   assert.ok(Array.isArray(v.signals_correlated), 'signals_correlated must be an array');
 
-  // Test 9: confidence is a number in [0,1]
+  // Test 10: confidence is a number in [0,1]
   assert.ok(typeof v.confidence === 'number' && v.confidence >= 0 && v.confidence <= 1);
 
-  // Test 10: empty / null record returns unknown mode without throwing
+  // Test 11: empty / null record returns unknown mode without throwing
   const u = analyze(null);
   assert.strictEqual(u.failure_mode, FAILURE_MODES.UNKNOWN, 'null record should be unknown');
 
-  process.stdout.write('ok: 10 assertions passed\n');
+  // Test 12: submodule_invisible is also detected from raw text pattern (not just structured fields)
+  const fromText = analyze({ raw_text: 'audit failed: constraint: hollow_commit, the auditor is submodule-blind' });
+  assert.strictEqual(fromText.failure_mode, FAILURE_MODES.SUBMODULE_INVISIBLE, 'expected submodule_invisible from text');
+
+  // Test 13: ensure the new mode is exported
+  assert.ok(FAILURE_MODES.SUBMODULE_INVISIBLE === 'submodule_invisible', 'SUBMODULE_INVISIBLE must be exported');
+
+  process.stdout.write('ok: 13 assertions passed\n');
 }
 
 try {

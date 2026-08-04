@@ -70,6 +70,7 @@ node skills/gep-failure-postmortem/index.js --demo
 | `json_schema_invalid` | Output rejected for missing JSON object | `retry_safe` with stricter prompt review |
 | `missing_knowledge` | Hub returned no match AND local has no similar gene | `fetch_hub` to populate local knowledge |
 | `stagnation` | stable_success_plateau + repeated gene | `switch_intent` to innovate |
+| `submodule_invisible` | Gene-declared validations pass, but audit gate flags `hollow_commit` because the change lives in a git submodule (e.g. `skills/evolver/`) that the parent-repo auditor cannot see | `relocate_or_auditor_patch` — move change to a parent-repo-visible path, commit inside the submodule + update parent pointer, or request an auditor patch that walks submodules |
 | `unknown` | Cannot classify | `switch_gene` to a different category |
 
 ## See Also
@@ -77,3 +78,8 @@ node skills/gep-failure-postmortem/index.js --demo
 - `validation-command-linter` — lint validation commands before submitting
 - `evolver-overseer` — verify blast-radius estimates before approval
 - `systematic-debugging` — general debugging methodology
+
+## Changelog
+
+- v0.2.0 — Added `submodule_invisible` failure mode (detects the `hollow_commit` pattern from submodule-blind auditors) and corresponding `relocate_or_auditor_patch` recommendation. Added a demo sample and detection triggers for `hollow_commit`, `submodule.*blind`, and `auditor.*submodule` text patterns, plus the structured `audit_outcome` field.
+- v0.1.0 — Initial release.

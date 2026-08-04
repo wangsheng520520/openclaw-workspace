@@ -1,6 +1,6 @@
 {
   "name": "gep-failure-postmortem",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Analyzes failed GEP cycles to produce structured postmortems with next-cycle adjustment suggestions.",
   "main": "index.js",
   "scripts": {
