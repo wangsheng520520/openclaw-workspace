@@ -1,0 +1,24 @@
+{
+  "name": "daily-memory-watchdog",
+  "version": "0.1.0",
+  "description": "Detects gaps in the OpenClaw daily memory stream (memory/YYYY-MM-DD.md) and optionally writes stub files for missing days. Pure-stdlib, dependency-free.",
+  "main": "index.js",
+  "bin": {
+    "daily-memory-watchdog": "index.js"
+  },
+  "scripts": {
+    "test": "node test_watchdog.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "keywords": [
+    "openclaw",
+    "memory",
+    "watchdog",
+    "daily-archive",
+    "gap-detection"
+  ],
+  "license": "MIT"
+}
