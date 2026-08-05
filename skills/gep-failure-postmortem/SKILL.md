@@ -30,6 +30,10 @@ cat failed_cycle.json | node skills/gep-failure-postmortem/index.js --stdin
 # Analyze a raw GEP prompt dump
 node skills/gep-failure-postmortem/index.js --file memory/evolution/gep_prompt_cycle_XXXX.json
 
+# Analyze the most recent "- failed" entry from the evolution narrative
+node skills/gep-failure-postmortem/index.js --recent
+node skills/gep-failure-postmortem/index.js --recent memory/evolution/evolution_narrative.md
+
 # Demo with built-in samples
 node skills/gep-failure-postmortem/index.js --demo
 ```

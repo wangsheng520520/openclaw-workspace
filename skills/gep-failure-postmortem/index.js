@@ -259,6 +259,84 @@ function loadFromFile(p) {
   }
 }
 
+// Parse the recent failed-cycle entry from evolution_narrative.md.
+// Looks for the most recent "INNOVATE/REPAIR/OPTIMIZE/EXPLORE - failed" block
+// and synthesises a record the analyzer can consume. Falls back to {raw_text}
+// if the file is missing or contains no parseable failure entry.
+function loadFromNarrative(narrativePath) {
+  const CANDIDATES = [];
+  if (narrativePath) CANDIDATES.push(narrativePath);
+  CANDIDATES.push(
+    'memory/evolution/evolution_narrative.md',
+    'skills/evolver/memory/evolution/evolution_narrative.md'
+  );
+  // Walk up from cwd to find the file (handles running from a skills/ subdir).
+  let dir = process.cwd();
+  for (let i = 0; i < 6; i++) {
+    CANDIDATES.push(path.join(dir, 'memory/evolution/evolution_narrative.md'));
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+
+  let text = null;
+  let usedPath = null;
+  for (const p of CANDIDATES) {
+    try {
+      if (fs.existsSync(p)) {
+        text = fs.readFileSync(p, 'utf8');
+        usedPath = p;
+        break;
+      }
+    } catch (_) { /* keep trying */ }
+  }
+  if (text === null) {
+    return { raw_text: '', source: null, found_entry: false };
+  }
+
+  // Find the most recent "- failed" block header line, then read its section
+  // until the next blank-line-then-header boundary.
+  const lines = text.split(/\r?\n/);
+  let blockStart = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/ - failed(?:\s|$)/.test(lines[i]) && /###\s*\[/.test(lines[i])) {
+      blockStart = i;
+    }
+  }
+  if (blockStart === -1) {
+    return { raw_text: text, source: usedPath, found_entry: false };
+  }
+
+  // Determine where the block ends (start of next ### header or end of file).
+  let blockEnd = lines.length;
+  for (let j = blockStart + 1; j < lines.length; j++) {
+    if (/^###\s*\[/.test(lines[j])) { blockEnd = j; break; }
+  }
+  const block = lines.slice(blockStart, blockEnd).join('\n');
+
+  const intentMatch = block.match(/(INNOVATE|REPAIR|OPTIMIZE|EXPLORE)/i);
+  const intent = intentMatch ? intentMatch[1].toLowerCase() : null;
+  const geneMatch = block.match(/Gene:\s*([a-z0-9_]+)/);
+  const gene_used = geneMatch ? geneMatch[1] : null;
+  const signalsMatch = block.match(/Signals:\s*\[([^\]]*)\]/);
+  const signals = signalsMatch
+    ? signalsMatch[1].split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+  const scoreMatch = block.match(/Score:\s*([\d.]+)/);
+  const score = scoreMatch ? parseFloat(scoreMatch[1]) : null;
+
+  return {
+    raw_text: block,
+    source: usedPath,
+    found_entry: true,
+    intent,
+    gene_used,
+    signals,
+    score,
+    block_header: lines[blockStart].trim()
+  };
+}
+
 function buildDemoSamples() {
   return [
     {
@@ -320,6 +398,14 @@ async function main() {
 
   if (args.includes('--stdin')) {
     record = await loadFromStdin();
+  } else if (args.includes('--recent')) {
+    const fileIdx = args.indexOf('--recent');
+    const provided = (fileIdx !== -1 && fileIdx !== args.length - 1) ? args[fileIdx + 1] : null;
+    record = loadFromNarrative(provided);
+    if (!record.found_entry) {
+      process.stderr.write('no recent failed entry found in evolution narrative\n');
+      process.exit(3);
+    }
   } else if (args.includes('--demo')) {
     const samples = buildDemoSamples();
     const out = samples.map(s => ({
@@ -331,7 +417,7 @@ async function main() {
   } else {
     const fileIdx = args.indexOf('--file');
     if (fileIdx === -1 || fileIdx === args.length - 1) {
-      process.stderr.write('usage: gep-failure-postmortem [--stdin | --file <path> | --demo]\n');
+      process.stderr.write('usage: gep-failure-postmortem [--stdin | --file <path> | --recent [path] | --demo]\n');
       process.exit(2);
     }
     record = loadFromFile(path.resolve(args[fileIdx + 1]));
@@ -349,6 +435,7 @@ module.exports = {
   extractSignals,
   extractGene,
   pickRecommendation,
+  loadFromNarrative,
   FAILURE_MODES,
   buildDemoSamples
 };

@@ -6,7 +6,7 @@
 'use strict';
 
 const assert = require('assert');
-const { analyze, buildDemoSamples, FAILURE_MODES, detectLoop, extractGene } = require('./index.js');
+const { analyze, buildDemoSamples, FAILURE_MODES, detectLoop, extractGene, loadFromNarrative } = require('./index.js');
 
 function run() {
   const samples = buildDemoSamples();
@@ -69,7 +69,43 @@ function run() {
   // Test 13: ensure the new mode is exported
   assert.ok(FAILURE_MODES.SUBMODULE_INVISIBLE === 'submodule_invisible', 'SUBMODULE_INVISIBLE must be exported');
 
-  process.stdout.write('ok: 13 assertions passed\n');
+  // Test 14: loadFromNarrative parses the most recent "INNOVATE - failed" block
+  const tmpDir = require('fs').mkdtempSync('/tmp/gep-pm-');
+  const narrativePath = require('path').join(tmpDir, 'evolution_narrative.md');
+  require('fs').writeFileSync(narrativePath, [
+    '# Evolution Narrative',
+    '',
+    'A chronological record of evolution decisions and outcomes.',
+    '',
+    '### [2026-08-05 02:15:44] INNOVATE - failed',
+    '- Gene: gene_gep_innovate_from_opportunity | Score: 0.65 | Scope: 6 files, 374 lines',
+    '- Signals: [protocol_drift, user_feature_request]',
+    '- Strategy:',
+    '  1. Extract opportunity signals',
+  ].join('\n'));
+  const nar = loadFromNarrative(narrativePath);
+  assert.strictEqual(nar.found_entry, true, 'should find a failed block');
+  assert.strictEqual(nar.intent, 'innovate', 'intent should be parsed lowercase');
+  assert.strictEqual(nar.gene_used, 'gene_gep_innovate_from_opportunity', 'gene should be parsed');
+  assert.deepStrictEqual(nar.signals, ['protocol_drift', 'user_feature_request'], 'signals should be parsed');
+  assert.strictEqual(nar.score, 0.65, 'score should be parsed');
+  const narResult = analyze(nar);
+  assert.ok(narResult.gene_used === 'gene_gep_innovate_from_opportunity', 'analyzer should accept narrative record');
+
+  // Test 15: loadFromNarrative returns found_entry=false when no candidate paths exist.
+  // Use a dedicated tmp dir as cwd so the walk-up search can't discover a real narrative.
+  const isolatedCwd = require('fs').mkdtempSync('/tmp/gep-pm-iso-');
+  const prevCwd = process.cwd();
+  process.chdir(isolatedCwd);
+  let empty;
+  try {
+    empty = loadFromNarrative(null);
+  } finally {
+    process.chdir(prevCwd);
+  }
+  assert.strictEqual(empty.found_entry, false, 'missing file -> found_entry=false');
+
+  process.stdout.write('ok: 15 assertions passed\n');
 }
 
 try {
