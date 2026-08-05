@@ -271,5 +271,3 @@ const assertPluginStateAllowed = () => {
 - plugin 2026.7.1 patched（白名单 + bge-m3: 1024）✅
 - Gateway PID 1425501, 22:03 启动 ✅
 - 记忆搜索走 LanceDB 真实向量索引 ✅
-
-

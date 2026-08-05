@@ -20,10 +20,20 @@
 | 主题 | 文件 | 内容 |
 |------|------|------|
 | 🔒 受保护字段历史 | `MEMORY-system-history.md` | bootstrapMaxChars 调整史、04-26~28 升级/wizard 回退、04-14 梦境回归等 |
+| 🌙 Dreaming 系统 | `MEMORY-dreaming.md` | 2026-08-05 dreaming 对齐官方文档决策、slots/memory-lancedb 接管 dreaming 调度事实认定、"功能断没断"5 步法永久规则 |
 | 🛠 关键决策归档 | `MEMORY-decisions.md` | 06-11 飞书插件升级/active-memory/插件路径统一 5 段完整过程 |
 | 📦 旧短期记忆提炼 | `MEMORY-promoted.md` | 05-22~06-15 累计 14 次自动提炼日志 + Promoted 模式识别 |
 | ⚙️ 操作手册 | `MEMORY-ops-playbook.md` | Evolver 手动流程 + 04-15~05 系统观察 + 模型教训 |
 | 🧪 Pi Agent (ACPX) | `MEMORY-pi-agent.md` | 2026-08-05 C 路径配置 + mergeAgentRegistry bug + 5 步法调试经验 |
+
+---
+
+### 🔒 2026-08-05 09:20 决策（Dreaming 系统对齐官方文档 + slots/memory-lancedb 接管 dreaming 调度的事实认定）
+
+> **决策**：保持 `plugins.slots.memory = "memory-lancedb"` 不变；`plugins.entries.memory-core` 整块**保留作备用**（doctor 已知 1 条 warning）；deep phase 阈值回退官方默认；删除 `scripts/dream-runner.sh` + `scripts/dream-sweep.mjs`。
+> **拍板人**：用户 @ 09:20 GMT+8。
+> **完整细节** → 拆分到子文件 `MEMORY-dreaming.md`（执行流程、事实认定表、证据链、当前配置、未来禁止动作 4 条全部归档）。
+> **本条仅留索引**：避免重复占 MEMORY.md 主空间（受 07-30 拆分原则保护 + 09:38 用户拍板"所有写入都用子文件 + 索引"）。
 
 ---
 
@@ -120,11 +130,12 @@
 1. **技能分层**: 系统插件在 `plugins.entries` 配置,工作区技能自动加载
 2. **记忆三层**: MEMORY.md(手动提炼) → daily memory(自动记录) → .dreams(梦境分析)
 3. **API 密钥管理**: 使用 `.env` 文件集中管理,权限 600
-4. **主动汇报**: 任务完成后主动汇报结果,不等待用户询问
-5. **受保护字段写入**: `bootstrapMaxChars`、`agents.defaults` 等受保护字段不可通过 config.patch 修改,需直接编辑 openclaw.json + gateway restart 热重载
-6. **心跳架构原则**: 心跳必须独立 session lane + lightContext:false,否则每 30 分钟阻塞主会话 5-7 分钟
-7. **Evolver 手动操作前必查**: 执行 `node index.js review --approve` 前必须先 `ps aux | grep "index.js" | grep -v grep` 确认只有一个 `--loop` daemon 进程，否则手动触发的新进程会与 daemon 并存造成循环混乱。手动操作完成后如有新孤立进程立即用 `kill <PID>` 清理。
-8. **文件改动是否需要 gateway reload** (2026-08-05 新增):
+4. **"功能断没断"判断 5 步法（2026-08-05 立，永久规则，禁止跳过）** → 详见 `MEMORY-dreaming.md`（含完整 5 步、反面教材 09:11 误判案例）
+5. **主动汇报**: 任务完成后主动汇报结果,不等待用户询问
+6. **受保护字段写入**: `bootstrapMaxChars`、`agents.defaults` 等受保护字段不可通过 config.patch 修改,需直接编辑 openclaw.json + gateway restart 热重载
+7. **心跳架构原则**: 心跳必须独立 session lane + lightContext:false,否则每 30 分钟阻塞主会话 5-7 分钟
+8. **Evolver 手动操作前必查**: 执行 `node index.js review --approve` 前必须先 `ps aux | grep "index.js" | grep -v grep` 确认只有一个 `--loop` daemon 进程，否则手动触发的新进程会与 daemon 并存造成循环混乱。手动操作完成后如有新孤立进程立即用 `kill <PID>` 清理。
+9. **文件改动是否需要 gateway reload** (2026-08-05 新增):
    - `openclaw.json` (config / plugins / agents.list / acp) → ✅ **需要 SIGUSR1** (受 06-10 决策保护)
    - `MEMORY.md` + `MEMORY-*.md` 子文件 → ❌ **不需要 reload** (下次 session 启动自动 read)
    - `TOOLS.md` + `TOOLS-*.md` 子文件 → ❌ 不需要 reload (同上)

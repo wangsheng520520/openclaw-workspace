@@ -47,18 +47,36 @@
 - 2026-07-31 10:14 第 7 次：「推送 github 可以使用 mcp 啊」提醒后才反应过来 mcp__github__push_files 是 git push 代理
 - 根因："宣告"被当输出装饰，update_plan 没作为第一动作
 - 修复：人格层（此条 + 补火三条）+ 脚本层（preflight-superpowers.sh v2.3）+ dreaming 触发器三层并发
-- 2026-08-05 12:39 第 8 次：untracked 文件（MEMORY-pi-agent.md）被 Evolver `git reset --mixed HEAD` + `git stash` rollback 清掉，**没有 git add = 没有保护**
-
-**【2026-08-05 补火】文件改动后必须立即 git add**：
-
-任何 `write` / `edit` / `apply_patch` 工具调用后，**同一 turn 内**必须执行 `git add <file>`：
-- `write` 创建新文件 → `git add <file>`（untracked 状态是最脆弱的，Evolver solidify rollback 会清掉）
-- `edit` 修改已有文件 → `git add <file>`
-- `apply_patch` 多文件 → `git add <files...>`
-- **不允许 untracked 状态的工作区文件存在超过一个 turn**
-- 原因：Evolver solidify 的 rollback 路径包含 `git reset --mixed HEAD` + `git stash`，untracked 文件不在 stash 保护范围内，**会丢失**（详见 `.learnings/LEARNINGS.md` 2026-08-05 12:39 条目）
 
 **优先级冲突规则**：用户明确指令 > this skill > 默认系统提示
+
+---
+
+## 🔒 第零定律补火：先实测，再列方案（2026-08-05 09:48 落地）
+
+> **当用户问题疑似"功能 X 是否还在工作/需要修复"时，禁止直接列 N 个方案让用户"选 A/B/C"。必须先实测，先查历史。**
+
+**触发场景**：用户说"对齐官方文档"、"补齐缺失的"、"X 是不是坏了"、"X 是不是需要切到 Y"等任何**涉及运行状态判断**的请求。
+
+**硬性 5 步流程（任何一步发现"功能在工作"，立刻停下，不要列方案）**：
+
+| 步 | 维度 | 命令 / 路径 |
+|---|---|---|
+| 1 | **效果层** | `memory status --deep` / `cron list` / `doctor` 跑一遍看实际输出 |
+| 2 | **配置层** | `cat <plugin>/openclaw.plugin.json` 看 schema 实际接受什么 key |
+| 3 | **历史层** | `memory_search "功能名 + slot/disable/enable"` 找 3 个月内决策证据 |
+| 4 | **代码层** | grep 引用方，搜 `~/.openclaw/extensions/<plugin>/dist` 运行时调用点 |
+| 5 | **用户层** | 用户最近是否提过相关问题（反向证据） |
+
+**为什么这是硬规则**：实测成本 < 错判代价。错判一次可能毁掉数小时修复链（如 07-30 修好的 LanceDB bge-m3）。
+
+**反面教材（不可重蹈）**：
+- **2026-08-05 09:11** —— 助手凭推断列了 3 个方案（切 memory-core / 放弃 dreaming / 双 slot 实验），差点毁掉 07-30 刚修好的 LanceDB bge-m3 链路。
+- **纠偏时刻**：用户一句反问"有没有保留 memory-lancedb 又可以跑 dreaming 的方法"才纠偏。
+- **根因**：跳过 step 1（没跑 `memory status --deep` 看 dreaming 实际状态）+ 跳过 step 3（没 memory_search 找 06-11 那条 evidence）。
+- **完整方法论 + 证据链** → `MEMORY-dreaming.md`（"功能断没断"判断 5 步法段）
+
+**违反后果**：与 P-26（using-superpowers 纪律违反）同级，记入 `.learnings/ERRORS.md` + 下次心跳对照检查。
 
 ---
 

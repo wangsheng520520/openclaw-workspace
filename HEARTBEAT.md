@@ -16,6 +16,34 @@ write /home/wszmd520520/.openclaw/workspace/memory/heartbeat-state.json (完整�
 ```
 **这是心跳存活的唯一证据**，不更新会导致 SESSION-STATE 检查误报"心跳漏触发"。
 
+### 0.5 写今日行为日志 (每日日志机制，2026-08-05 启用)
+文件：`memory/YYYY-MM-DD.md`（今日日期，Asia/Shanghai）
+
+**规则**（每次心跳必做，append-only）：
+1. 取今日文件名 `memory/<YYYY-MM-DD>.md`
+2. **如果文件不存在** → 创建并写入开头：
+   ```
+   # YYYY-MM-DD
+   
+   ## 心跳记录
+   
+   - HH:MM CST — <本轮关键结论摘要，1~3 行>
+   ```
+3. **如果文件已存在** → append 一行：
+   ```
+   - HH:MM CST — <本轮关键结论摘要，1~3 行>
+   ```
+4. 如果本轮只是 `HEARTBEAT_OK`、无新事件 → append：
+   ```
+   - HH:MM CST — HEARTBEAT_OK (无新任务)
+   ```
+5. **不要**回填历史日期（52 天空白另议，不在本规则范围）
+6. **不要**写会话级摘要（那是 OpenClaw 自动生成的 `YYYY-MM-DD-HHMM.md`，是另一回事）
+
+**为什么**：MEMORY.md 提炼每周日需要 `memory/YYYY-MM-DD.md` 输入；2026-06-14 后断档 52 天，原因是 HEARTBEAT.md 从未规定"谁来写"。本规则把"每日日志"从习惯升级为机制。
+
+**撤销方式**：删除本段即可，最末备份在 `/tmp/HEARTBEAT.md.bak-2026-08-05-0856`。
+
 ---
 
 ## 定期检查任务
