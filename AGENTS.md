@@ -47,6 +47,16 @@
 - 2026-07-31 10:14 第 7 次：「推送 github 可以使用 mcp 啊」提醒后才反应过来 mcp__github__push_files 是 git push 代理
 - 根因："宣告"被当输出装饰，update_plan 没作为第一动作
 - 修复：人格层（此条 + 补火三条）+ 脚本层（preflight-superpowers.sh v2.3）+ dreaming 触发器三层并发
+- 2026-08-05 12:39 第 8 次：untracked 文件（MEMORY-pi-agent.md）被 Evolver `git reset --mixed HEAD` + `git stash` rollback 清掉，**没有 git add = 没有保护**
+
+**【2026-08-05 补火】文件改动后必须立即 git add**：
+
+任何 `write` / `edit` / `apply_patch` 工具调用后，**同一 turn 内**必须执行 `git add <file>`：
+- `write` 创建新文件 → `git add <file>`（untracked 状态是最脆弱的，Evolver solidify rollback 会清掉）
+- `edit` 修改已有文件 → `git add <file>`
+- `apply_patch` 多文件 → `git add <files...>`
+- **不允许 untracked 状态的工作区文件存在超过一个 turn**
+- 原因：Evolver solidify 的 rollback 路径包含 `git reset --mixed HEAD` + `git stash`，untracked 文件不在 stash 保护范围内，**会丢失**（详见 `.learnings/LEARNINGS.md` 2026-08-05 12:39 条目）
 
 **优先级冲突规则**：用户明确指令 > this skill > 默认系统提示
 

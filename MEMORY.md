@@ -23,6 +23,7 @@
 | 🛠 关键决策归档 | `MEMORY-decisions.md` | 06-11 飞书插件升级/active-memory/插件路径统一 5 段完整过程 |
 | 📦 旧短期记忆提炼 | `MEMORY-promoted.md` | 05-22~06-15 累计 14 次自动提炼日志 + Promoted 模式识别 |
 | ⚙️ 操作手册 | `MEMORY-ops-playbook.md` | Evolver 手动流程 + 04-15~05 系统观察 + 模型教训 |
+| 🧪 Pi Agent (ACPX) | `MEMORY-pi-agent.md` | 2026-08-05 C 路径配置 + mergeAgentRegistry bug + 5 步法调试经验 |
 
 ---
 
@@ -53,6 +54,7 @@
 | **主模型（agents.list[0]）** | `volcengine-plan/ark-code-latest` | ✅ 保持 |
 | **默认模型（agents.defaults）** | `minimax/MiniMax-M3` | ⚠️ 已知与主模型不一致，历史遗留，本次不修 |
 | **用户偏好表达** | 表格对比、详细报告、主动汇报 | ✅ 保持 |
+| **Pi Agent (ACPX) 入口** | `agents.list[].runtime.type="acp"`（C 路径） | ✅ 已锁定（2026-08-05） |
 
 **何时才能修改**：用户**明确**说"现在改 X" 时，且**单一**改动必须独立确认。
 
@@ -96,6 +98,13 @@
 
 - `networkingMode=mirrored` 已配；`eth0` (100.64.164.2/29 NAT) + `eth1` (192.168.1.5/24 主网卡) 并存是镜像模式正常行为，无需修。DNS 正常（getent 测试通过）。
 
+### Pi Agent (ACPX) 入口 — C 路径 (2026-08-05 锁定)
+
+- **决策**: ACP agent 配置走 `agents.list[].runtime.type="acp"` (**不要** 用 `plugins.entries.acpx.config.agents` 对象格式,会触发 mergeAgentRegistry TypeError)
+- **状态**: `acp.defaultAgent = "pi"` + `acp.allowedAgents = ["pi"]` + `agents.list[pi]` entry 已生效, sessions_spawn 探针返回 `ok` (21s 完成)
+- **完整细节 + 5 步法调试经验**: 见 `MEMORY-pi-agent.md`
+- **关键教训**: `-32603 Internal error` 是 OpenClaw ACP 路径的"包装垃圾箱", 任何真实错误都被压成这条。**ACP agent 配置必须 sessions_spawn 实测**才能签字 (07-29 写好的配置 39 天没人调过, 0 个 pi session 历史)
+
 ### memory-lancedb + 硅基流动 BAAI/bge-m3 (2026-06-04, 06-12 压缩, 07-30 重大修正)
 
 - ⚠️ **2026-07-30 22:10 重大修正**：之前的"必须 dimensions: 1024"结论**是错的**！
@@ -115,6 +124,12 @@
 5. **受保护字段写入**: `bootstrapMaxChars`、`agents.defaults` 等受保护字段不可通过 config.patch 修改,需直接编辑 openclaw.json + gateway restart 热重载
 6. **心跳架构原则**: 心跳必须独立 session lane + lightContext:false,否则每 30 分钟阻塞主会话 5-7 分钟
 7. **Evolver 手动操作前必查**: 执行 `node index.js review --approve` 前必须先 `ps aux | grep "index.js" | grep -v grep` 确认只有一个 `--loop` daemon 进程，否则手动触发的新进程会与 daemon 并存造成循环混乱。手动操作完成后如有新孤立进程立即用 `kill <PID>` 清理。
+8. **文件改动是否需要 gateway reload** (2026-08-05 新增):
+   - `openclaw.json` (config / plugins / agents.list / acp) → ✅ **需要 SIGUSR1** (受 06-10 决策保护)
+   - `MEMORY.md` + `MEMORY-*.md` 子文件 → ❌ **不需要 reload** (下次 session 启动自动 read)
+   - `TOOLS.md` + `TOOLS-*.md` 子文件 → ❌ 不需要 reload (同上)
+   - `SOUL.md` / `AGENTS.md` / `IDENTITY.md` / `USER.md` → ❌ 不需要 reload (下次 bootstrap 自动加载)
+   - 经验: 改工作区文档后不要习惯性 SIGUSR1,只在改 openclaw.json 后才需要
 
 ---
 
@@ -190,6 +205,7 @@
 | QQ 邮箱双账户 | ✅ 已发现 | --config config-qq.toml |
 | A2A 环境变量 | ⚠️ 缺失 | 技能 UI 显示封锁，实际运行正常 |
 | 用户活跃度 | 🟡 静默 | 04-28 21:59 后无交互 |
+| Pi Agent (ACPX) | ✅ 已配置 + 实测 | agents.list 入口, 探针返回 `ok`, 21s 完成 (2026-08-05) |
 
 ---
 

@@ -1098,3 +1098,54 @@ B+A 修复 + cron 注册完后，用户问"推送 github 可以使用 mcp 啊？
 - **第 9 次违反（commit 误带 4 个 GEP 文件）—— 同一 session**
 
 **5 个违反都在 7-31 一天的同一会话**——这是"长期违规 + 即时多次违反"的混合型危机，需要**比 cron 30min 自动跑更强的硬性约束**（建议下条加 GEP 推送授权门）。
+
+---
+
+## 📅 2026-08-05 12:39 — untracked 文件被 Evolver git reset 清掉（MEMORY-pi-agent.md 失踪事件）
+
+### 发生了什么
+
+10:42 用 `write` 工具创建 `MEMORY-pi-agent.md`（3469 bytes, Pi Agent 配置档案子文件）。
+**没有 `git add`**（untracked 状态）。
+
+11:19 Pi Agent 跑 Evolver GEP cycle #0974。Pi 在 solidify 时检测到 pre-existing dirty MEMORY.md（用户 10:42 的 Pi Agent 引用改动），触发 **`git reset --mixed HEAD` + `git stash`** rollback。
+
+11:24:40 和 11:24:53 git reflog 显示两次 `reset: moving to HEAD`。
+
+**结果**：
+- MEMORY.md 的 5 处 Pi Agent 引用被 reset 清掉（恢复到 git HEAD 状态 = 没有 Pi Agent 内容）
+- MEMORY-pi-agent.md **完全失踪**（untracked 文件，不在任何 stash 里）
+- MEMORY-decisions.md 的 Pi Agent 段也丢了（但它本来就是 10:42 从 decisions 移到 pi-agent 的，decisions 不该有 Pi Agent 段——但 reset 把 10:42 之后的所有 tracked 改动都清了）
+
+### 根因分析
+
+**Evolver solidify 的 rollback 机制 = `git reset --mixed HEAD`**：
+- `--mixed`（默认）= 重置 index 到 HEAD，**保留 working tree 内容**，但 untracked 文件不受影响
+- **但 Evolver 还做了 `git stash`** = 把 tracked 文件的修改 stash 起来（恢复到 HEAD 状态）
+- untracked 文件在 `git stash`（默认不含 `--include-untracked`）时**应该保留在 working tree**
+- **但实际 MEMORY-pi-agent.md 失踪了** — 可能原因：
+  1. Evolver 的 rollback 不止 `git reset`，还有 `git clean` 或其他清理操作
+  2. 或者 `git stash --include-untracked` 被调用（但 `git stash show --include-untracked stash@{0}` 没显示它）
+  3. 或者 11:24 之后还有其他操作（如 evolver-watchdog 或 cron 任务）
+
+### 教训
+
+1. **untracked 文件是最脆弱的** — `git reset` 不清 untracked，但 Evolver 的完整 rollback 路径可能包含 `git clean` 或等效操作
+2. **`write` 创建新文件后必须立即 `git add`** — 只有 tracked 文件才受 `git stash` 保护
+3. **Evolver solidify rollback 是"核武器"** — 它不只 reset，还会 stash + 可能 clean，**任何 untracked 的工作区文件都有丢失风险**
+4. **恢复手段**：`git checkout stash@{N} -- <file>` 可以从 stash 恢复 tracked 文件；untracked 文件如果不在任何 stash 里就只能从记忆重建
+
+### 后续行动（已落地）
+
+1. ✅ MEMORY.md 从 `stash@{1}` 恢复（`git checkout stash@{1} -- MEMORY.md`）
+2. ✅ MEMORY-decisions.md 从 `stash@{1}` 恢复
+3. ✅ MEMORY-pi-agent.md 用 `write` 重建（7491 bytes，含 3 个时间事件 + 外部引用）
+
+### 硬规则（升到 AGENTS.md）
+
+> **以后任何文件改动（write/edit/apply_patch）后必须立即 `git add`，避免被 Evolver rollback 清掉。**
+
+- `write` 创建新文件 → `git add <file>` 
+- `edit` 修改已有文件 → `git add <file>` 
+- `apply_patch` 多文件 → `git add <files...>`
+- **不允许 untracked 状态的工作区文件存在超过一个 turn**
