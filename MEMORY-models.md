@@ -31,10 +31,8 @@
 
 **关键结论**：
 - 主会话（main）实际用 `minimax/MiniMax-M3`；pi 无 own model → 用全局默认 `volcano/ark-code-latest`
-- `volcano` = 火山方舟 Ark（provider baseUrl: ark.cn-beijing.volces.com/api/plan/v3）；`volcengine-plan/` 是旧别名写法，现已统一为 `volcano/`（openclaw.json 里 `volcengine-plan/ark-code-latest` 出现 0 次）
-- **易错教训**：别把 `agents.defaults.model.primary`（全局默认）当成主会话模型。记忆里 `.dreams` 明确记录「cron/子 agent 跟随 `agents.list[0].model.primary`（主 agent），不是 `agents.defaults.model.primary`(全局默认)」——2026-08-06 我曾错记默认模型为 ark-code-latest，实为主 agent 用 MiniMax-M3
-
-**待续**：火山方舟 `Agent-Plan-Medium` 包月 **2026-08-09 23:59 到期**（08-04 自动续费失败，需续费否则 `volcano/ark-code-latest` 主心断流回退）
+- `volcano` = 火山方舟 Ark（provider baseUrl 已切到 Coding Plan: ark.cn-beijing.volces.com/api/coding/v3）；`volcengine-plan/` 是旧别名写法，现已统一为 `volcano/`
+- **易错教训**：别把 `agents.defaults.model.primary`（全局默认）当成主会话模型。
 
 **其他模型**：`deepseek/deepseek-v4-pro` + `deepseek/deepseek-v4-flash`（2026-08-05 用户配置）；硅基流动 SiliconFlow（BAAI/bge-m3 嵌入 + 其余模型）；bailian-token-plan（qwen3.7/max/plus、qwen3.6-flash、glm-5.2、deepseek-v4-pro）**全部 fallbacks**
 
@@ -49,3 +47,30 @@
 | lark-cli | ✅ 已安装 | v1.0.71, 复用飞书App |
 
 > ⚠️ 完整渠道运行细节见 `TOOLS.md` + `TOOLS-lark-cli.md` + `TOOLS-memory-ai.md`
+
+---
+
+## 火山 Coding Plan 套餐切换 (2026-08-07 12:02)
+
+**用户操作**: 火山模型换套餐（Coding Plan），提供新 API 凭据。
+
+**配置变更**:
+- baseUrl: `https://ark.cn-beijing.volces.com/api/plan/v3` → `https://ark.cn-beijing.volces.com/api/coding/v3`
+- apiKey: `ark-fc2bb5ed-...` → `ff622315-85eb-43dc-a1a8-d229a08aa4c3`
+- 模型名: `ark-code-latest`（不变）
+- api 适配: `openai-completions`（不变，新套餐 OpenAI 兼容端点 /api/coding/v3）
+
+**变更位置**:
+- `openclaw.json` → `models.providers.volcano.baseUrl`（reloadKind=hot）
+- `secrets/default.json` → `models.volcano.apiKey` / `models.volcengine.apiKey` / `models.volcengine-plan.apiKey`（3 处统一更新）
+- `profiles.volcengine.default.key` 已是新 key（未动）
+
+**验证**:
+- ✅ curl 新端点 + 新 key → 200 OK（"好哒..."响应）
+- ✅ gateway 日志: `[reload] config hot reload applied (models.providers.volcano.baseUrl)`
+- ✅ JSON 合法性 + secrets 权限 600
+- 备份: `/tmp/openclaw.json.bak-20260807-1202` + `/tmp/secrets-default.json.bak-20260807-1202`
+
+**新套餐双协议**（备忘）:
+- OpenAI 兼容: `https://ark.cn-beijing.volces.com/api/coding/v3`（已配）
+- Anthropic 兼容: `https://ark.cn-beijing.volces.com/api/coding`（未用，如需切换 api=anthropic-messages）
