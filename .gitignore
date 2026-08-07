@@ -33,3 +33,7 @@ backups/
 state/
 
 # Post-commit auto-sync to GitHub
+
+# Independent git repos (nested workspaces)
+opencode/
+pi/

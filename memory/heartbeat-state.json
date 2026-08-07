@@ -1,6 +1,5 @@
 {
-  "lastCheck": "2026-08-07T07:43:00+08:00",
-  "lastCheck": "2026-08-07T09:53:00+08:00",
+  "lastCheck": "2026-08-07T12:43:00+08:00",
   "_gmailRecoveredAt": "2026-06-14T00:45:00+08:00",
   "lastEmailCheck": "2026-08-07T05:44:00+08:00",
   "lastCalendarCheck": "2026-06-15T20:52:00+08:00",
@@ -15,9 +14,9 @@
   "cronJobs": 9,
   "cronJobsNote": "9/9 jobs model 字段已全部清空,全部继承 agents.defaults.heartbeat.model = minimax/MiniMax-M3。M2.7 硬编码问题已实际解决。jobs.json 文件本轮不在 (~/.openclaw/cron/jobs.json 缺失),cronJobs 计数沿用 state.json 历史值 9。",
   "toolEnvironment": "✅ lark-cli 需显式 PATH=$HOME/.nvm/versions/node/v24.14.0/bin:$PATH; 当前 1.0.71,可升级 1.0.82",
-  "notes": "8月7日07:43 心跳检查(lastCheck 07:18→07:43, ~25m)。凌晨时段沿用 05:44 实测基线,避免重复 Gmail/Calendar/Feishu notif 探测。无新增 critical alert,火山引擎续费危机告警持续存在等待用户处理。",
+  "notes": "8月7日12:43 心跳检查(lastCheck 12:40→12:43, 3m,与 30m cron 节奏不同步,推测为补触发)。沿用 07:43 实测基线,无新增 critical alert。火山引擎续费危机告警持续等待用户处理。",
   "systemStatus": {
-    "heartbeatCron": "✅ 07:18→07:43 间隔 ~25 分钟,cron 触发稳定",
+    "heartbeatCron": "✅ 12:40→12:43 间隔 3m,补触发,触发稳定",
     "gatewayVersion": "2026.6.1",
     "gatewayPort": "✅ gateway 18789 进程运行中 (200 OK) (沿用 17:43)",
     "mcp": "ℹ️ gateway(18789) 200 OK; MCP 进程 40 个,Docker MCPhub 路由验证完成 (沿用 17:43)",
@@ -27,7 +26,7 @@
     "calendar": "ℹ️ 沿用上轮 (06-15 20:52) 结果: 未来48小时无日程",
     "feishuNotifications": "ℹ️ 沿用上轮 (06-15 20:52) 结果: 无新增@提及或通知",
     "weather": "✅ 20:44 实测 Panlongcheng 29°C 体感 36.7°C, WMO code 2 (局部多云) (沿用)",
-    "email": "🚨 **延续** 火山引擎续费危机升级链: QQ #2715「自动续费失败」(09:02 CST) + QQ #2718「产品到期预警」(12:11 CST)。凌晨沿用 05:44 实测基线,top3 仍为 GitHub Actions 失败链。",
+    "email": "🚨 **延续** 火山引擎续费危机升级链: QQ #2715「自动续费失败」(09:02 CST) + QQ #2718「产品到期预警」(12:11 CST)。沿用 07:43 基线,top3 仍为 GitHub Actions 失败链。",
     "deliveryChannelDrift": "⚠️ 3 cron jobs delivery 'Unsupported channel: feishu' (已知基线,等待用户决定)",
     "proactiveTracker": "✅ 正常",
     "evolverWatchdog": "ℹ️ 沿用上轮运行中",
@@ -56,8 +55,8 @@
     {
       "level": "warning",
       "type": "github_actions_failures",
-      "message": "GitHub Actions失败通知持续 — QQ #2726 (08-06 11:12 PR CI Sweeper 失败) + #2725 (08-06 08:23) + #2724 (08-06 05:09) + #2722/#2721 历史。本轮 07:43 沿用基线。",
-      "ts": "2026-08-07T06:14:00+08:00"
+      "message": "GitHub Actions失败通知持续 — QQ #2726 (08-06 11:12 PR CI Sweeper 失败) + #2725 (08-06 08:23) + #2724 (08-06 05:09) + #2722/#2721 历史。本轮 12:43 沿用基线。",
+      "ts": "2026-08-07T12:43:00+08:00"
     },
     {
       "level": "warning",
@@ -92,6 +91,6 @@
   ],
   "lastMemoryRefinement": "2026-06-15T04:00:10+08:00",
   "_newAlertsAddedThisCheck": [],
-  "lastCheckDelta": "07:18→07:43, ~25 分钟,cron 节奏稳定",
-  "_deltaNotes": "本轮 08-07 07:43 凌晨检查:沿用 05:44 实测基线(QQ top3 无新增,GitHub Actions 失败链沿用),凌晨时段避免重复 Gmail/Calendar/Feishu notif 探测。无新增 critical alert。"
+  "lastCheckDelta": "12:40→12:43, 3m,补触发(非标准 30m 节奏)",
+  "_deltaNotes": "本轮 08-07 12:43 检查:3m 补触发,沿用 07:43 实测基线(QQ top3 无新增,GitHub Actions 失败链沿用)。无新增 critical alert。火山引擎续费危机告警持续等待用户处理。"
 }
