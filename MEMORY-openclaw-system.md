@@ -26,7 +26,8 @@
 6. **受保护字段写入**: `bootstrapMaxChars`、`agents.defaults` 等受保护字段不可通过 config.patch 修改,需直接编辑 openclaw.json + gateway restart 热重载
 7. **心跳架构原则**: 心跳必须独立 session lane + lightContext:false,否则每 30 分钟阻塞主会话 5-7 分钟
 8. **自进化引擎已卸载 (2026-08-06)**: Evolver 因自启删文件被彻底移除。若未来调试 `--loop` daemon 类进程，执行前先 `ps aux | grep "index.js" | grep -v grep` 确认唯一实例，避免多进程并存。
-9. **文件改动是否需要 gateway reload** (2026-08-05 新增):
+9. **EvoMap 节点凭据已清 (2026-08-07 10:34)**: `~/.evomap/` 9 个凭据 (node_id/secret/oauth_token/mailbox 等) 已删; 备份在 `/tmp/evomap-backup-20260807-1031/`。**未来若重连 EvoMap Hub**: 需重新走 OAuth + 拿新 node_id (旧 `74c0d023894c` 已作废)。检查项: `crontab -l | grep evomap` (应为 0) + `systemctl --user list-units | grep evomap` (应为 0) + `ps aux | grep evomap` (应为 0)。
+10. **文件改动是否需要 gateway reload** (2026-08-05 新增):
    - `openclaw.json` (config / plugins / agents.list / acp) → ✅ **需要 SIGUSR1** (受 06-10 决策保护)
    - `MEMORY.md` + `MEMORY-*.md` 子文件 → ❌ **不需要 reload** (下次 session 启动自动 read)
    - `TOOLS.md` + `TOOLS-*.md` 子文件 → ❌ 不需要 reload (同上)
@@ -51,6 +52,7 @@
 | huashu-nuwa | alchaincyf | 女娲造人术 (Skill 蒸馏) |
 | ada-lovelace | 本地创建 | 诗性科学视角 |
 | evolver | EvoMap | 自进化引擎 (GEP 协议) — 🔴 已于 2026-08-06 卸载 |
+| evomap-node | EvoMap | evolver 连 Hub 节点凭据 (node_id=`74c0d023894c`, 9 文件) — 🔴 已于 2026-08-07 10:34 清理; 备份 `/tmp/evomap-backup-20260807-1031/`; A2A_HUB_URL 仍指向 https://evomap.ai 但无客户端连接 |
 
 ---
 
