@@ -271,3 +271,39 @@ const assertPluginStateAllowed = () => {
 - plugin 2026.7.1 patched（白名单 + bge-m3: 1024）✅
 - Gateway PID 1425501, 22:03 启动 ✅
 - 记忆搜索走 LanceDB 真实向量索引 ✅
+
+---
+
+## mcporter 升级 0.12.3 → 0.13.0 (2026-08-07 12:30)
+
+**触发**: 用户拍板"直接升 0.13.0"（changelog 含 MCP 2.0 协议 + 大量 bugfix + OAuth 安全增强）
+
+**操作**:
+1. `npm i -g mcporter@0.13.0`（12s，38 packages changed）
+2. 停旧 daemon (PID 1770) + 旧 serve (PID 606)
+3. 清理旧 socket (`~/.mcporter/daemon/*.sock`)
+4. 启动新 daemon (PID 39541) + 新 serve (PID 39554)
+5. 验证 4 项：CLI version / initialize / tools list / amap 真实调用
+
+**关键不变量 (记忆 1 硬约束)**: 
+- openclaw.json `mcp.servers.mcporter-bridge.timeout=60` + `connectTimeout=10` **升级后保留生效**
+- curl initialize 耗时 <1s（13 server 冷启动远未触发 60s 边界）
+- 13 servers + 160 tools 全部就绪
+
+**新版本主要改进 (MCP 2.0)**:
+- 支持 MCP 协议 2026-07-28 (stateless + server/discover 协商)
+- 双协议桥接 (serve 单一端点兼容 2026-07-28 + 2025-era)
+- OAuth RFC 9207 issuer 验证 + Client ID Metadata Documents
+- Daemon socket timeout = 闲置预算 (progress frame 刷新)，OAuth 长流程不再重启 daemon
+- TypeScript SDK v2 升级，v1 仅作 legacy 测试 fixture
+
+**rollback 路径** (如有问题):
+```bash
+kill 39541 39554
+rm -f ~/.mcporter/daemon/*.sock
+npm i -g mcporter@0.12.3
+nohup mcporter daemon start --foreground &
+nohup mcporter serve --http 3099 &
+```
+
+**memory-order 检查**: 0.12.3 (2026-07-01) → 0.12.4 (2026-08-02) → 0.13.0 (2026-08-04)；直接跳 0.12.4 升 0.13.0 是用户拍板（changelog 显示 0.13.0 已有完整 migration + 0.12.4 是过渡版本）

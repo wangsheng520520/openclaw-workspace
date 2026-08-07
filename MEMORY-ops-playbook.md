@@ -132,3 +132,27 @@
 5. 验证: `git show github/main:<path> | md5sum` vs 本地 `md5sum <path>`
 
 **⚠️ 注意**: .git/config 有工作区级 `[http] proxy = socks5://127.0.0.1:1234` — 这是 git 强制走代理的根因; 用 `-c http.proxy=` 临时禁用即可, 不要改 .git/config (避免污染其他 remote)。
+
+---
+
+## mcporter 升级流程 (2026-08-07 实战, 0.12.3 → 0.13.0)
+
+**一句话**: npm 装新版 + 停旧 daemon/serve + 清 socket + 启新 daemon/serve + **curl 验证 initialize 不超 60s**
+
+**详细步骤**:
+1. `npm i -g mcporter@<ver>` (12s 左右, 30-40 packages changed)
+2. 备份: `cp workspace/config/mcporter.json /tmp/mcporter.json.bak-<ts>`
+3. 停旧进程: `kill <old_daemon_pid> <old_serve_pid>` (用 `ps aux | grep mcporter` 找 PID)
+4. 清 socket: `rm -f ~/.mcporter/daemon/*.sock` (防新版用旧 sock 路径)
+5. 启新 daemon: `nohup mcporter daemon start --foreground > /tmp/mcporter-daemon.log 2>&1 &`
+6. 启新 serve: `nohup mcporter serve --http 3099 > /tmp/mcporter-serve.log 2>&1 &`
+7. **硬约束验证**: curl POST /mcp initialize 必须 < 60s (记忆 1 timeout=60 不变)
+8. 端到端验证: `mcporter list` (13 servers healthy) + curl /mcp tools/list + curl tools/call 实际跑一个
+
+**踩坑点**:
+- ❌ 不停 daemon 直接装新版 → 旧进程继续用 0.12.3 binary, 新版无效
+- ❌ 不清 socket → 新 daemon 可能拿到旧 sock 路径, 启动失败
+- ❌ 跳过 curl initialize 验证 → 13 server 冷启动超时不会被发现 (回到 -32001)
+- ✅ 关键不变量: openclaw.json mcp.servers.mcporter-bridge.timeout=60 + connectTimeout=10 升级后**不动**
+
+**当前版本** (2026-08-07 12:30): mcporter **0.13.0**, daemon PID 39541, serve PID 39554
