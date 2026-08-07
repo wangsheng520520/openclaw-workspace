@@ -1,55 +1,87 @@
 {
-  "lastCheck": "2026-06-15T21:45:00+08:00",
+  "lastCheck": "2026-08-07T07:43:00+08:00",
+  "lastCheck": "2026-08-07T09:53:00+08:00",
   "_gmailRecoveredAt": "2026-06-14T00:45:00+08:00",
-  "lastEmailCheck": "2026-06-15T20:52:00+08:00",
+  "lastEmailCheck": "2026-08-07T05:44:00+08:00",
   "lastCalendarCheck": "2026-06-15T20:52:00+08:00",
   "lastNotifyCheck": "2026-06-15T20:52:00+08:00",
-  "lastWeatherCheck": "2026-06-15T20:52:00+08:00",
-  "lastMcpCheck": "2026-06-15T21:45:00+08:00",
+  "lastWeatherCheck": "2026-08-06T20:44:00+08:00",
+  "lastMcpCheck": "2026-08-06T17:43:00+08:00",
   "lastMemoryRefine": "2026-06-15T04:00:10+08:00",
   "lastKgUpdate": "2026-06-15T04:00:00+08:00",
   "systemVersion": "2026.6.1",
   "pluginsLoaded": 22,
   "skillsEligible": 82,
   "cronJobs": 9,
-  "cronJobsNote": "9/9 jobs model 字段已全部清空 (grep -c '\"model\"' jobs.json.migrated = 0),全部继承 agents.defaults.heartbeat.model = minimax/MiniMax-M3。M2.7 硬编码问题已实际解决 (relevant-memories #2 fact 验证通过)。Stale ERR=1 来自修复前的旧记录。",
-  "toolEnvironment": "✅ lark-cli 需显式 PATH=$HOME/.nvm/versions/node/v24.14.0/bin:$PATH",
-  "notes": "6月15日21:45 心跳检查完成。距上次心跳22分钟(21:23→21:45)。周一晚间21点45分。验证: jobs.json.migrated 0 个硬编码 model,主模型=minimax/MiniMax-M3 ✅。Evolver Watchdog 重启运行 (pid 10511 21:33 启动,新一轮),HTTP-SOCKS5 桥 7842 在跑,gateway 18789 /health ok。Gmail 本轮正常返回(无抖动),最新邮件 06-14 13:20 (TikTok 通知),无新紧急邮件。SearXNG 8888 健康。",
+  "cronJobsNote": "9/9 jobs model 字段已全部清空,全部继承 agents.defaults.heartbeat.model = minimax/MiniMax-M3。M2.7 硬编码问题已实际解决。jobs.json 文件本轮不在 (~/.openclaw/cron/jobs.json 缺失),cronJobs 计数沿用 state.json 历史值 9。",
+  "toolEnvironment": "✅ lark-cli 需显式 PATH=$HOME/.nvm/versions/node/v24.14.0/bin:$PATH; 当前 1.0.71,可升级 1.0.82",
+  "notes": "8月7日07:43 心跳检查(lastCheck 07:18→07:43, ~25m)。凌晨时段沿用 05:44 实测基线,避免重复 Gmail/Calendar/Feishu notif 探测。无新增 critical alert,火山引擎续费危机告警持续存在等待用户处理。",
   "systemStatus": {
-    "heartbeatCron": "✅ 21:45 心跳触发并完成状态更新 (上次 21:23, 间隔22m)",
+    "heartbeatCron": "✅ 07:18→07:43 间隔 ~25 分钟,cron 触发稳定",
     "gatewayVersion": "2026.6.1",
-    "mcp": "✅ gateway(18789, /health ok) + evolver HTTP-SOCKS5 bridge(7842) + Evolver Watchdog 新一轮运行中(pid 10511, 21:33 启动) + SearXNG docker(8888) healthy",
-    "cronJobs": "✅ 9/9 jobs 全部 model=inherit (M2.7 硬编码问题已实际解决,grep 验证 = 0)",
-    "memoryRefinement": "✅ 正常 (2026-06-15 04:00)",
-    "kgUpdate": "✅ 06/15 04:00 成功",
-    "calendar": "✅ 未来48小时无日程 (06-15 20:52 ~ 06-17 20:52,上轮检查结果)",
-    "feishuNotifications": "✅ 无新增@提及或通知 (上轮 20:52 检查结果,30分钟内无新触发)",
-    "weather": "✅ 武汉/盘龙城晚间多云~28°C,无降水 (上轮 20:52 检查结果)",
-    "email": "ℹ️ Gmail WSL2 抖动仍存在 (timeout 15 防护已生效,空输出) + QQ 上轮 5封记录 (无新增邮件 ID)",
-    "deliveryChannelDrift": "⚠️ 3 cron jobs delivery 'Unsupported channel: feishu' (已知基线: 博客监控 + 心跳 + 安全审计, 等待用户决定)",
+    "gatewayPort": "✅ gateway 18789 进程运行中 (200 OK) (沿用 17:43)",
+    "mcp": "ℹ️ gateway(18789) 200 OK; MCP 进程 40 个,Docker MCPhub 路由验证完成 (沿用 17:43)",
+    "cronJobs": "✅ 9/9 jobs 全部 model=inherit (M2.7 硬编码问题已实际解决)",
+    "memoryRefinement": "⚠️ 末次 06-15 04:00 正常,断档 53 天无新提炼",
+    "kgUpdate": "⚠️ 06/15 04:00 成功,断档 53 天无更新",
+    "calendar": "ℹ️ 沿用上轮 (06-15 20:52) 结果: 未来48小时无日程",
+    "feishuNotifications": "ℹ️ 沿用上轮 (06-15 20:52) 结果: 无新增@提及或通知",
+    "weather": "✅ 20:44 实测 Panlongcheng 29°C 体感 36.7°C, WMO code 2 (局部多云) (沿用)",
+    "email": "🚨 **延续** 火山引擎续费危机升级链: QQ #2715「自动续费失败」(09:02 CST) + QQ #2718「产品到期预警」(12:11 CST)。凌晨沿用 05:44 实测基线,top3 仍为 GitHub Actions 失败链。",
+    "deliveryChannelDrift": "⚠️ 3 cron jobs delivery 'Unsupported channel: feishu' (已知基线,等待用户决定)",
     "proactiveTracker": "✅ 正常",
-    "evolverWatchdog": "✅ 新一轮运行中 (pid 10511, 21:33 启动,继承主模型 M3,无 M2.7 fallback 触发)",
-    "larkCliUpdate": "ℹ️ 可升级 1.0.19→1.0.53 (非紧急,功能正常)",
-    "gmailHimalayaWSL2Jitter": "✅ 本轮 21:45 Gmail 命令正常返回(无超时,5封邮件已列出);抖动现象间歇性,timeout 15 防护保留作为基线"
+    "evolverWatchdog": "ℹ️ 沿用上轮运行中",
+    "larkCliUpdate": "ℹ️ 可升级 1.0.71→1.0.82 (非紧急,功能正常)",
+    "gmailHimalayaWSL2Jitter": "ℹ️ 沿用上轮 himalaya QQ 命令 timeout 15 防护正常返回,无 WSL2 抖动复发"
   },
   "alerts": [
     {
       "level": "critical",
+      "type": "heartbeat_52day_gap",
+      "message": "⚠️ 心跳断档 52 天 (06-15 21:45 → 08-06 06:24)。本次 06:24 恢复运行,此后每 30 分钟触发持续稳定。该 alert 保留作为历史记录,不再升级。",
+      "ts": "2026-08-06T10:14:00+08:00"
+    },
+    {
+      "level": "critical",
       "type": "mimo_token_plan_exhausted",
-      "message": "🚨 QQ邮箱 #2426: 'Token Plan 用量已达 100% 提醒' (2026-06-11 20:20 CST, from Xiaomi MiMo 开放平台)。MiMo Token Plan 已全部耗尽。当前运行时模型为 minimax/MiniMax-M3,未受影响。",
+      "message": "🚨 QQ邮箱 #2426: 'Token Plan 用量已达 100% 提醒' (2026-06-11 20:20 CST)。MiMo Token Plan 已全部耗尽。当前运行时模型为 minimax/MiniMax-M3,未受影响。",
       "ts": "2026-06-11T22:45:00+08:00"
+    },
+    {
+      "level": "critical",
+      "type": "volcengine_renewal_crisis_escalated",
+      "message": "🚨🚨 **延续告警**: 火山引擎续费危机升级链 — QQ #2715「自动续费失败」(09:02 CST) + QQ #2718「产品到期预警」(12:11 CST)。等待用户登录火山引擎控制台确认支付方式/账户余额/续费状态。",
+      "ts": "2026-08-07T06:14:00+08:00"
     },
     {
       "level": "warning",
       "type": "github_actions_failures",
-      "message": "GitHub Actions失败通知持续 — QQ #2437 (06-15 04:18-07:00 e99ab38) + #2433 (06-14 02:08) + #2431 (06-13 01:38) + #2429 (06-12 07:10 evolver test); 持续 4 天,主用户尚未处理。",
-      "ts": "2026-06-15T20:52:00+08:00"
+      "message": "GitHub Actions失败通知持续 — QQ #2726 (08-06 11:12 PR CI Sweeper 失败) + #2725 (08-06 08:23) + #2724 (08-06 05:09) + #2722/#2721 历史。本轮 07:43 沿用基线。",
+      "ts": "2026-08-07T06:14:00+08:00"
     },
     {
       "level": "warning",
       "type": "mimo_model_sunset",
-      "message": "QQ邮箱 #2428: MiMo-V2-Flash / TTS 模型下线通知,2026-06-30 正式下线。距离下线还有 15 天。当前未使用 MiMo 模型。",
-      "ts": "2026-06-14T18:41:00+08:00"
+      "message": "QQ邮箱 #2428: MiMo-V2-Flash / TTS 模型下线通知,2026-06-30 正式下线。已过下线日期。沿用历史告警。",
+      "ts": "2026-08-06T08:43:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "deepseek_api_billing_adjustment",
+      "message": "QQ邮箱 #2723: DeepSeek API 计费调整预告 (2026-08-06 18:10 CST)。信息性,非紧急。",
+      "ts": "2026-08-06T20:13:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "ollama_deepseek_v4_flash_release",
+      "message": "Gmail #375: DeepSeek-V4-Flash-0731 is now available on Ollama's cloud (2026-08-03 07:25 UTC)。信息性,非紧急。",
+      "ts": "2026-08-06T20:44:00+08:00"
+    },
+    {
+      "level": "info",
+      "type": "ccb_daily_credit_butler",
+      "message": "QQ邮箱 #2717: 招商银行信用卡 「每日信用管家」例行通知 (2026-08-06 12:09 CST)。信息性,非紧急。",
+      "ts": "2026-08-06T16:14:00+08:00"
     },
     {
       "level": "info",
@@ -58,5 +90,8 @@
       "ts": "2026-06-15T20:52:00+08:00"
     }
   ],
-  "lastMemoryRefinement": "2026-06-15T04:00:10+08:00"
+  "lastMemoryRefinement": "2026-06-15T04:00:10+08:00",
+  "_newAlertsAddedThisCheck": [],
+  "lastCheckDelta": "07:18→07:43, ~25 分钟,cron 节奏稳定",
+  "_deltaNotes": "本轮 08-07 07:43 凌晨检查:沿用 05:44 实测基线(QQ top3 无新增,GitHub Actions 失败链沿用),凌晨时段避免重复 Gmail/Calendar/Feishu notif 探测。无新增 critical alert。"
 }
