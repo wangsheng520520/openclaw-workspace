@@ -1,50 +1,10 @@
 # MEMORY-ops-playbook.md — 操作手册归档
 
 > 从 `MEMORY.md` 拆分出来的"操作手册 + 04-15~05 系统运行观察"子域 (2026-07-30)。
-> 主题：Evolver 手动操作流程、问题排查模式、04 月用户静默期观察、模型配置教训、技能扩展、关键经验总结等。
+> 主题：问题排查模式、04 月用户静默期观察、模型配置教训、技能扩展、关键经验总结等。
 > 主索引见 → `MEMORY.md`。
 >
 > **加载规则**：OpenClaw bootstrap 走精确 basename 匹配（看 `run-attempt-V636cwT5.js` 白名单），`MEMORY-*.md` 不在白名单，按需 `read` 加载。
-
----
-
-### Evolver 手动操作标准流程
-
-**触发新周期**:
-```bash
-# 1. 确认只有一个 daemon 进程
-ps aux | grep "index.js" | grep -v grep | grep -v gateway
-# 应只有 PID xxx ... /home/.../index.js --loop
-
-# 2. 触发新周期（90s 超时）
-timeout 90 node index.js
-
-# 3. 确认 cycleCount 更新
-cat memory/evolution/evolution_state.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['cycleCount'])"
-```
-
-**手动审查并固化**:
-```bash
-# 1. 确认只有一个 daemon 进程
-ps aux | grep "node.*index.js" | grep -v grep | grep -v gateway
-# 应只有 PID xxx ... /home/.../index.js --loop
-
-# 2. 生成审查报告
-node index.js review > /tmp/evolve-review.txt 2>&1
-# 阅读 /tmp/evolve-review.txt 判断 approve/reject
-
-# 3. 固化（120s 超时）
-timeout 120 node index.js review --approve
-
-# 4. 检查孤立进程并清理
-ps aux | grep "node.*index.js" | grep -v grep | grep -v gateway
-# 如果出现第二个进程（非 --loop 的），立即 kill 其 PID
-
-# 5. 确认状态
-node src/ops/lifecycle.js status
-```
-
-**关键原则**: 手动 `node index.js` 不会替换 daemon，只是创建新进程与之竞争 lifecycle 管理权。操作完成后必须检查并清理孤立进程。
 
 ---
 
@@ -61,12 +21,6 @@ node src/ops/lifecycle.js status
 
 ---
 
-### Evolver 进化记录 (2026-04, 已过期)
-
-- #0001-#0004 验证问题（缺测试文件）→ #0005+ v1.57.0 自带 36 测试解决；04-23 升 v1.69.11；之后多次 v1.7x→v1.86+。
-
----
-
 ### 女娲造人术实践经验 (2026-04-14, 已沉淀到 skill)
 
 - Phase 0-5 完整流程首次跑通：调研 6 Agent / 2h / 196KB → 提炼 30min → 验证 3/3 → 精炼 20min。三重验证（跨域复现+生成力+排他性）有效。
@@ -77,7 +31,6 @@ node src/ops/lifecycle.js status
 
 **用户静默期 (04-15~04-19, 6天)**:
 - 系统全部自治组件稳定运行,无人类干预
-- Evolver Watchdog 有效维持进化引擎存活(多次自动重启成功)
 - 博客监控持续产出日报,每日 30-66 篇新文章
 - 梦境系统、记忆提炼、SESSION-STATE 检查均正常
 
@@ -136,13 +89,6 @@ node src/ops/lifecycle.js status
 
 ---
 
-### Evolver 新进展 (04-23, 已固化)
-
-- **Evolver Bridge 启用**: `EVOLVE_BRIDGE=true` 允许引擎应用进化变更并验证失败时回滚
-- 双轨记忆架构: `workspace/memory/` (日常自动) + `~/memory/` (长期结构化,含 projects/people/decisions/knowledge/preferences)
-
----
-
 ### 系统自治运行观察 (04-15~04-29, 总结)
 
 - 4 月静默期 (04-15~04-19) + 04-20~29 多次用户回归 + 4 次 MCP 泄漏 (04-23 14:05 ~300 进程 + 04-26 63 进程 + 04-27 147 进程 + 04-29 31 进程冗余)
@@ -153,5 +99,4 @@ node src/ops/lifecycle.js status
 
 ### 关键经验总结 (2026-04-13~14, 一次沉淀)
 
-- Evolver "自动模式"= 自动执行 (无人工确认)，区别于"审核模式"和"疯狗模式 `--loop`"。准确理解用户对"自动"的定义，不混淆。
 - 女娲造人术：6 Agent 并行调研效率高 (196KB/~2h)，Phase 4 质量验证 (Sanity+Edge+Voice) 是 Skill 质量关键。

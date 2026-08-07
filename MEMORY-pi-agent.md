@@ -61,6 +61,30 @@ for (const [name, command] of Object.entries(overrides)) {
 
 ---
 
+## 2026-08-06 Pi Agent 实测验证 + 模型策略确认（跟随默认）
+
+**端到端实测**（非纸面检查）：
+
+| 步骤 | 操作 | 结果 |
+|------|------|------|
+| 1 | 检查 `openclaw.json` | ✅ `agents.list` 含 pi（`runtime.type="acp"` + acpx + persistent）；`acp.allowedAgents=["pi"]` |
+| 2 | 确认包已安装 | ✅ `@automatalabs/pi-acp@0.3.0` + `@earendil-works/pi-coding-agent@0.82.1` |
+| 3 | `sessions_spawn(runtime="acp", agentId="pi")` 探针 | ✅ `status: accepted` |
+| 4 | 读子会话历史 | ✅ Pi 实际回复（model 显示 `ark-code-latest`） |
+| 5 | 统计 | ✅ 耗时 25s，状态 `done` |
+
+**验证结论**：C 路径修复仍有效，未回退；Pi 可用。
+
+**模型策略（用户 @ 12:26 拍板：不指定模型，跟随默认）**：
+- `agents.list` 的 pi entry **无 `model` 字段**（keys 仅 `['id','runtime']`）→ 天然继承 `agents.defaults.model.primary`
+- 默认模型 = `volcano/ark-code-latest`；fallbacks 7 个（qwen3.7-plus/max、qwen3.6-flash、glm-5.2、deepseek-v4-pro、deepseek-v4-flash、qwen3.8-max-preview）
+- `acp` 配置块无 model 覆盖（keys 无 model）
+- **实测确认**：Pi 实际用的就是 `ark-code-latest`（默认模型）
+- **与 main entry 的区别**：`agents.list` 的 main 显式指定 `minimax/MiniMax-M3`（历史遗留，主会话用自己的模型）；pi 不指定 → 跟随默认。两者独立，互不影响
+- **无需修改任何配置**：现状已满足
+
+---
+
 ## 相关外部引用
 
 - OpenClaw ACP 文档: `https://docs.openclaw.ai/zh-CN/tools/acp-agents` 和 `https://docs.openclaw.ai/tools/acp-agents-setup`

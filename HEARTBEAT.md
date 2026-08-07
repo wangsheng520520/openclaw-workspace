@@ -113,13 +113,10 @@ write /home/wszmd520520/.openclaw/workspace/memory/heartbeat-state.json (完整�
 |----------|----------|----------|
 | 系统心跳 (每 30 分钟) | `volcengine-plan/ark-code-latest` (主模型) | `openclaw.json` → `agents.defaults.heartbeat.model` |
 | HEARTBEAT.md 检查任务 | `volcengine-plan/ark-code-latest` (主模型) | `agents.defaults.model.primary` |
-| Evolver 看门狗 (进程检查) | `siliconflow/Qwen/Qwen3-8B` | `evolver-watchdog.sh` (仅检查进程状态) |
-| Evolver 实际扫描 | `volcengine-plan/ark-code-latest` (主模型) | `agents.defaults.model.primary` |
 | 用户交互会话 | `volcengine-plan/ark-code-latest` (主模型) | `agents.defaults.model.primary` |
 
 **成本优化策略**:
-- **简单监控任务** (Evolver 看门狗进程检查) → 免费模型
-- **深度分析任务** (心跳检查、Evolver 扫描、用户交互) → 主模型 `ark-code-latest`
+- **深度分析任务** (心跳检查、用户交互) → 主模型 `ark-code-latest`
 
 ---
 
@@ -200,4 +197,3 @@ himalaya envelope list --page 1 --page-size 5
 |------|------|------|
 | 心跳频率过高 | 添加 `every: "30m"` | 18:52 |
 | Himalaya 挂起 | 加 `timeout 15` 防护 | 20:23 |
-| Evolver Watchdog 超时 | 超时 300→600s | 19:48 |

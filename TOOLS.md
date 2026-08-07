@@ -43,8 +43,7 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 
 | 主题 | 文件 | 内容 | 何时读 |
 |------|------|------|--------|
-| 🐦 lark-cli 飞书 CLI | `TOOLS-lark-cli.md` | v1.0.19 安装、命令体系、与 feishu_* 工具优先级 | 飞书操作前查命令 |
-| 🦎 Evolver / EvoMap Hub | `TOOLS-evolver-evomap.md` | WSL2 持久化、watchdog、validator、publish 实战、Node 身份陷阱 | evolver 出问题或要 publish |
+| 🐦 lark-cli 飞书 CLI | `TOOLS-lark-cli.md` | v1.0.71 安装、PATH 配置、命令体系、与 feishu_* 工具优先级 | 飞书操作前查命令 |
 | 🔮 Memory / AI 模型 | `TOOLS-memory-ai.md` | memory-lancedb + 硅基流动 BAAI/bge-m3 配置 | 配置长期记忆或调整嵌入模型 |
 
 **加载规则**：gateway bootstrap 按文件名注入，所以 `TOOLS-*.md` 这类**不会被自动注入**——它们按需 `read` 加载。日常任务只看主 `TOOLS.md` 即可，避免上下文膨胀。
@@ -191,13 +190,27 @@ openclaw cron add --name "每日心跳" --schedule "0 9,14,18 * * *" --payload '
 | 工具 | 命令 | 备注 |
 |------|------|------|
 | lark-cli | `lark-cli calendar +agenda` | 飞书日程（详见 `TOOLS-lark-cli.md`） |
-| lark-cli | `lark-cli mail +triage` | 飞书邮件（详见同上） |
+| lark-cli | `lark-cli mail +triage` | 飞书邮件（详见同一子文件） |
 | lark-cli | `lark-cli docs +fetch --url <url>` | 飞书文档（同上） |
 | himalaya | `himalaya envelope list --page 1 --page-size 5` | Gmail 收件箱 |
-| evolver | `bash scripts/evolver-spawn.sh` | 单次进化（详见 `TOOLS-evolver-evomap.md`） |
 | gateway | `gateway restart` | 热重载（SIGUSR1） |
 | gateway | `systemctl --user restart openclaw-gateway.service` | 硬重启（修改 env 必须用） |
 | 记忆 | `memory_recall query="..."` | 语义召回（详见 `TOOLS-memory-ai.md`） |
+
+---
+
+## 🔧 问题排查速查（复制自 MEMORY-ops-playbook.md，2026-08-06）
+
+> 完整经验教训归档见 `MEMORY-ops-playbook.md` + `.learnings/ERRORS.md`
+
+- himalaya 挂起：`timeout 15` 包裹；QQ 邮箱需 `--config config-qq.toml`。
+- 微信文章提取失败：优先 Tavily，web_fetch/jina.ai 效果差。
+- 子 Agent 超时：`runTimeoutSeconds` 调 600+（大型调研）。
+- MCP 进程 >20：`pkill -f "mcp-server|mcp-deepwiki" + systemctl --user restart`。
+- 模型切换异常：检查 `agents.defaults` 是否含新模型；fallback 链不能为空。
+- A2A 环境变量缺失：技能 UI 显示封锁但看门狗 exec 时单独传 env，进程实际正常。
+- Gateway 回滚：升 systemd 服务配置版本；CLI 滞后：`npm install -g openclaw@latest` + 重建 symlink。
+- 飞书配对失败：`openclaw pairing approve feishu <code>`。
 
 ---
 

@@ -24,7 +24,7 @@
 | `~/.openclaw/workspace/memory/` | 日常记忆 (15 daily + .dreams/) | 自动捕获, 1638 行 |
 | `~/.openclaw/workspace/obsidian-vault/` | 软链 → `D:\Obsidian知识库文件` | 408 篇笔记, 7 主目录 |
 | `~/.openclaw/workspace/.learnings/` | 自我提升记录 (LEARNINGS/ERRORS/FEATURE) | 371 行 LEARNINGS |
-| `~/.openclaw/workspace/scripts/` | 运维脚本 (evolver-watchdog/memory-snapshot/alignment-check) | 3 个守护/观测脚本 |
+| `~/.openclaw/workspace/scripts/` | 运维脚本 (memory-snapshot/alignment-check) | 观测脚本 |
 | `~/.openclaw/openclaw.json` | **主配置** (31KB, 1060+ 行) | 受保护字段需直接编辑 |
 | `~/.openclaw/secrets/default.json` | secrets 池 (apiKey 存储) | `secrets reload` 处理 drift |
 | `~/.openclaw/memory/lancedb/` | 向量索引 (2.3MB, BAAI/bge-m3 1024d) | `memory-lancedb` slot |
@@ -81,7 +81,6 @@
 | **记忆查询** | `memory_recall query="..."` (LanceDB 语义搜索) |
 | **Obsidian 操作** | ⚠️ 严禁 `mv/rm/cp`，必须用 `obsidian-cli move/create` |
 | **心跳** | 独立 session `heartbeat`, 30 分钟一次, 不阻塞主会话 |
-| **Evolver** | daemo + watchdog, 2h cron 启动, 看门狗 exec 时传 A2A env |
 | **决策固化** | `MEMORY.md` + `LEARNINGS.md` 双写 |
 | **重启 gateway** | ⚠️ 仅最后手段, 受保护字段 (heartbeat/compaction/contextPruning 子段) 可热重载 |
 
@@ -132,9 +131,9 @@
 4. 发现知识错误？→ `LEARNINGS.md` (category: knowledge_gap)
 5. 找到更好方法？→ `LEARNINGS.md` (category: best_practice)
 
-跨文件模式 → `AGENTS.md` / 行为模式 → `SOUL.md` / 工具技巧 → `TOOLS.md` (+ `TOOLS-lark-cli.md` / `TOOLS-evolver-evomap.md` / `TOOLS-memory-ai.md` 按主题拆分，2026-07-30 起)
+跨文件模式 → `AGENTS.md` / 行为模式 → `SOUL.md` / 工具技巧 → `TOOLS.md` (+ `TOOLS-memory-ai.md` / `TOOLS-lark-cli.md` 按主题拆分，2026-07-30 起)
 
-> **TOOLS.md 拆分说明**：主 TOOLS.md 只保留日常快速参考（天气/邮件/日历/通知/定时）+ 子文件索引。Evolver/lark-cli/memory 等专题内容已拆分到 `TOOLS-*.md` 文件，按需 `read` 加载（OpenClaw bootstrap 只匹配精确 basename，所以拆分文件不会自动注入）。
+> **TOOLS.md 拆分说明**：主 TOOLS.md 只保留日常快速参考（天气/邮件/日历/通知/定时）+ 子文件索引。lark-cli/memory 等专题内容已拆分到 `TOOLS-*.md` 文件，按需 `read` 加载（OpenClaw bootstrap 只匹配精确 basename，所以拆分文件不会自动注入）。
 
 ---
 
