@@ -169,3 +169,48 @@
 ## Promoted From Short-Term Memory (2026-06-10 摘要)
 
 **06-05 周模式识别** 6 个新增模式: P-34 (升级导致 Cron 丢失) / P-35 (MC Porter daemon) / P-36 (memory-lancedb 400 错,已修) / **P-37 (安全审计 Warning 重复 6 次,提议白名单优化)** / P-38 (Gmail IMAP 超时 3+ 次,防护已部署) / P-39 (升级后插件/进程同步丢失,提议基线对比)。详见 `notes/areas/proactive-tracker.md` (676→914 行)。
+---
+
+**最后记忆提炼**: 2026-08-07 11:19
+**自动提炼**: (2026-08-07 11:19 CST, 3 文件)
+
+- [2026-08-06.md]
+  - 06:24 CST — 心跳恢复运行 (距上次 06-15 21:45 断档 52 天)。状态文件已更新,无新紧急事件,沿用上轮已检查项结论。
+  - 06:44 CST — HEARTBEAT_OK (无新任务,沿用上轮 06:24 恢复态,cron 触发节奏已回归正常 30m)
+  - 07:13 CST — HEARTBEAT_OK (无新任务,沿用 06-15 21:45 起断档期间未变的检查结论)
+  - 07:44 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 31m 节奏正常)
+  - 08:14 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 30m 节奏正常)
+  - 08:43 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 29m 节奏正常)
+  - 08:43 CST — QQ邮箱重新检查: 最新 #2710-#2714 全为 GitHub Actions PR CI Sweeper 失败 + Issue #94666 回复 (08-05),无紧急个人邮件; Gmail 触发 timeout 15 防护(WSL2 抖动沿用上轮)
+  - 09:14 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 31m 节奏正常 08:43→09:14)
+  ... (31 more)
+
+- [2026-08-07-0748.md]
+  - **Session Key**: agent:main:main
+  - **Session ID**: dc14bc7d-8fba-4d88-80ae-3144ac2af677
+  - **Source**: webchat
+  - stash@12：Dreaming 决策（09:20）
+  - stash@11：Pi Agent 决策（10:42）+ reload 规则（11:24 前）
+
+- [2026-08-07.md]
+  - 06:43 CST — HEARTBEAT_OK (无新任务)。沿用 05:44 实测基线,无新增 critical alert。火山引擎续费危机告警持续等待用户处理。cron 节奏 06:14→06:43 (~29m) 正常。
+  - 07:18 CST — HEARTBEAT_OK (无新任务)。沿用 05:44 实测基线,无新增 critical alert。火山引擎续费危机告警持续等待用户处理。cron 节奏 06:43→07:18 (~35m) 略超 30m 但容忍范围内稳定。
+  - 07:43 CST — HEARTBEAT_OK (无新任务,沿用 05:44 邮件基线,cron 节奏 07:18→07:43 ~25m)
+  - 10:28 CST — HEARTBEAT_OK (无新任务,沿用 05:44 邮件基线,cron 节奏 07:43→10:28 ~165m,异常长间隔但容忍范围内)
+  - 10:44 CST — HEARTBEAT_OK (无新任务,实测刷新 Gmail+QQ:Gmail 仅社交噪音,QQ #2725-#2727 仍是已知 GitHub Actions PR CI Sweeper 失败链,cron 节奏 ~16m 恢复正常)
+  - 11:14 CST — HEARTBEAT_OK (无新任务,沿用 10:44 邮件基线,cron 节奏 10:44→11:14 ~30m 恢复正常节奏)
+---
+
+**最后记忆提炼**: 2026-08-07 11:23
+**自动提炼**: (2026-08-07 11:23 CST, 1 文件)
+
+- [2026-08-06.md]
+  - 06:24 CST — 心跳恢复运行 (距上次 06-15 21:45 断档 52 天)。状态文件已更新,无新紧急事件,沿用上轮已检查项结论。
+  - 06:44 CST — HEARTBEAT_OK (无新任务,沿用上轮 06:24 恢复态,cron 触发节奏已回归正常 30m)
+  - 07:13 CST — HEARTBEAT_OK (无新任务,沿用 06-15 21:45 起断档期间未变的检查结论)
+  - 07:44 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 31m 节奏正常)
+  - 08:14 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 30m 节奏正常)
+  - 08:43 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 29m 节奏正常)
+  - 08:43 CST — QQ邮箱重新检查: 最新 #2710-#2714 全为 GitHub Actions PR CI Sweeper 失败 + Issue #94666 回复 (08-05),无紧急个人邮件; Gmail 触发 timeout 15 防护(WSL2 抖动沿用上轮)
+  - 09:14 CST — HEARTBEAT_OK (无新任务,沿用上轮结论,cron 31m 节奏正常 08:43→09:14)
+  ... (31 more)
