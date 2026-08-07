@@ -1,6 +1,6 @@
 # MEMORY-ops-playbook.md — 操作手册归档
 
-> 从 `MEMORY.md` 拆分出来的"操作手册 + 04-15~05 系统运行观察"子域 (2026-07-30)。
+> 从 `MEMORY.md` 拆出来的"操作手册 + 04-15~05 系统运行观察"子域 (2026-07-30)。
 > 主题：问题排查模式、04 月用户静默期观察、模型配置教训、技能扩展、关键经验总结等。
 > 主索引见 → `MEMORY.md`。
 >
@@ -49,7 +49,7 @@
 - web_fetch 对微信公众号文章提取效果差
 - r.jina.ai 对微信公众号也不稳定
 - **Tavily 是微信公众号文章提取的最佳选择**
-- 建立双链时要先检柢 Vault 中已有的相关笔记
+- 建立双链时要先检索 Vault 中已有的相关笔记
 
 ---
 
@@ -100,3 +100,35 @@
 ### 关键经验总结 (2026-04-13~14, 一次沉淀)
 
 - 女娲造人术：6 Agent 并行调研效率高 (196KB/~2h)，Phase 4 质量验证 (Sanity+Edge+Voice) 是 Skill 质量关键。
+---
+
+### GitHub MCP 操作手册 (2026-08-07)
+
+**背景**: 08-07 代理 (127.0.0.1:1234 变色龙) 故障时 git push/fetch 全挂; 改用 GitHub MCP 后成功。用户 11:50 拍板: **Git 操作统一走 GitHub MCP**。
+
+**为什么 MCP 优于 git push**:
+- GitHub MCP 走 GitHub REST API 直连 (免代理, 免网络波动)
+- create_or_update_file / push_files 直接创建 remote commit
+- list_commits 可实时查 remote 真实状态
+
+**常用 MCP 工具** (mcporter-bridge__github__*):
+| 工具 | 用途 |
+|------|------|
+| `create_or_update_file` | 单文件创建/更新 (需 owner/repo/path/content/message/branch) |
+| `push_files` | 多文件单 commit 推送 |
+| `list_commits` | 查 remote commit 历史 (拿真实 sha) |
+| `get_file_contents` | 读 remote 文件验证 |
+
+**MCP 推送 vs 本地 git 的差异**:
+- MCP 创建的 commit **不在本地对象库** → `git update-ref` 会报 nonexistent object
+- 本地引用对齐方法: `git -c http.proxy= -c https.proxy= fetch github main`
+  (临时绕开 .git/config 的 [http]/[https] proxy 配置, 不改文件)
+
+**实操流程 (推送文件)**:
+1. 本地 `git show HEAD:<path> > /tmp/file` 提取内容 (确保与 commit 一致)
+2. MCP `create_or_update_file` 推送 (content = 文件全文)
+3. MCP `list_commits` 拿 remote 新 sha
+4. `git -c http.proxy= -c https.proxy= fetch github main` 对齐本地引用
+5. 验证: `git show github/main:<path> | md5sum` vs 本地 `md5sum <path>`
+
+**⚠️ 注意**: .git/config 有工作区级 `[http] proxy = socks5://127.0.0.1:1234` — 这是 git 强制走代理的根因; 用 `-c http.proxy=` 临时禁用即可, 不要改 .git/config (避免污染其他 remote)。

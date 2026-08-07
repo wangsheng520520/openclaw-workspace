@@ -81,6 +81,7 @@
 | **Pi Agent 模型** | 无 own model → 跟随全局默认 `volcano/ark-code-latest` | ✅ 已确认（2026-08-06 实测） |
 | **用户偏好表达** | 表格对比、详细报告、主动汇报 | ✅ 保持 |
 | **Pi Agent (ACPX) 入口** | `agents.list[].runtime.type="acp"`（C 路径） | ✅ 已锁定（2026-08-05） |
+| **Git 操作推送** | 统一走 GitHub MCP（`mcporter-bridge__github__*`），不用 `git push`（避代理/网络问题） | ✅ 已锁定（2026-08-07，用户拍板） |
 
 > ⚠️ **易错提醒**：全局默认 ≠ 主会话模型。此前错记「主模型=ark-code-latest / 默认=MiniMax-M3」已修正（2026-08-06 实测 openclaw.json）。`volcengine-plan/` 是旧别名，现已统一为 `volcano/`。详见 `MEMORY-models.md` 三层区分表。
 

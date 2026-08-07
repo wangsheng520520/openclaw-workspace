@@ -211,6 +211,7 @@ openclaw cron add --name "每日心跳" --schedule "0 9,14,18 * * *" --payload '
 - A2A 环境变量缺失：技能 UI 显示封锁但看门狗 exec 时单独传 env，进程实际正常。
 - Gateway 回滚：升 systemd 服务配置版本；CLI 滞后：`npm install -g openclaw@latest` + 重建 symlink。
 - 飞书配对失败：`openclaw pairing approve feishu <code>`。
+- **Git 推送/拉取**：优先 GitHub MCP（`mcporter-bridge__github__create_or_update_file` / `push_files` / `list_commits`），走 GitHub API 直连免代理（2026-08-07 用户拍板）。若必须用 git 命令：`git -c http.proxy= -c https.proxy= fetch/push` 临时绕开 .git/config 的 socks5 代理。MCP 推送的 commit 不在本地对象库，需 fetch 后才能 update-ref。
 
 ---
 
