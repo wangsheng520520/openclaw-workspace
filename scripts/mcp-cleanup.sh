@@ -14,6 +14,9 @@ BEFORE_AVAIL=$(free -m | awk 'NR==2{print $7}')
 log "=== MCP Cleanup Start === (Available: ${BEFORE_AVAIL}MB)"
 
 # 只在可用内存低于 3GB 或有重复进程时清理
+# 纵深防御 (2026-08-07 决策): 即使 Evolver 已卸载 (MEMORY.md L45),
+#   保留 grep -v "evolver" 以防未来重装时误触发清理 / 防止 npm 缓存的
+#   @evomap/evolver 进程被误判为 MCP 泄漏。
 TOTAL_MCP=$(ps aux | grep -E "mcp|chrome-devtools|bazi|ziwei|markmap|playwright|context7|exa-mcp|Sequential|think-tool" | grep -v grep | grep -v "openclaw-gateway" | grep -v "evolver" | wc -l)
 
 if [ "$TOTAL_MCP" -le 30 ] && [ "$BEFORE_AVAIL" -gt 3000 ]; then

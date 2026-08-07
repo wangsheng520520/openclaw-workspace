@@ -33,11 +33,6 @@
       "source": "user:ada-lovelace",
       "sourceType": "local"
     },
-    "evolver": {
-      "source": "github:EvoMap/evolver",
-      "sourceType": "github",
-      "version": "1.57.0"
-    },
     "code-generator": {
       "source": "clawhub:code-generator",
       "sourceType": "clawhub"

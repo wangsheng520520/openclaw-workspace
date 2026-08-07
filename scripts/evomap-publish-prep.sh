@@ -29,6 +29,11 @@
 #   --no-struct   跳过 B（结构自洽）校验，只做 A（validation/diff/substance）
 #
 # 幂等：可重复运行；每次运行前备份到 .evolver/gep/*.json.prep-bak-<ts>
+# @deprecated since 2026-08-07 (Evolver v1.57 卸载, 见 MEMORY-openclaw-system.md L12)
+#   evolver contentHash 模块在 $WS/skills/evolver 路径下已删，
+#   本脚本的 B 段（结构自洽校验）需要重写为 EvoMap CLI 调用
+#   或纯 python3 实现。脚本主体仍可用作 EvoMap Hub publish 字段清洗。
+
 # 边界：只改 validation/diff/结构自洽字段；不碰 signals/strategy/outcome 等语义字段。
 #       结构校验对已非空的 learning_history/epigenetic_marks 不覆盖（仅补空缺）。
 # =============================================================================
