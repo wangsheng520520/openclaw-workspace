@@ -139,11 +139,9 @@ echo "------------------------------------------------------------------"
 P1_AM=$(get_json "plugins.entries.active-memory.enabled")
 check_p1 "P1.AM"  "active-memory plugin"        "$P1_AM"
 
-P1_TD=$(get_json "agents.defaults.memorySearch.query.hybrid.temporalDecay.enabled")
-check_p1 "P1.TD"  "memorySearch.query.hybrid.temporalDecay"  "${P1_TD:-(未设)}"
-
-P1_MMR=$(get_json "agents.defaults.memorySearch.query.hybrid.mmr.enabled")
-check_p1 "P1.MMR" "memorySearch.query.hybrid.mmr"            "${P1_MMR:-(未设)}"
+# P1.TD / P1.MMR 在 OpenClaw 2026.8.x 已成 builtin fixed defaults
+# (固定 30 天 half-life + fixed lambda 0.7 MMR,见 docs/reference/memory-config.md §Hybrid search config)
+# 2026-09-04 删除过时的 schema 检查项 —— 配置项不存在,长期 false negative
 
 echo
 echo "▶ P2 维稳与观测项"

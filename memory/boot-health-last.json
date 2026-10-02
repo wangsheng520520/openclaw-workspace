@@ -1,0 +1,22 @@
+{
+  "ts": "2026-10-02T12:13:39+08:00",
+  "checks": {
+    "heartbeat": {
+      "status": "ok",
+      "detail": "heartbeat fresh (34 min ago)"
+    },
+    "alignment": {
+      "status": "ok",
+      "detail": "alignment-check exit=0"
+    },
+    "doctor": {
+      "status": "ok",
+      "detail": "doctor warning blocks=1 (baseline 2)"
+    },
+    "feishuWs": {
+      "status": "ok",
+      "detail": "feishu WebSocket started within 24h"
+    }
+  },
+  "attention": 0
+}

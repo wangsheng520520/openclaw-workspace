@@ -1,6 +1,11 @@
 ---
 name: receiving-code-review
 description: 收到代码审查反馈后、实施建议之前使用，尤其当反馈不明确或技术上有疑问时——需要技术严谨性和验证，而非敷衍附和或盲目执行
+version: "1.0.0"
+license: MIT
+metadata:
+  hermes:
+    tags: [code-review]
 ---
 
 # 接收代码审查
@@ -204,10 +209,3 @@ description: 收到代码审查反馈后、实施建议之前使用，尤其当�
 
 在 GitHub 上回复行内审查评论时，在评论线程中回复（`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`），不要发顶层 PR 评论。
 
-## 底线
-
-**外部反馈 = 待评估的建议，不是必须执行的命令。**
-
-验证。质疑。然后实施。
-
-不要敷衍附和。始终保持技术严谨。

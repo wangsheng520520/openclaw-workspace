@@ -37,3 +37,4 @@ state/
 # Independent git repos (nested workspaces)
 opencode/
 pi/
+main/

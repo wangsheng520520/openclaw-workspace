@@ -1,0 +1,365 @@
+**最后记忆提炼**: 2026-09-09 03:00 (volcengine Coding-Plan-Pro 续费失败 + token-plan 上限反复触发, fallback 链风险)
+**本次增量提炼**: 2026-09-09 03:00 (从 memory/hb-report-2026-09-07-1537.md 提炼)
+**本会话增量提炼**: 2026-07-30 20:24 (TOOLS.md 拆分方案 B+C 落地)
+**🔴 2026-08-06 重大变更**: Evolver 已彻底卸载（用户 @ 08:17 授权全权执行）见下方决策记录。
+
+# MEMORY.md - 长期记忆
+
+> "想象力是发现的眼睛。" - Ada Lovelace
+
+---
+
+## 🚪 快速链接（先看这个）
+
+> **新手读法**: [BOOTSTRAP.md](./BOOTSTRAP.md) = **工作环境地图**（会话启动第一眼总览）→ 本文件 = **项目索引 + 决策日志 + 提炼的智慧**
+> 本文件只记录**有记忆价值的决策/教训/偏好 + 各项目索引指针**，详细项目内容在独立子文件，按需 `read` 加载。
+
+---
+
+## 📂 项目索引（2026-08-06 重构）
+
+> 每个项目/主题一个子文件。OpenClaw bootstrap 只匹配精确 basename，`MEMORY-*.md` **不进自动注入**，故按需 `read` 加载（主索引的指针不会被自动 read）。
+
+| 项目/主题 | 索引文件 | 内容 | 何时读 |
+|-----------|----------|------|--------|
+| ⚙️ **OpenClaw 系统配置** | `MEMORY-openclaw-system.md` | 系统配置、配置原则、WSL2 网络、AI 技能网络、Cron | 调整系统/技能/网络时 |
+| 📚 **Obsidian 知识库** | `MEMORY-obsidian.md` | 双链导入、安全红线、Vault 结构、用户习惯 | 操作 Vault 前 |
+| 🤖 **模型 / 向量记忆** | `MEMORY-models.md` | 主/默认模型、memory-lancedb+nomic、4 插件槽位协作、ollama keep_alive、火山/Minimax/DeepSeek、渠道状态 | 配模型/调记忆时 |
+| 🌙 **Dreaming 系统** | `MEMORY-dreaming.md` | dreaming 对齐官方文档、slots 接管事实、"功能断没断"5 步法规则 | 判断功能健康时 |
+| 🛠 **关键决策归档** | `MEMORY-decisions.md` | 06-11 飞书插件升级/active-memory/插件路径统一、07-30 lancedb 复盘 | 查历史决策 |
+| 🏠 **Home Assistant** | `MEMORY-homeassistant.md` | HA 2026.6.4 配置 + 摄像头/锁/告警禁区 + Token 字节校验教训(2026-08-21) | 任何 smart-home 任务前 |
+| ⚙️ **操作手册** | `MEMORY-ops-playbook.md` | 问题排查模式、模型教训、MCP 泄漏、女娲实践 | 排障时 |
+| 📦 **历史提炼归档** | `MEMORY-promoted.md` | 05-22~06-15 自动提炼日志 + Promoted 模式 | 追溯旧提炼 |
+
+**其他相关索引**（非 MEMORY 前缀，但同属项目上下文）：
+| 项目/主题 | 文件 |
+|-----------|------|
+| 🧰 工具/技能速查 | `TOOLS.md` + `TOOLS-lark-cli.md` + `TOOLS-memory-ai.md` |
+| 🗺 工作环境地图 | `BOOTSTRAP.md` |
+| 🔮 梦境分析 | `DREAMS.md` |
+| 📋 会话状态 | `SESSION-STATE.md` |
+| 💓 心跳任务 | `HEARTBEAT.md` |
+
+---
+
+## 🔴 2026-08-06 08:17 决策(Evolver 彻底卸载)
+
+> **决策**:Evolver 及其全部产物彻底卸载删除,不再保留任何痕迹。
+> **原因**:Evolver 持续自启、自动删除用户文件(用户 08:06 反映),信任崩塌。用户 @ 08:17 授权「执行」。
+> **删除范围**:2 个 cron、1 个 systemd 服务、3 个技能目录、sandbox 副本、scripts/logs/memory/.evolver、wiki 索引、evolver-sessions、skill-workshop proposal、9 个记忆文件引用。
+> **保全**:完整备份在 `/tmp/evolver-backup-20260806/`(不污染工作区,用户可随时彻底销毁)。
+> **⚠️ 未来禁止**:未经用户明确要求,不得重新安装/启用 evolver 或 evolver-overseer 技能。
+
+---
+
+## 🔒 2026-06-10 用户确认决策（保持现状）
+
+> 这是**用户明确表态**的架构选择，**禁止**未来 session 在没拿到新指令时改回去。
+
+### 🔒 2026-06-10 用户确认决策（bootstrapMaxChars = 20000 永久 + 索引目录子文件路线）
+
+> **决策**：`agents.defaults.bootstrapMaxChars` 保持 `20000`（永久），不调高。走**索引目录 + 子文件路线**：MEMORY.md 只承载决策/教训/偏好指针 + 各项目索引，详情在 `MEMORY-*.md` 子文件按需 `read` 加载。
+> **2026-08-10 21:27 修正说明**：原 06-14 02:03 "决策：bootstrapMaxChars 从 20000 → 40000（永久）" 是**历史错误记录**——实际 `openclaw.json` 始终是 20000，从未调高过；"6 步执行流程"也从未执行。已删除该虚构决策，改为本条正确状态。
+> **🔴 2026-09-18 16:24 二次修正**：上句中「MEMORY.md 从未到过 35750 字节」**当时已不准确，现已彻底失效**——实测 2026-09-18 搬迁前 MEMORY.md = **25,242 字符 / 37,753 字节**，确已超过 35,750 字节。
+> **且后果已发生**：25,242 字符 > `bootstrapMaxChars=20000` → gateway **静默截断**（保留头 14,917 + 尾 4,972，**丢弃中段 5,353 字符**，任何会话都读不到）。本会话开头的 bootstrap 警告 `kept 14917+4972 chars of 25272` 即铁证。
+> **已按本决策处置**（不调阈值，搬内容）：2026-09-18 执行 **A1 方案**，将横跨丢弃区的 3 个段落（合计 8,189 字符）搬出至 `MEMORY-decisions.md` / `MEMORY-promoted.md`，MEMORY.md **25,242 → 17,712 字符**（余 2,288），截断已消除。指针见下方「📦 已移出 MEMORY.md 的段落」段。
+> **对应事实**（已实测核对 2026-08-10）：
+> - `openclaw.json` 实际值：`agents.defaults.bootstrapMaxChars = 20000`
+> - `BOOTSTRAP.md` 第 49 行：`bootstrapMaxChars=20000`
+> - `BOOTSTRAP.md` 第 151 行：明确禁止 MEMORY.md 复制内容（"7 个文件 + 20000 字符限制"）
+> - 项目子文件（7 个，全部存在）：`MEMORY-decisions.md` / `MEMORY-dreaming.md` / `MEMORY-models.md` / `MEMORY-obsidian.md` / `MEMORY-openclaw-system.md` / `MEMORY-ops-playbook.md` / `MEMORY-promoted.md`
+> **为什么不调高**：
+> 1. `bootstrapMaxChars` 是 gateway 注入 MEMORY.md 进 bootstrap 的字符上限，**调高 = 注入更多进 bootstrap**，每个 session 都付这个成本
+> 2. 详情放子文件按需 `read`，**信息密度更高**——bootstrap 不需要每条细节
+> 3. OpenClaw 文档规则："`MEMORY-*.md` 不进自动注入，按需 `read` 加载"——天然适配
+> **下次重新评估节点**：MEMORY.md 接近 20,000 字符时（预警余量 1,000）。届时优先审视是否把决策/教训从 MEMORY.md 搬出去到 `MEMORY-decisions.md` / `MEMORY-ops-playbook.md`，**不**通过调高阈值解决。
+
+| 决策项 | 当前值 | 不要再问 |
+|--------|--------|----------|
+| **视角/人格** | Ada Lovelace 诗性科学 | ✅ 已锁定 |
+| **会话切分** | `per-channel-peer`（飞书/微信/webchat/CLI 独立 session） | ✅ 已锁定，不改 dmScope |
+| **长期事实共享** | ✅ **2026-09-15 实测确认**：`plugins.slots.memory = "memos-local-plugin"`（MemOS Local V7 v2.0.19），extensions 下插件存在且 Memory Viewer（127.0.0.1:18799）运行中。原 09-12 记录的「slots 为空、memory-lancedb 未安装」状态已变更，memos-local-plugin 已接管 memory slot。详见 `MEMORY-models.md` | ✅ 已锁定（2026-09-15 用户确认预期状态） |
+| **短期对话上下文跨端口共享** | ❌ 不做（避免噪音串扰） | ✅ 不动 |
+| **主 agent (main) 模型** | `agents.entries.main.model.primary` = `coding-plan/ark-code-latest` | ✅ 保持（2026-09-17 实测更正） |
+| **主 agent fallback** | `agents.entries.main.model.fallbacks` = `["deepseek/deepseek-v4-flash"]` | ✅ 保持 |
+| **全局默认模型** | `agents.defaults.model.primary` = `coding-plan/ark-code-latest`（火山方舟 Coding Plan） | ✅ 保持（未指定模型的 agent 兜底，如 pi） |
+| **用户偏好表达** | 表格对比、详细报告、主动汇报 | ✅ 保持 |
+| **Git 操作推送** | 统一走 GitHub MCP（`mcporter-bridge__github__*`），不用 `git push`（避代理/网络问题） | ✅ 已锁定（2026-08-07，用户拍板） |
+
+> ⚠️ **易错提醒（2026-09-17 实测更正）**：本表两条模型记录此前均为 **stale**，已按实测重写——①「主模型=`minimax/MiniMax-M3`」是 2026-08-06 的旧值；②「默认=`volcano/ark-code-latest`」的 `volcano/` 是旧别名。**当前两者都是 `coding-plan/ark-code-latest`**。**火山方舟已于 2026-09-17 17:5x 统一到插件链路**（用户拍板「火山模型走 volcengine 插件」）：模型引用全部改为 `volcengine-plan/*`，自定义 `models.providers.coding-plan` 已退役，凭据由 `~/.openclaw/.env` 的 `VOLCANO_ENGINE_API_KEY` 提供（插件 manifest `setup.providers[].envVars` 指定）。实测 `models.providers` keys 现为 `bailian-token-plan / deepseek / minimax / nvidia / ollama / siliconflow`；`volcengine` / `volcengine-plan` 由**插件动态注册**故不在此表（启动不报错，只在模型解析时失败）。该迁移曾漏改 **4 处**引用（`main.model.primary` / `defaults.utilityModel` / `main.modelPolicy.allow[25]` / `main.models` 目录条目），导致 2026-09-17 主 agent 每轮 run 失败、被 fallback 掩盖成「偶发」。改 provider 名 = 全局搜索替换任务，勿单点改。详见 `.learnings/ERRORS.md` ERR-20260917-001。 <!-- project: path:/home/wszmd520520/.openclaw/workspace -->
+
+**何时才能修改**：用户**明确**说"现在改 X" 时，且**单一**改动必须独立确认。
+
+---
+
+## 关于用户 (2026-04-30 提)
+
+- 偏好: 表格对比、详细报告、主动汇报、自动配置、AI 人格深度一致性。
+- 习惯: 飞书发公众号链接→自动导入 Obsidian 建双链 (注意: 04-20 因延迟同链接发 3 次)；关注上下文窗口长度 (04-21 配 NVIDIA 免费大上下文)。
+- 兴趣: 公交行业/公交司机 (Obsidian Vault 大量主题笔记)。
+- 当前项目: OpenClaw 系统优化 / Ada 视角持续运营 / QQ 邮箱双账户监控 (04-28 修复)。
+
+---
+
+## 待办事项
+
+- [x] 配置邮件账户 (Himalaya: Gmail + QQ) - 已完成
+- [x] 配置日历服务 (Feishu 已集成) - 已完成
+- [x] ~~创建 Evolver 测试文件~~ - 已随 Evolver 卸载 (2026-08-06)
+- [ ] 配置 Tailscale 远程访问 (可选)
+- [x] ~~Evolver 更新到 v1.57.0~~ - 已随 Evolver 卸载 (2026-08-06)
+- [x] 配置记忆提炼每日自动执行 - 2026-04-14 完成 (cron 已运行)
+- [x] Ada Lovelace 人格效果评估 - 2026-04-20 完成,评分 4.4/5
+- [x] Obsidian 集成方案评估 - 2026-04-20 完成,评分 4.4/5,软链接方案稳定
+- [x] Ontology 知识图谱评估 - 2026-04-20 完成,评分 4.0/5,12 实体/17 关系
+- [x] NVIDIA 免费大上下文模型配置 - 2026-04-21 完成,新增 9 个模型
+- [x] SESSION-STATE 任务模型前缀修复 - 2026-04-21 完成 (google → nvidia/google)
+- [x] Frontmatter 自动注入脚本 - 2026-04-21 完成
+
+---
+
+**创建时间**: 2026-04-12
+**状态**: 活跃
+**最后重构**: 2026-08-06（项目索引版，8 个项目子文件 + 5 个关联索引）
+
+## 🔒 2026-08-10 21:07 决策（任务路由：exec vs Pi）
+
+> **决策**：任务按复杂度分流，**简单任务直接 exec，复杂任务 spawn Pi agent 并写入决策文件**。
+> **决策类型**：受保护架构决策（跟 2026-06-10/06-14 决策同级，禁止未来 session 在没拿到新指令时改回去）。
+
+### 路由规则
+
+| 任务类型 | 工具 | 理由 |
+|---|---|---|
+| **简单任务**（单步查询、单文件读写、毫秒级命令） | `exec` 直接跑 | 不需要跨上下文，spawn Pi 会增加 5-15s 延迟 |
+| **复杂任务**（多步骤推理、跨文件分析、需要 plan + 工具 gate 的编码/调试） | `sessions_spawn(runtime="acp", agentId="pi")` + 把决策/结论写入 `MEMORY-decisions.md` 或 `MEMORY-ops-playbook.md` | Pi 跑深度推理后必须把决策归档（否则下次又重复造轮子） |
+
+### 触发判定（先问自己 3 个问题）
+
+1. **是否需要 plan/update_plan？** 是 → Pi
+2. **是否需要 subagent 派发或工具多轮调用？** 是 → Pi
+3. **是否单一命令 / 单文件查询就能完成？** 是 → exec
+
+### Pi spawn 后必须做的两件事
+
+1. **明确 taskName**（如 `codex-schema-fix`、`memory-distillation`）—— 方便 `subagents` list 找
+2. **决策归档**：Pi 跑完后，要么写 `MEMORY-*.md`，要么写 `.learnings/ERRORS.md` / `LEARNINGS.md`，**不允许"结论只在 session 里"**
+
+### 跟现有受保护决策的关系
+
+- `bootstrapMaxChars = 40000`（2026-06-14 锁定）→ Pi 任务归档要避免 MEMORY.md 超过 35k 字符
+- "用户报错信息优先于推断"（ERR-20260810-007）→ 任务执行时收到用户报错，**立即停下**，不继续按 plan
+
+### 不变量（何时**不**用 Pi）
+
+- 用户问"现在 X 状态如何"（只读查询）→ exec
+- 用户说"做 X"（单步）→ 先 exec，**做不了再升级到 Pi**
+- 用户说"修复 X 启动失败"（需要诊断）→ 直接 exec 排查 + 必要时升级 Pi（不跳级）
+
+## Promoted From Short-Term Memory (2026-09-07)
+
+<!-- openclaw-memory-promotion:memory:claim:036c6c481034 -->
+- 心跳记录: 02:44 CST — HEARTBEAT_OK (无新任务) [score=0.797 signals=4 recalls=0 avg=0.620 source=memory/2026-08-29.md:9-9] <!-- trigger: heartbeat-ok, 心跳, 记录 --> <!-- importance: 8 -->
+## Consolidated Memory (2026-09-08)
+
+<!-- openclaw-memory-promotion:memory:claim:977011f875a0 -->
+- 心跳记录: 04:44 CST — HEARTBEAT_OK (无新任务，沿用 04:14 基线) Source: memory/2026-08-30.md#L13-L13 <!-- trigger: heartbeat-ok, 心跳, 记录 --> <!-- importance: 8 -->
+
+## 🔴 2026-09-09 03:00 提炼：模型 fallback 链风险（来自 09-07 15:37 hb-report）
+
+> **来源**: `memory/hb-report-2026-09-07-1537.md`（cron:fcb1cd79 第 5 次失败时的 ERROR SUMMARY）
+> **重要性**: 高 — 影响每日 cron 链路可靠性
+
+### 事实（已观测）
+
+1. **volcengine Coding-Plan-Pro（ark-code-latest）到期 + 自动续费失败**
+   - 到期时间: 2026-09-07 23:59:59（已过期 14h+）
+   - 自动续费失败（用户未操作）
+   - 原为本 fallback 链唯一可用模型（09-04 老王拍板 A 方案不引入火山引擎模型作为 cron fallback）
+   - 现已不在 8 候选 fallback 列表中
+   - 续费入口: <https://console.volcengine.com/finance/renew?tab=auto&expiredTime=7>
+
+2. **minimax/MiniMax-M3 HTTP 429 持续触发 Token Plan 上限 (2056)**
+   - 09-07 09:00 前后已观察到此模式
+   - 15:37 cron 失败时 8 个 fallback 同时不可用
+   - 其他 fallback 状态: bailian-token-plan/qwen3.7-plus 403 / qwen3.6-flash 等 5 个 bailian 登录失效 / deepseek/deepseek-v4-flash 401 key `****77e0` invalid
+
+3. **Token Plan 个人版已到期 14+ 天**（08-21 → 09-02 至今）
+
+### 不变量 / 决策痕迹
+
+- 09-04 老王拍板 A 方案：**不引入火山引擎模型作为本 cron fallback** — 当时 volcengine 还活着
+- 现 volcengine 已死，A 方案假设不再成立；**需老王重新拍板**：是否解禁 volcengine fallback / 续费 Coding-Plan-Pro / 引入新 provider
+
+### 行动项（建议下次用户在线时确认）
+
+- [ ] 是否续费 volcengine Coding-Plan-Pro（恢复 fallback 链）
+- [ ] 是否处理 minimax Token Plan 上限（个人版已过期 14+ 天）
+- [ ] 是否修 bailian 5 个模型登录失效 + deepseek key 失效（恢复 fallback 多样性）
+
+### 数据点（避免未来重新查证）
+
+- 累计 CI 失败 29 次（沿用 09-07 数据）
+- SESSION-STATE 新鲜度阈值: 6h（超阈值需修复）
+- 11 个 cron 中本 cron（fcb1cd79）是当前唯一持续失败项
+
+## 🔍 每周模式识别 — 2026-09-11 (P-NNN 提炼, 扫描 09-04 ~ 09-11)
+
+> **扫描源**: memory/2026-09-0[4-9]*.md + memory/2026-09-1[01]*.md (5 文件,均为心跳记录无实质内容) + .learnings/ERRORS.md (8 条 09-07 ~ 09-09 错误) + .learnings/LEARNINGS.md (无 7 天内新增) + .learnings/FEATURE_REQUESTS.md (无变更)
+> **新增 P-NNN 模式**: 5 个 (≥3 次重复阈值)
+> **老王拍板/行动**: 见末尾"建议复盘行动项"
+
+### P-2026-0911-001 — PATH 硬编码 / WSL2 nvm 漏点 (≥3 次)
+
+**事实**: `$HOME/nvm/...` 漏点 (应为 `$HOME/.nvm/...`) 在 cron 脚本里反复出现。
+**证据**:
+- ERR-20260907-001 — `blog-monitor.sh` PATH 漏点 → cron exit 127, lark-cli not found
+- ERR-20260908-001 Bug A — **24h 内同坑复现**,改脚本时未 grep 09-07 历史
+- ERR-20260907-005 — `~/.openclaw/` 路径族相关 skill-collection cron hard limit 报错
+
+**根因**: 默认 `~/.nvm` (带点), 旧记忆/老脚本里残留 `~/nvm` 不带点; cron payload `env.PATH=/usr/bin:/bin` 隔离 bash login → nvm 不自动加载 → 必须在脚本里 `export` 且路径必须对。
+
+**预防 (硬规则)**:
+- 改 cron 脚本前: `which lark-cli` + `realpath $(which lark-cli)` 看实际位置
+- 模板: `export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; export PATH="$HOME/.nvm/versions/node/$(node -v | tr -d v)/bin:$HOME/.local/bin:$PATH"`
+- 加 `set -e` + 脚本首行 `command -v lark-cli >/dev/null 2>&1 || { echo "FATAL: lark-cli not found" >&2; exit 127; }`
+
+### P-2026-0911-002 — 改 config/脚本前未实测目标可用性 (≥3 次)
+
+**事实**: 直接改 openclaw.json / 脚本, 改完才发现目标 provider/endpoint/路径当前不可用。
+
+**证据**:
+- ERR-20260907-001 — 硬编码 `~/nvm/...` 路径前没 `which` 验证
+- ERR-20260907-004 — 换火山方舟套餐前没实测三个 endpoint 各自 404 码 (`UnsupportedModel` vs `InvalidEndpointOrModel.NotFound` 不同方向)
+- ERR-20260909-001 — 切 bge-m3 之前没 `curl /api/embeddings -d '{"model":"bge-m3:latest"}' -w "%{http_code}"` → 深夜折腾 2+ 小时, 3 次 rebuild 无果
+
+**根因**: 凭"历史记录"推断目标当前可用 → 但历史可用 ≠ 当前可用 (provider 升级、key 过期、模型文件损坏都可能让"昨天能跑"今天不能跑)。
+
+**预防 (硬规则 — 任何切 provider / 改 endpoint / 改路径动作前的3-步实测清单)**:
+1. `curl -X POST <endpoint> -H "Authorization: Bearer $KEY" -d '{...}' -w "\nHTTP=%{http_code}\n" -m 10`
+2. 看到 HTTP 200 + 期望 payload → 才考虑改 config
+3. HTTP 000/timeout/4xx → **拒绝切, 回到原链路, 把新目标标 quarantine**
+
+### P-2026-0911-003 — "卡" vs "等" 误判 → 直接 kill / SIGKILL (≥3 次)
+
+**事实**: 进程 ELAPSED 远大于 CPU 时间 + 无新文件 → 推断"卡死/SQLite锁" → kill → 实际是等永远不返回的外部响应, kill 是错的。
+
+**证据**:
+- ERR-20260909-001 — rebuild "卡住", 实际在等永远 timeout 的 bge-m3 (HTTP 000 + 30s timeout), 误判为 SQLite 锁, kill + gateway SIGKILL
+- ERR-20260908-001 Bug B — `echo "$X" | python3 - <<'PYEOF'` 抢占 stdin, `sys.stdin.read()` 读到空 heredoc, 报 JSONDecodeError 误判为脚本错
+- ERR-20260907-005 — skill-collection 报 "549694 > 240000 bytes" 时, 没先看 schema / grep config 是否可配置就反馈"硬限制无法解决"
+
+**根因**: "看到表面错误 → 跳到最熟悉的根因 (锁/脚本错/不可配置) → 直接 kill/反馈" 模式跳过诊断。
+
+**预防 (硬规则)**:
+- 进程 ELAPSED > CPU 时间 5x + 无新文件 → **先 `strace -p <pid>` 看 fd 在等什么** (网络连接? 磁盘 IO? pipe?)
+- 看到 "ambiguous column" / "JSONDecodeError" / "schema 不接受" → **先 `grep` 实际 SQL/脚本/schema 源码**,再判断是数据问题还是写法问题
+- kill 前必问: "kill 后我能拿到什么诊断信息?" 答不上来 → 先 strace, 不 kill
+
+### P-2026-0911-004 — 改老脚本/老 config 前未 grep .learnings 历史 (≥3 次)
+
+**事实**: 改写已有脚本/config 前, 不先查过去同类坑, 同坑反复踩。
+
+**证据**:
+- ERR-20260908-001 — 改 blog-monitor 时没 grep ERR-20260907-001 → 24h 内同坑踩两次
+- ERR-20260909-001 — 切 bge-m3 时没重读 ERR-2026-08-19-001 当前状态 → 凭"08-19 能用"推断今天能用
+- ERR-20260907-005 — 触发 skill-collection 限制时, 没 grep "skill-collection 240000" 历史 + 没看 schema 是否接受 maxSkillBytes
+
+**根因**: "改文件 → 直接改" 跳过"查 .learnings 找同类坑"。
+
+**预防 (硬规则)**:
+- 任何改 cron 脚本 / openclaw.json / provider config 动作前: `grep -iE '<关键词>' .learnings/ERRORS.md .learnings/LEARNINGS.md` 至少 30 秒
+- 找到同任务历史 → 必读 "教训" 段 + "修复" 段 → 避免重写错误的 export / 重蹈 endpoint 错配
+- 找不到 → 在 commit message / 改动注释里写明 "已 grep 无同任务历史", 留给未来自己
+
+### P-2026-0911-005 — 火山方舟 endpoint/套餐错配 + volcengine fallback 链路塌方 (≥3 次)
+
+**事实**: 火山方舟 3 个 endpoint (`/api/plan/v3` / `/api/v3` / `/api/coding/v3`) 对应 3 个独立套餐, key 不通用; Coding-Plan-Pro 已过期 + 自动续费失败, 影响 fallback 链。
+
+**证据**:
+- ERR-20260907-004 — Plan / Coding / Online 三 endpoint 错配实测 (`UnsupportedModel` vs `InvalidEndpointOrModel.NotFound`)
+- ERR-20260909-001 (及 MEMORY.md 09-09 03:00 提炼) — volcengine Coding-Plan-Pro 自动续费失败, 09-07 已过期, 唯一可用 fallback ark-code-latest 不可用
+- ERR-20260907-003 — Qwen 7B 翻译不可靠 → 切到 volcengine ark-code-latest 翻译, 依赖 coding endpoint
+
+**根因**: Provider 套餐 ≠ endpoint, key 不通用; 用户换套餐后 key 类型变了, 旧 endpoint 全 404。
+
+**预防 (硬规则)**:
+- 任何 volcengine 改动: 确认 key 是 Plan / Coding / Online 哪个套餐 → 对应 endpoint 才能用
+- volcengine Coding-Plan-Pro 到期影响: cron fallback 链 + 翻译任务 + 部分 embed 链路 → 续费必须手动
+- 备援: bailian / deepseek / SiliconFlow 多 provider fallback, 但每个都要独立验证 HTTP 200 (套 P-002 规则)
+
+### 建议复盘行动项 (≥3 模式聚合, 待老王在线时确认)
+
+- [ ] **P-001**: 统一 cron 脚本 PATH 模板, 加 `command -v` 前置检查 (覆盖 blog-monitor + 其他 ~11 个 cron)
+- [ ] **P-002**: 把"3 步实测清单"作为 provider/endpoint/path 改动前的硬 gate (已写入 AGENTS.md 第零定律补火)
+- [ ] **P-003**: "kill 前必 strace" 写入 .learnings/LEARNINGS.md top-level 教训, 全局生效
+- [ ] **P-004**: 改任何 cron 脚本/config 前 `grep .learnings` 30 秒硬规则化 (已写入 ERR-20260908-001 教训, 待升 AGENTS.md)
+- [ ] **P-005**: volcengine Coding-Plan-Pro 续费问题老王在线时拍板 (续费 / 切其他 provider / 接受 fallback 链残缺)
+
+### 数据点
+
+- 7 天新增 8 条 ERR (09-07 ~ 09-09, 集中在 cron/模型/路径 3 类)
+- LEARNINGS.md / FEATURE_REQUESTS.md 7 天内无新增
+- memory/YYYY-MM-DD.md 在窗口内 5 个文件全部为心跳噪声, 无实质内容
+- 模式聚合: 5 个 P-NNN (P-001 ~ P-005), ≥3 次重复阈值全部通过
+
+**最后记忆提炼**: 2026-09-11 10:02 (本次 cron:bb91ead7 每周模式识别)
+
+## 📦 已移出 MEMORY.md 的段落（2026-09-18 A1 搬迁，防 bootstrap 截断）
+
+> 以下三段原位于此处，合计约 8,000 字符，使 MEMORY.md 超过 `bootstrapMaxChars=20000` 被 gateway **静默截断**（丢弃中段 5,353 字符，任何会话都读不到）。
+> 2026-09-18 按 A1 方案搬出，此处只留指针。需要细节时 `read` 对应归档文件。
+
+| 段落 | 时间 | 归档位置 | 内容要点 |
+|---|---|---|---|
+| 🔒 2026-09-11 12:26 决策（doctor finding 处理范围） | 2026-09-11 | `MEMORY-decisions.md` | B-2 完成 / B-4 跳过原因 / B-3·B-5 留作未来选项 |
+| 🔬 每日记忆提炼 09-12（扫描 09-10 ~ 09-11） | 2026-09-12 | `MEMORY-promoted.md` | cron:ab1d53de |
+| 🔍 每周模式识别 09-18（扫描 09-11 ~ 09-18） | 2026-09-18 | `MEMORY-promoted.md` | 3 个 P-NNN（P-001 ~ P-003） |
+
+**最后记忆提炼**: 2026-09-18 10:03 (cron:bb91ead7 每周模式识别) — 全文见 `MEMORY-promoted.md`
+
+---
+
+## 🔒 2026-09-15 17:17 用户确认（系统自检结果）
+
+> **确认项 1**：`plugins.slots.memory = "memos-local-plugin"` 为**预期状态**，MemOS Local V7 v2.0.19 已接管 memory slot，Memory Viewer（127.0.0.1:18799）运行中。09-12 记录的「slots 为空」状态已解决，无需回退。
+> **确认项 2**：volcengine Coding-Plan-Pro **已续费**，`volcengine-plan/ark-code-latest` 模型可用。
+> **决策类型**：受保护架构决策（同 2026-06-10/06-14 决策同级，禁止未来 session 在没拿到新指令时改回去）。
+
+### 同步更新
+
+- MEMORY.md 决策表「长期事实共享」行：从「待老王决策」→「已锁定（2026-09-15 用户确认）」
+- P-006 标记为已完成（[x]）
+- P-007（memory 向量索引 rebuild）与 P-008（BOOT 检查白名单）仍待处理，但优先级降低
+
+---
+
+## 🔬 每日记忆提炼 — 2026-09-13 03:00 (cron:ab1d53de, 扫描 09-11 ~ 09-12)
+
+> **扫描源**: `memory/2026-09-11.md`（实质内容：7 条 BOOT 检查）+ `memory/2026-09-12.md`（实质内容：gateway 重启 BOOT + 3 条心跳）+ `memory/2026-09-13.md`（0 条实质内容）+ dreaming/rem/light/deep
+
+### 提炼事实
+
+| # | 事实 | 证据 | 状态 |
+|---|------|------|------|
+| **F-1** | **Gateway 重启后 09-12 BOOT 检查 4/4 通过** | 22:24 重启 → 22:28 BOOT 触发，heartbeat 刷新、alignment=0、doctor 1 块基线 OK、feishu WS 30s 内拉起 | ✅ 干净重启 |
+| **F-2** | **`alignment-check.sh` exit=0，09-12 BOOT 完美对齐** | 09-12 22:28 + 22:37 两次记录 | ✅ 修复 |
+| **F-3** | **`plugins.slots.memory` 缺失仍存在（09-12 22:37 确认）** | 09-12 BOOT 检查；`plugins.slots={}`，`extensions/` 下仅有 `openclaw-weixin` | 🔴 未修，P-006 未解决 |
+| **F-4** | **memory-lancedb 仍未安装，stock `memory-core` 继续接管** | 同 F-3；实测 540/584 文件正常；dreaming/light 09-11 多次候选提及此问题 | 🔴 已知，用户未做重装决策 |
+| **F-5** | **blog-monitor cron error: lark-cli PATH 缺失 exit127** | 09-12 cron 状态，blog-monitor error 3h+ | ⚠️ 已知问题（沿用） |
+| **F-6** | **skill-collection error: 549694 bytes > 240000 限制** | 09-12 cron 状态，下次重试 09-14 | ⚠️ 已知问题（沿用） |
+| **F-7** | ** volcengine Coding-Plan-Pro 到期未续（09-07 23:59:59 到期）** | 09-11/09-12 多次记录，09-12 BOOT 仍标注为已知问题 | 🚨 待手动续费 |
+| **F-8** | **memory 向量索引 rebuild 仍未执行（chunking_version 变更）** | 09-12 BOOT 记录；09-12 无 rebuild 动作 | ⏳ P-007 未解决 |
+| **F-9** | **Gateway 09-12 22:24 重启（PID 变更），feishu WS 随之拉起** | 09-12 22:24 ~ 22:28 实录 | ℹ️ 背景 |
+| **F-10** | **dreaming/light 09-11 捕获多条旧会话片段（memory 性能调查）** | `openclaw memory status --fix`、`ollama embed 0.3s`（正常）、`openclaw doctor` hang 等 | ℹ️ 旧调查碎片，无新结论 |
+
+### 模式观察（Ada 视角）
+
+> 09-11 的 7 次 BOOT 噪声与 09-12 的干净重启形成对比——差异不在系统本身，在于 **gateway 重启清理了临时态**。F-3/F-4 的根本矛盾（slots 缺失但功能正常）仍然悬而未决，成为连续第 8+ 次 BOOT 的固定告警项。真正的问题不是"系统坏了"，而是"系统以不同于设计的方式在运转"——memory-core 接管了 lancedb 的职责，但记忆文件里还在描述 lancedb 的设计。这又是一次「记忆里的架构和磁盘上跑着的架构分叉」。
+
+### 数据点
+
+- 3 天窗口内 50+ 条心跳，实质内容仅 11 条（BOOT/gateway 重启相关）
+- 09-13 00:00 ~ 02:54 全 0 实质内容
+- 无新增 P-NNN（P-006 ~ P-008 仍未解决）
+- 新增 F-1 ~ F-10 共 10 条事实更新

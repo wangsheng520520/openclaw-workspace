@@ -1,0 +1,172 @@
+{
+  "mcpServers": {
+    "amap": {
+      "description": "\u9ad8\u5fb7\u5730\u56fe MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@amap/amap-maps-mcp-server"
+      ],
+      "env": {
+        "AMAP_MAPS_API_KEY": "a1251a0acdd54d98189e5cb6a592c102"
+      },
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "playwright": {
+      "description": "Playwright MCP",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless",
+        "--browser",
+        "chromium"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "chrome-devtools": {
+      "description": "Chrome DevTools MCP",
+      "command": "npx",
+      "args": [
+        "chrome-devtools-mcp@latest"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "exa-search": {
+      "description": "Exa Search MCP",
+      "command": "npx",
+      "args": [
+        "exa-mcp-server"
+      ],
+      "env": {
+        "EXA_API_KEY": "ea72205d-4920-4b22-af22-f9e7222ce522"
+      },
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "mcp-deepwiki": {
+      "description": "DeepWiki MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-deepwiki@latest"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "Memory": {
+      "description": "Memory Knowledge Graph MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "sequential-thinking": {
+      "description": "Sequential Thinking MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "context7": {
+      "description": "Context7 MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "github": {
+      "description": "GitHub MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "PLACEHOLDER_REPLACE_WITH_GITHUB_TOKEN"
+      },
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "mcp-server-chart": {
+      "description": "AntV Chart MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@antv/mcp-server-chart"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "think-tool": {
+      "description": "Think Tool MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@cgize/mcp-think-tool"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "thinking-models": {
+      "description": "Thinking Models MCP",
+      "command": "npx",
+      "args": [
+        "--no-cache",
+        "@thinking-models/mcp-server"
+      ],
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    },
+    "markmap": {
+      "description": "Markmap MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@jinzcdev/markmap-mcp-server"
+      ],
+      "env": {
+        "MARKMAP_DIR": "/tmp/markmap"
+      },
+      "lifecycle": {
+        "mode": "keep-alive"
+      },
+      "keepAlive": true
+    }
+  }
+}

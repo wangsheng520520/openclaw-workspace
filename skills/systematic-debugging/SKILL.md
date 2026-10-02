@@ -1,13 +1,16 @@
 ---
 name: systematic-debugging
 description: 遇到任何 bug、测试失败或异常行为时使用，在提出修复方案之前执行
+version: "1.0.0"
+license: MIT
+metadata:
+  hermes:
+    tags: [debugging]
 ---
 
 # 系统化调试
 
 ## 概述
-
-随意修复既浪费时间又会引入新 bug。草率的补丁只会掩盖深层问题。
 
 **核心原则：** 在尝试修复之前，务必先找到根本原因。只修症状就是失败。
 
@@ -176,7 +179,7 @@ description: 遇到任何 bug、测试失败或异常行为时使用，在提出
    - 尽可能用自动化测试
    - 没有测试框架就写一次性测试脚本
    - 修复前必须先有测试
-   - 使用 `superpowers:test-driven-development` 技能来编写规范的失败测试
+   - 使用 `test-driven-development` 技能来编写规范的失败测试
 
 2. **实施单一修复**
    - 修复已定位的根本原因
@@ -188,6 +191,7 @@ description: 遇到任何 bug、测试失败或异常行为时使用，在提出
    - 测试现在通过了吗？
    - 其他测试没有被破坏吧？
    - 问题真的解决了吗？
+   - 宣称成功之前，使用 `verification-before-completion` 技能
 
 4. **如果修复不起作用**
    - 停下来
@@ -283,14 +287,3 @@ description: 遇到任何 bug、测试失败或异常行为时使用，在提出
 - **`defense-in-depth.md`** - 找到根因后，在多个层级添加校验
 - **`condition-based-waiting.md`** - 用条件轮询替代硬编码等待时间
 
-**相关技能：**
-- **superpowers:test-driven-development** - 用于创建失败测试用例（第四阶段，第 1 步）
-- **superpowers:verification-before-completion** - 在宣称成功之前验证修复确实有效
-
-## 实际效果
-
-调试实践中的数据：
-- 系统化方法：15-30 分钟修复
-- 随意修复方法：2-3 小时反复折腾
-- 一次修复成功率：95% vs 40%
-- 引入新 bug：几乎为零 vs 经常发生

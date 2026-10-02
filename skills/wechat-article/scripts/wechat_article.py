@@ -6,68 +6,21 @@
 """
 
 import sys
-import os
 import json
 import requests
 import re
 from urllib.parse import quote
 from datetime import datetime
 
-# 移动端 User-Agent（实测：伪装微信内置浏览器可显著提升成功率，参考成功率 95%）
-MOBILE_UA = (
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) "
-    "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 "
-    "MicroMessenger/8.0.30(0x18001e2f) NetType/WIFI Language/zh_CN"
-)
-
-
-def fetch_via_tavily(url: str) -> dict:
-    """
-    使用 Tavily Extract API 提取文章内容。
-    实测经验：Tavily 是微信公众号文章提取的首选，成功率最高，
-    优于 r.jina.ai / web_fetch。需要环境变量 TAVILY_API_KEY。
-    """
-    api_key = os.environ.get("TAVILY_API_KEY")
-    if not api_key:
-        return {
-            "success": False,
-            "method": "tavily",
-            "error": "未配置 TAVILY_API_KEY 环境变量",
-        }
-    try:
-        response = requests.post(
-            "https://api.tavily.com/extract",
-            json={"urls": [url], "extract_depth": "advanced"},
-            headers={"Authorization": f"Bearer {api_key}"},
-            timeout=30,
-        )
-        response.raise_for_status()
-        data = response.json()
-        results = data.get("results") or []
-        if results and results[0].get("raw_content"):
-            return {
-                "success": True,
-                "method": "tavily",
-                "content": results[0]["raw_content"].strip(),
-            }
-        return {"success": False, "method": "tavily", "error": "Tavily 返回空内容"}
-    except requests.exceptions.Timeout:
-        return {"success": False, "method": "tavily", "error": "请求超时"}
-    except requests.exceptions.RequestException as e:
-        return {"success": False, "method": "tavily", "error": str(e)}
-    except Exception as e:
-        return {"success": False, "method": "tavily", "error": str(e)}
-
 
 def fetch_via_jina(url: str) -> dict:
     """
-    使用 r.jina.ai 提取文章内容（备用方式）。
-    实测：对微信公众号效果不稳定，仅在 Tavily/本地脚本失败后作为回退。
-    伪装移动端微信 UA 以提升通过率。
+    使用 r.jina.ai 提取文章内容
+    这是最可靠的方式，支持微信公众号
     """
     jina_url = f"https://r.jina.ai/{url}"
     headers = {
-        "User-Agent": MOBILE_UA,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         "X-Return-Format": "markdown",
         "X-With-Links-Summary": "true",
     }
@@ -200,8 +153,9 @@ def parse_jina_content(content: str) -> dict:
     # 清理正文
     body = "\n".join(body_lines).strip()
     
-    # 尝试提取发布时间和公众号（实测：从正文中用正则回捞元数据）
-    publish_time, account = _extract_metadata(content)
+    # 尝试提取发布时间和公众号
+    publish_time = ""
+    account = ""
     
     return {
         "title": title,
@@ -209,34 +163,6 @@ def parse_jina_content(content: str) -> dict:
         "publish_time": publish_time,
         "account": account
     }
-
-
-def _extract_metadata(content: str) -> tuple:
-    """
-    从文章原始内容中回捞发布时间与公众号名。
-    返回 (publish_time, account)，任一提取失败则为空字符串。
-    支持中文日期（2026年07月29日）与 ISO 日期（2026-07-29）。
-    """
-    publish_time = ""
-    account = ""
-    if not content:
-        return publish_time, account
-
-    # 发布时间：优先中文日期，其次 ISO 日期
-    cn_date = re.search(r"(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日", content)
-    if cn_date:
-        publish_time = f"{cn_date.group(1)}-{int(cn_date.group(2)):02d}-{int(cn_date.group(3)):02d}"
-    else:
-        iso_date = re.search(r"(20\d{2})-(\d{1,2})-(\d{1,2})", content)
-        if iso_date:
-            publish_time = f"{iso_date.group(1)}-{int(iso_date.group(2)):02d}-{int(iso_date.group(3)):02d}"
-
-    # 公众号名：常见格式"公众号：XXX"或"来源：XXX"
-    acct_match = re.search(r"(?:公众号|来源|作者)\s*[：:]\s*([^\n\r，,。]{1,30})", content)
-    if acct_match:
-        account = acct_match.group(1).strip()
-
-    return publish_time, account
 
 
 def wechat_article(url: str) -> dict:
@@ -250,24 +176,8 @@ def wechat_article(url: str) -> dict:
             "error": "无效的微信公众号文章链接"
         }
     
-    # 策略 1: 使用 Tavily（实测首选，成功率最高）
-    print(f"📡 尝试使用 Tavily 提取...", file=sys.stderr)
-    result = fetch_via_tavily(url)
-    if result["success"]:
-        print(f"✅ 使用 {result['method']} 成功提取", file=sys.stderr)
-        parsed = parse_jina_content(result["content"])
-        return {
-            "success": True,
-            "method": result["method"],
-            "title": parsed["title"],
-            "content": parsed["content"],
-            "publish_time": parsed["publish_time"],
-            "account": parsed["account"],
-            "url": url
-        }
-
-    # 策略 2: 使用 jina.ai（备用，移动端 UA 伪装）
-    print(f"📡 尝试使用 jina.ai 提取（备用）...", file=sys.stderr)
+    # 策略 1: 使用 jina.ai（最可靠）
+    print(f"📡 尝试使用 jina.ai 提取...", file=sys.stderr)
     result = fetch_via_jina(url)
     if result["success"]:
         print(f"✅ 使用 {result['method']} 成功提取", file=sys.stderr)
@@ -281,9 +191,9 @@ def wechat_article(url: str) -> dict:
             "account": parsed["account"],
             "url": url
         }
-
-    # 策略 3: 直接抓取（最后回退，微信易拦截）
-    print(f"📡 尝试直接抓取（回退）...", file=sys.stderr)
+    
+    # 策略 2: 直接抓取
+    print(f"📡 尝试直接抓取...", file=sys.stderr)
     result = fetch_via_web_fetch(url)
     if result["success"]:
         print(f"✅ 使用 {result['method']} 成功提取", file=sys.stderr)

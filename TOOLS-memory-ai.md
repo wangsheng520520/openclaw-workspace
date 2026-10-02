@@ -188,6 +188,39 @@ ExecStartPre=-/home/wszmd520520/.openclaw/workspace/scripts/repatch-memory-lance
 
 ---
 
+## 🚀 ollama keep_alive 优化（2026-08-19 22:50 落地）
+
+**问题**：memory-lancedb + ollama 嵌入，每次 idle 5 分钟后会触发 **30-47s 冷启动**（模型从磁盘重载到内存），严重影响连续对话体验。
+
+**根因**：ollama server 默认 `keep_alive=5m`（300s）—— idle 5 分钟自动 unload 模型。下次用要重新加载 1GB 模型。
+
+**优化方案**（方案 2：改 ollama server 端环境变量）：
+
+在 Windows 管理员 PowerShell 执行（一次性，永久生效）：
+```powershell
+[Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "-1", "Machine")
+```
+
+下次 ollama 加载模型时就会读到这个值，模型**永不过期**。
+
+**实测验证**（2026-08-19 22:50 WSL 端）：
+
+| 操作 | 优化前 | 优化后 |
+|------|--------|--------|
+| 已 loaded → 5 次嵌入 | 0.55-0.61s | 0.55-0.61s（一样）|
+| 5min idle 后再次嵌入 | **30-34s 冷启动** | **0.6s 热调用**（50x 提升）|
+| `expires_at` 显示 | 5 min 后过期 | **2318-11-29（292 年后）= 永久** |
+
+**重要纠正之前的诊断**：
+- ❌ 2026-08-19 13:10 测过 `keep_alive=24h` 无效 → **但那次测的是 builtin memorySearch（SQLite 写入）**，不是 ollama server 端
+- ✅ 改 ollama server 端 `OLLAMA_KEEP_ALIVE=-1`（环境变量）才是**真正的根治方案**
+- ✅ ollama 不是 Windows 服务（`Stop-Service ollama` 找不到），所以不需要重启服务 —— 改环境变量后**下次模型加载即生效**（ollama 在请求时读 OLLAMA_KEEP_ALIVE）
+
+**未来排查指引**：
+- 如果嵌入突然变慢（> 5s）→ 先 `curl http://127.0.0.1:11434/api/ps` 看 expires_at
+- 如果 expires_at 变成正常时间（< 1h）→ 说明 OLLAMA_KEEP_ALIVE 被某次 ollama 重启清掉了
+- 修复：在 Windows 管理员 PowerShell 重跑 `[Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "-1", "Machine")`
+
 ## 🔬 memory-core 备用方案
 
 memory-core 是 slot 默认降级方案，走 SQLite 向量存储。不需要外部 API，但**语义能力弱于 LanceDB**。

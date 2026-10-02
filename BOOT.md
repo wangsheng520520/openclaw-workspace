@@ -17,6 +17,52 @@
 
 ---
 
+## 📦 历史归档：原 HEARTBEAT.md 合并说明
+
+**合并时间**: 2026-09-11 17:32 CST
+**触发**: HEARTBEAT.md（199 行）从 git HEAD 中删除（uncommitted deletion），按老王决策 🅱️——只把"每日日志机制"并入 BOOT.md，其余内容（每日 4 项检查 / 每周 MEMORY 提炼 / 心跳架构演化 / 邮件天气通知配置）保留在原位置或对应章节：
+
+| 原 HEARTBEAT.md 章节 | 去向 | 状态 |
+|---|---|---|
+| ⚡ 0. 更新 heartbeat-state.json | BOOT.md 检查 1 已隐含覆盖（读 lastCheck） | ✅ 已覆盖 |
+| ⚡ 0.5 写每日行为日志 | **并入下方** | ✅ 见下 |
+| 定期检查任务（每日 4 项 + 每周 1 项） | skills/proactive-agent/SKILL.md 体系内引用 | ⏸️ 保持 |
+| 记忆提炼指南 | skills/proactive-agent/assets/HEARTBEAT.md | ⏸️ 保持 |
+| 模型配置说明 | 与 BOOT.md 风格不符 | ⏸️ 跳过 |
+| 心跳架构（v1-v8 演化） | 与 BOOT.md 风格不符 | ⏸️ 跳过 |
+| 已知问题与防护措施 | TOOLS.md 已覆盖 | ⏸️ 跳过 |
+
+### 🆕 每日行为日志机制（每日必做，2026-08-05 启用）
+
+文件：`memory/YYYY-MM-DD.md`（今日日期，Asia/Shanghai）
+
+**规则**（append-only）：
+1. 取今日文件名 `memory/<YYYY-MM-DD>.md`
+2. **如果文件不存在** → 创建并写入开头：
+   ```
+   # YYYY-MM-DD
+   
+   ## 心跳记录
+   
+   - HH:MM CST — <本轮关键结论摘要，1~3 行>
+   ```
+3. **如果文件已存在** → append 一行：
+   ```
+   - HH:MM CST — <本轮关键结论摘要，1~3 行>
+   ```
+4. 如果本轮只是 `HEARTBEAT_OK`、无新事件 → append：
+   ```
+   - HH:MM CST — HEARTBEAT_OK (无新任务)
+   ```
+5. **不要**回填历史日期（52 天空白另议，不在本规则范围）
+6. **不要**写会话级摘要（那是 OpenClaw 自动生成的 `YYYY-MM-DD-HHMM.md`，是另一回事）
+
+**为什么**：MEMORY.md 提炼每周日需要 `memory/YYYY-MM-DD.md` 输入；2026-06-14 后断档 52 天，原因是 HEARTBEAT.md 从未规定"谁来写"。本规则把"每日日志"从习惯升级为机制。
+
+**撤销方式**：删除本小节即可，最末备份在 `/tmp/HEARTBEAT.md.bak-2026-08-05-0856`。
+
+---
+
 ## ✅ 4 项关键检查（按顺序）
 
 ### 检查 1：heartbeat 是否在最近 1 小时内跑过
@@ -157,6 +203,6 @@ fi
 
 ---
 
-**最后更新**: 2026-06-11 20:45 CST（完美最佳实践对账方案 C 落地）
+**最后更新**: 2026-09-11 17:32 CST（HEARTBEAT.md 合并：仅每日日志机制并入，根文件 git rm 落地）
 **作者**: Ada Lovelace v2.1 视角
 **配置参考**: OpenClaw v2026.6.5 `automation/hooks.md` § boot-md details

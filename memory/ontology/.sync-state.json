@@ -1,0 +1,21 @@
+{
+  "last_sync_at": "2026-09-28T20:04:47+00:00",
+  "last_sync_at_local": "2026-09-29T04:04:47+08:00",
+  "last_graph_mtime": 1790625766.3190515,
+  "last_graph_size": 129794,
+  "last_graph_lines": 557,
+  "last_graph_sha256": "5e1d76da7785c019a76944cb0d4e3be3c6b242d4db485fbe40d8de66397d9d2f",
+  "last_synced_records": 9,
+  "last_sync_report": {
+    "entity_created": 3,
+    "relation_created": 4,
+    "observations_added": 2,
+    "mcp_synced": true,
+    "mcp_method": "mcporter call Memory.*"
+  },
+  "last_drift": {
+    "local_entity_count": 224,
+    "mcp_entity_count": "synced",
+    "severity": "ok"
+  }
+}

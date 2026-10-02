@@ -1,8 +1,7 @@
 {
   "version": 1,
-  "registry": "https://clawhub.ai",
+  "registry": "https://cn.clawhub-mirror.com",
   "slug": "document-pro",
   "installedVersion": "1.0.0",
-  "installedAt": 1780825057302,
-  "owner": "jackeven02"
+  "installedAt": 1776147770261
 }

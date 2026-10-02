@@ -9,6 +9,11 @@
 
 ## ⚠️ 关键事实（先读）
 
+0. **技能已合并为 1 个路由技能**（2026-08-16）：原 27 个 `lark-*` 独立技能（calendar/im/doc/drive/mail/task/sheets/base/slides/whiteboard/approval/attendance/contact/okr/vc/vc-agent/minutes/note/markdown/event/apps/openapi-explorer/wiki/workflow-*/skill-maker/shared）已移到 `skills/lark-cli/domains/` 下，catalog 只剩 1 个 `lark-cli` 路由技能。
+   - **使用方式**：飞书任务先匹配 `lark-cli` 技能（含认证核心+路由表），再按需 `read skills/lark-cli/domains/<子技能>/SKILL.md` 获取深度操作指引。
+   - **实测结论**：OpenClaw 文档称"SKILL.md 在 root 下最多 6 层会被发现"，但实测带 SKILL.md 的目录内部嵌套 SKILL.md 不会被当成独立技能（同 references/ 逻辑），故移到 domains/ 有效。
+   - **验证命令**：`openclaw skills list` / `openclaw skills info <name>`（需先 export PATH）。
+
 1. **lark-cli 不在默认 PATH** — 每次使用前必须 `export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"`
    - 装了但 OpenClaw 默认 shell 不自动加载 → 记得先 export（记忆 2026-06-11 多次踩坑）
 2. **版本**：v1.0.71（旧记录 v1.0.19 已过时）

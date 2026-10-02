@@ -7,9 +7,181 @@
       "registry": "https://clawhub.ai"
     },
     "self-improving-agent": {
-      "version": "3.0.21",
-      "installedAt": 1778146484779,
-      "registry": "https://clawhub.ai"
+      "version": "4.0.2",
+      "installedAt": 1787842229001,
+      "registry": "https://clawhub.ai",
+      "ownerHandle": "pskoett",
+      "artifact": {
+        "kind": "archive",
+        "sha256": "b1a047b6f953b6cdac6c970cd8f57af758f0d19b42eb7482bfc82406baaeb3bd",
+        "integrity": "sha256-saBHtvlTts2sbJcM2PV691jw0ZtC63SCv8gkBrqus70="
+      },
+      "skillFile": {
+        "path": "SKILL.md",
+        "sha256": "eff889950f23bb8a3de90cd617481bbf2557f9495f884bd5b1e9b7604a20817c"
+      },
+      "verification": {
+        "schema": "clawhub.skill.verify.v1",
+        "ok": true,
+        "decision": "pass",
+        "reasons": [],
+        "card": {
+          "available": true,
+          "path": "skill-card.md",
+          "url": "https://wry-manatee-359.convex.site/api/v1/skills/self-improving-agent/card?ownerHandle=pskoett&version=4.0.2",
+          "sha256": "7a58774b206effd7679e527f82320be87700f2adbd8442dac1c4c94580cf69f9",
+          "size": 2393,
+          "contentType": "text/markdown; charset=utf-8"
+        },
+        "artifact": {
+          "sourceFingerprint": "c75aa847057f2210ef7136d8456b1f91b7d7cd0352962c9f920679cce045adf2",
+          "bundleFingerprints": [
+            "a0b59e786c352370b6031b7f2b956eaade2dec1467933d0f97e104aa28220214",
+            "3bb2a005cd20f56524be2d5e379f14b0f4cadc5ae2a6801179d46a4530385612"
+          ],
+          "files": [
+            {
+              "path": "CHANGELOG.md",
+              "size": 7598,
+              "sha256": "8d8e946a3e1482470068773fa62482af3440431b3aa400df23b8c781906ba934",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/uninstall.md",
+              "size": 1891,
+              "sha256": "c569a88473ac0187e0d9dde1686eb24efe4666d84af2a149b5fb8e99b7a99828",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/examples.md",
+              "size": 8287,
+              "sha256": "ba521451abf0f1cc774b061894c94689390dafa3ce3905f63d5fa6f860a5e3b8",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/openclaw-integration.md",
+              "size": 9814,
+              "sha256": "517a40ddec886f07cf66cb7c98e61ea464af953b505610722ed46a297741708a",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "hooks/openclaw/handler.test.js",
+              "size": 8921,
+              "sha256": "3047f4239bc3eadcb8f12cc3515f946e86b16cb482de82ae900e5b994c403e69",
+              "contentType": "text/javascript"
+            },
+            {
+              "path": "hooks/openclaw/handler.js",
+              "size": 13741,
+              "sha256": "b94261dce2de54ba6bd1d6aca48d9ef11236cbe7396bd37354daa218e0ceecf3",
+              "contentType": "text/javascript"
+            },
+            {
+              "path": "hooks/openclaw/HOOK.md",
+              "size": 2465,
+              "sha256": "2ae0820cc5cad75d9ecce8cfc6a9c4c8baafcb4c96f820bf85f3a0e7ff2364f5",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "hooks/openclaw/handler.ts",
+              "size": 14615,
+              "sha256": "35f8ccd18d6979b4bacfbf1841f4f0965193ed694e46fa6cee67994f3ac838ba",
+              "contentType": "application/octet-stream"
+            },
+            {
+              "path": "scripts/extract-skill.sh",
+              "size": 5293,
+              "sha256": "d9af3d6f2cde0eeb3c0a85b898828656c1c6d9d51f61ba38f9801030424f5147",
+              "contentType": "text/x-sh"
+            },
+            {
+              "path": "SKILL.md",
+              "size": 21361,
+              "sha256": "eff889950f23bb8a3de90cd617481bbf2557f9495f884bd5b1e9b7604a20817c",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "assets/FEATURE_REQUESTS.md",
+              "size": 84,
+              "sha256": "a6291573936034efaad57b43b6f57bdb35ed627f01ce9309b2c781da63563c37",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "assets/ERRORS.md",
+              "size": 75,
+              "sha256": "731f4a26fee7074d11e999920e5c3ca63b0e025b75a4d9966429ee88a2cb5988",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "assets/SKILL-TEMPLATE.md",
+              "size": 3407,
+              "sha256": "3ee008f80d53e0e576f7e747ac4c4e040ff659f02d3f5689a95524a3696e4881",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "assets/LEARNINGS.md",
+              "size": 1135,
+              "sha256": "58b31d4cda7d1f2a6fdaf1aff06f45288e6cb0161dd1ed1bf2152c7f8c3c88da",
+              "contentType": "text/markdown"
+            }
+          ]
+        },
+        "provenance": {
+          "source": "unavailable",
+          "reason": "No server-resolved GitHub import provenance is stored for this version."
+        },
+        "security": {
+          "status": "clean",
+          "passed": true,
+          "rawStatus": "clean",
+          "verdict": "benign",
+          "confidence": "high",
+          "summary": "This skill is a disclosed local self-improvement logger with optional transcript-sweeping hooks, so it is usable but should be treated as storing potentially sensitive work history.",
+          "model": null,
+          "checkedAt": 1786004394755,
+          "signals": {
+            "staticScan": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "reasonCodes": [],
+              "summary": "No suspicious patterns detected.",
+              "engineVersion": "v2.4.26",
+              "checkedAt": 1785999527775
+            },
+            "virusTotal": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "verdict": null,
+              "analysis": null,
+              "source": "engines",
+              "scanner": null,
+              "engineStats": {
+                "harmless": 0,
+                "malicious": 0,
+                "suspicious": 0,
+                "undetected": 56
+              },
+              "checkedAt": 1786003606986
+            },
+            "skillSpector": {
+              "status": "suspicious",
+              "rawStatus": "suspicious",
+              "score": 79,
+              "severity": "HIGH",
+              "recommendation": "DO_NOT_INSTALL",
+              "issueCount": 7,
+              "scannerVersion": "2.3.5",
+              "summary": null,
+              "error": null,
+              "checkedAt": 1786004394755
+            },
+            "dependencyRegistry": null
+          }
+        },
+        "signature": {
+          "status": "unsigned"
+        }
+      }
     },
     "ontology": {
       "version": "1.0.4",
@@ -30,10 +202,6 @@
       "version": "0.1.0",
       "installedAt": 1775894021790,
       "registry": "https://clawhub.ai"
-    },
-    "evolver": {
-      "version": "1.52.0",
-      "installedAt": 1775920189271
     },
     "code-generator": {
       "version": "2.3.4",
@@ -135,9 +303,199 @@
       "installedAt": 1776918323529
     },
     "memory": {
-      "version": "1.0.2",
-      "installedAt": 1776919173410,
-      "registry": "https://clawhub.ai"
+      "version": "1.0.7",
+      "installedAt": 1787842129167,
+      "registry": "https://clawhub.ai",
+      "ownerHandle": "ivangdavila",
+      "artifact": {
+        "kind": "archive",
+        "sha256": "0178b9e1a0893c4f9e89c17904012bc4e5c760679e40533c6db765f8b99767fa",
+        "integrity": "sha256-AXi54aCJPE+eicF5BAErxOXHYGeeQFM8bbdl+LmXZ/o="
+      },
+      "skillFile": {
+        "path": "SKILL.md",
+        "sha256": "0ab3e7090538728ff6331612d97655f5cab7ade6059804afe06a7c75640119b2"
+      },
+      "verification": {
+        "schema": "clawhub.skill.verify.v1",
+        "ok": true,
+        "decision": "pass",
+        "reasons": [],
+        "card": {
+          "available": true,
+          "path": "skill-card.md",
+          "url": "https://wry-manatee-359.convex.site/api/v1/skills/memory/card?ownerHandle=ivangdavila&version=1.0.7",
+          "sha256": "a5b10025477ef2eac17e62c158bc583cb3d2c07d3711432ece1b57afe18c2b9a",
+          "size": 3210,
+          "contentType": "text/markdown; charset=utf-8"
+        },
+        "artifact": {
+          "sourceFingerprint": "bc419f948e2746422466c1a5dd4cbe9fe20110073b50db4c538f191f6d169560",
+          "bundleFingerprints": [
+            "67ab553e2bce47a8ccaf9eb26604f31f8cf08cbbfaaf998a58f68ad7f9005d30",
+            "6862ac25804b01223da91b468d09cd6af4d9e2e5605e06ecf05c05fcbfef2d43"
+          ],
+          "files": [
+            {
+              "path": "SKILL.md",
+              "size": 20829,
+              "sha256": "0ab3e7090538728ff6331612d97655f5cab7ade6059804afe06a7c75640119b2",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "_meta.json",
+              "size": 610,
+              "sha256": "5967a163ff4f3ca7d3bff98562a33a91f6cca8ec1256e61d5293800a3ff2780a",
+              "contentType": "application/json"
+            },
+            {
+              "path": "capture.md",
+              "size": 6003,
+              "sha256": "67b18d54b73dccee45a6c229e5eb72940a7d39d6d1d6383cc84e39e472b5ccf7",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "commands.md",
+              "size": 4308,
+              "sha256": "c22ecfe0222e4834a08a765f7cb76636eb2cf45026fc04f509e567d845263348",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "conflicts.md",
+              "size": 5144,
+              "sha256": "047d73c6e1d521b37eac853a0a599e37966f703fe335180e001d5aa341638f7e",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "entities.md",
+              "size": 5296,
+              "sha256": "1bef6788b5f7c1e1d0d43669938dd6cdc20dbf1eeccdd1d0a3feba103e79f628",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "layouts.md",
+              "size": 6348,
+              "sha256": "bbbbf8b824c7f651b6044a8f166be3a38d4a548bdb098bbb45569eb226167d65",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "maintenance.md",
+              "size": 5106,
+              "sha256": "43f3f21b142cb6eaaa85638a7eb4f131fc72f105822e90f6a83c48ee4e247528",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "memory-template.md",
+              "size": 8282,
+              "sha256": "1dfb98382959d7c52cd58b218fd0169999cef5e025e321c8e0d30578a7af4be7",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "migration.md",
+              "size": 5465,
+              "sha256": "a7547c9e3735fc82802b91b666b38e6b52a345351d9a4425230658b1095e1443",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "privacy.md",
+              "size": 4747,
+              "sha256": "424bb472278c09725b339a25b95a3a333b753ae7797a70fe348c58e63d2569e5",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "recall.md",
+              "size": 5467,
+              "sha256": "2a4aa317a52ef89260a7ca8a7cd885991b31de43049deb1232b3aa9901b08d85",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "scaling.md",
+              "size": 5227,
+              "sha256": "90c1dddbaa20e9528b37699fd5471da4e9c4a75db5087901ab850ebf6190f752",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "sessions.md",
+              "size": 4827,
+              "sha256": "ebb5c8859098709118215ae0a7a6e9ae0853990f0c194a9d4b0f6c92f04cd671",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "setup.md",
+              "size": 4462,
+              "sha256": "7465c31d8a8023bf105631bd928217d539a0d64560af8b57d670edfb8fe3a09b",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "sync.md",
+              "size": 5054,
+              "sha256": "94d63e2906f43fd6223bdcdb4a5641667764c44b2f0a63b1cda84d3be07ecc9c",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "troubleshooting.md",
+              "size": 6344,
+              "sha256": "6d60a7428ba9b676ef89bfc7277f75c9c30806b6ad8f54238c33de7025eae911",
+              "contentType": "text/markdown"
+            }
+          ]
+        },
+        "provenance": {
+          "source": "unavailable",
+          "reason": "No server-resolved GitHub import provenance is stored for this version."
+        },
+        "security": {
+          "status": "clean",
+          "passed": true,
+          "rawStatus": "clean",
+          "verdict": "benign",
+          "confidence": "high",
+          "summary": "This skill stores and manages local plaintext memory files as advertised, with no evidence of hidden network access or deceptive behavior.",
+          "model": null,
+          "checkedAt": 1785074422355,
+          "signals": {
+            "staticScan": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "reasonCodes": [],
+              "summary": "No suspicious patterns detected.",
+              "engineVersion": "v2.4.26",
+              "checkedAt": 1785071895422
+            },
+            "virusTotal": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "verdict": null,
+              "analysis": null,
+              "source": "engines",
+              "scanner": null,
+              "engineStats": {
+                "harmless": 0,
+                "malicious": 0,
+                "suspicious": 0,
+                "undetected": 64
+              },
+              "checkedAt": 1785074208735
+            },
+            "skillSpector": {
+              "status": "suspicious",
+              "rawStatus": "suspicious",
+              "score": 24,
+              "severity": "MEDIUM",
+              "recommendation": "CAUTION",
+              "issueCount": 11,
+              "scannerVersion": "2.3.5",
+              "summary": null,
+              "error": null,
+              "checkedAt": 1785074422355
+            },
+            "dependencyRegistry": null
+          }
+        },
+        "signature": {
+          "status": "unsigned"
+        }
+      }
     },
     "using-superpowers": {
       "version": "0.1.0",
@@ -159,29 +517,404 @@
       "registry": "https://clawhub.ai"
     },
     "neat-freak": {
-      "version": "1.0.2",
-      "installedAt": 1777927045293,
-      "registry": "https://clawhub.ai"
-    },
-    "find-skill": {
-      "version": "1.0.0",
-      "installedAt": 1778500793668,
-      "registry": "https://clawhub.ai"
-    },
-    "feishu-common": {
-      "version": "1.0.0",
-      "installedAt": 1770943930785,
-      "registry": "https://clawhub.ai"
-    },
-    "feishu-evolver-wrapper": {
-      "version": "1.8.0",
-      "installedAt": 1779476276933,
-      "registry": "https://clawhub.ai"
+      "version": "1.0.3",
+      "installedAt": 1787842175277,
+      "registry": "https://clawhub.ai",
+      "ownerHandle": "kkkkhazix",
+      "artifact": {
+        "kind": "archive",
+        "sha256": "5c4a3332bb37b83409933a6ec0107564917d4a47010518507540ed90f6b89f35",
+        "integrity": "sha256-XEozMrs3uDQJkzpuwBB1ZJF9SkcBBRhQdUDtkPa4nzU="
+      },
+      "skillFile": {
+        "path": "SKILL.md",
+        "sha256": "31ab2058d60664799af767e46c985a59025934315bee1b9c20d7ff442b0af687"
+      },
+      "verification": {
+        "schema": "clawhub.skill.verify.v1",
+        "ok": false,
+        "decision": "fail",
+        "reasons": [
+          "security.status_not_clean"
+        ],
+        "card": {
+          "available": true,
+          "path": "skill-card.md",
+          "url": "https://wry-manatee-359.convex.site/api/v1/skills/neat-freak/card?ownerHandle=kkkkhazix&version=1.0.3",
+          "sha256": "52ec3bac00af4395098213d5f8008de2182cc4b950b7e5c4d332669c916b20b0",
+          "size": 2262,
+          "contentType": "text/markdown; charset=utf-8"
+        },
+        "artifact": {
+          "sourceFingerprint": "3073eeed429f8d2aac0154c6612676795b109c3e9777d82a433e0c63b9b50a39",
+          "bundleFingerprints": [
+            "660d4c76e743bdc0da6ada8c2d268e4d82d7b6ab23f19ca1b70a7fd67ef44d58"
+          ],
+          "files": [
+            {
+              "path": "SKILL.md",
+              "size": 25602,
+              "sha256": "31ab2058d60664799af767e46c985a59025934315bee1b9c20d7ff442b0af687",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/agent-paths.md",
+              "size": 4582,
+              "sha256": "451005676270aa419be71f81d0f22d9fac6639a5f4cebe88fb9ab686f2a75782",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/governance.md",
+              "size": 4314,
+              "sha256": "2dcff1df7b84e89ce20a606044ccb15d5015d2208c35d608995f75c437c688c6",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/sync-matrix.md",
+              "size": 5226,
+              "sha256": "f09956c1af6d65ae62c50c970404474ffdf4670fe0c3979d88882df4834b188e",
+              "contentType": "text/markdown"
+            }
+          ]
+        },
+        "provenance": {
+          "source": "unavailable",
+          "reason": "No server-resolved GitHub import provenance is stored for this version."
+        },
+        "security": {
+          "status": "suspicious",
+          "passed": false,
+          "rawStatus": "suspicious",
+          "verdict": "suspicious",
+          "confidence": "high",
+          "summary": "This is a legitimate documentation and memory cleanup skill, but it asks for broad cross-project and global agent-memory access with automatic persistent edits that users should review carefully.",
+          "model": "gpt-5.5",
+          "checkedAt": 1783586210326,
+          "signals": {
+            "staticScan": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "reasonCodes": [],
+              "summary": "No suspicious patterns detected.",
+              "engineVersion": "v2.4.26",
+              "checkedAt": 1782998808668
+            },
+            "virusTotal": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "verdict": null,
+              "analysis": null,
+              "source": "engines",
+              "scanner": null,
+              "engineStats": {
+                "harmless": 0,
+                "malicious": 0,
+                "suspicious": 0,
+                "undetected": 64
+              },
+              "checkedAt": 1783005707285
+            },
+            "skillSpector": {
+              "status": "suspicious",
+              "rawStatus": "suspicious",
+              "score": 56,
+              "severity": "HIGH",
+              "recommendation": "DO_NOT_INSTALL",
+              "issueCount": 4,
+              "scannerVersion": "2.3.5",
+              "summary": null,
+              "error": null,
+              "checkedAt": 1783586180787
+            },
+            "dependencyRegistry": null
+          }
+        },
+        "signature": {
+          "status": "unsigned"
+        }
+      }
     },
     "skill-sub": {
-      "version": "1.2.0",
-      "installedAt": 1779371044773,
-      "registry": "https://clawhub.ai"
+      "version": "1.38.1",
+      "installedAt": 1787842207004,
+      "registry": "https://clawhub.ai",
+      "ownerHandle": "ldxs001",
+      "artifact": {
+        "kind": "archive",
+        "sha256": "2bd82948ed353f589cd2176839e4323b34d1aa2bfcfbc49c49bca819c76c90ee",
+        "integrity": "sha256-K9gpSO01P1ic0hdoOeQyOzTRqiv8+8ScSbyoGcdskO4="
+      },
+      "skillFile": {
+        "path": "SKILL.md",
+        "sha256": "e9943648344a4bbea28ce2f11cf0e27eeccd6dc06e95d7799206972ce4793ea4"
+      },
+      "verification": {
+        "schema": "clawhub.skill.verify.v1",
+        "ok": false,
+        "decision": "fail",
+        "reasons": [
+          "security.status_not_clean"
+        ],
+        "card": {
+          "available": true,
+          "path": "skill-card.md",
+          "url": "https://wry-manatee-359.convex.site/api/v1/skills/skill-sub/card?ownerHandle=ldxs001&version=1.38.1",
+          "sha256": "44b35f99b86d48333c252794d4f2699d748fd4958e5ec9fed7be8ac6ad2b5d2e",
+          "size": 2856,
+          "contentType": "text/markdown; charset=utf-8"
+        },
+        "artifact": {
+          "sourceFingerprint": "277229cd5beb3e12668d23a292208c0c04e4cc99f19028fe75e837c7884f706d",
+          "bundleFingerprints": [
+            "f4b5925e065b03b2baaab112ba2cbef3a783f1c41e02b2e7851f091384e95be1"
+          ],
+          "files": [
+            {
+              "path": "references/adhesion.md",
+              "size": 5948,
+              "sha256": "3abdeb383a08ad75426c1bc2e6fdb04f5819256d36d20c31c07c81ca3df837e0",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/antipatterns.md",
+              "size": 2639,
+              "sha256": "a12d6ed24f0beedfccaae0e401b2300f2b0e93d5b3c834a00fa48691cd60ae44",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/blueprint.md",
+              "size": 342,
+              "sha256": "4f15d8cd583df89fdf9769b669c383c97e864b020d84044f6fc3b6ce3890c255",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/chain_schema.md",
+              "size": 14756,
+              "sha256": "2eec375c2939beb1cfb1b1faf3e45e54685462e6c4a1861c629b858dc477b1e4",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/chain_search.md",
+              "size": 158,
+              "sha256": "ac93c0de482e0094c68c446fdab4b1b048e1db231f505611f2a7fca1ed8556e5",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/changelog.md",
+              "size": 21639,
+              "sha256": "7fad9220054ec641559aaafe34c8a118ffe855ae2228fadae2382703ad000d60",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/examples.md",
+              "size": 5150,
+              "sha256": "3446131867f568b985345885dc74cfe54bdb49628e7a2e2158e52fc37dd78548",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/faq.md",
+              "size": 4975,
+              "sha256": "278b9b00e2706a3e1f17d8a5181f29c446edf75f79daedb330087e822fdc4769",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/gate.md",
+              "size": 841,
+              "sha256": "c68e7bd93ebd0555bb3e9c9715aceeca94a2cb63554b2313eea345a8d6210996",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/LICENSE.md",
+              "size": 1097,
+              "sha256": "338898397425ce74a9feccb69e18e5fd2691852be66ed2cce5e5a1f8bb8b528a",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/llm_params.md",
+              "size": 536,
+              "sha256": "161c4da6dcf0a70fb93ece0fdc53955954033ebd396f45118ff64adf8a00aa6a",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/loop_branch.md",
+              "size": 1456,
+              "sha256": "6b811bd0a71e181501a0795b84f5cd35b5453135d404b75d25fc87a3d6762482",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/permissions.md",
+              "size": 1779,
+              "sha256": "470c41591e97e87cbc653e96412dfc8939d668870dc3ea24df6622c06ef9d8b5",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/private_blueprint.md",
+              "size": 366,
+              "sha256": "a03610df642cca8bcda8dc5d193b87b37f9a0c32b825184d2281b54a54b52939",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/reference.md",
+              "size": 6938,
+              "sha256": "df23c24879905be5137a6815372d29434d39034aaeb51144e002638bc4595dd6",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "references/workflow.md",
+              "size": 10642,
+              "sha256": "b67d4d09157ef7ddecb3eead8a50516f4c9a743d4410a62a4074276c720a8f3a",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "scripts/chain_executor.py",
+              "size": 30337,
+              "sha256": "0441d64336802b65b914c96986d329d34deda0653b19a754a6a2668fd4ab2a1f",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/chain_flow_validator.py",
+              "size": 10430,
+              "sha256": "0982b301a7fd4f1c63310615b34ff60126034bd4982668d31ee5e0e1a580a7fc",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/chain_gate.py",
+              "size": 10191,
+              "sha256": "d0eb1ebbe8476d0a76649521b05487217300380f65e1104142da18d918593fb0",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/chain_hook.py",
+              "size": 5755,
+              "sha256": "3b8b075f455f1d16ee5e8b1b66513bce6812443b5ff6e3c9221d722acb9a4549",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/chain_manager.py",
+              "size": 59541,
+              "sha256": "1e8f3e2ef2b18279550e7233519ee665e63918d065d7c1e8fc0376009f12b5d6",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/chain_planner.py",
+              "size": 23557,
+              "sha256": "8585ff970efab7498b5e3d2204bacc69ef837c51c8c205dd5e35ee9ab28debff",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/chain_structure_checker.py",
+              "size": 11758,
+              "sha256": "ac380be6fab5435249e65f988b206b2f5850300387b8b28b785493a90085a68f",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/default_config.json",
+              "size": 194,
+              "sha256": "fb2721cbcb8d67f2d30af0dbb5196001e3d6d76dbbdf3453a4b3cfc7e7340d9a",
+              "contentType": "application/json"
+            },
+            {
+              "path": "scripts/settings.html",
+              "size": 10712,
+              "sha256": "5b19690d323366fac5a8bfc33e062c927cbaaf9baafc5bb9775974488e12f48f",
+              "contentType": "text/html"
+            },
+            {
+              "path": "scripts/settings.py",
+              "size": 12327,
+              "sha256": "e6d3390d83ca2bda3f2f40552177f8cc10116cb1a85e893ba76aa09fb7d4c58d",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/skill_extractor.py",
+              "size": 45337,
+              "sha256": "9b1bbb809c69e45652283a1e2b6a98ef9ef0b4d64b3b1c36ad7469fe059c1053",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/step_indexer.py",
+              "size": 33333,
+              "sha256": "4a29c7187879fb91de0356eef779eb5ed02ff25147114b2f550e51dcdd71035a",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "scripts/step_link_validator.py",
+              "size": 27465,
+              "sha256": "1f8954f188e5a50e172c5def54bba398eb6ade09835524261d1dd143b1f6551f",
+              "contentType": "text/plain"
+            },
+            {
+              "path": "SKILL.md",
+              "size": 9797,
+              "sha256": "e9943648344a4bbea28ce2f11cf0e27eeccd6dc06e95d7799206972ce4793ea4",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "_meta.json",
+              "size": 786,
+              "sha256": "1ac8afac41d5c7f27da20571b159939f9caa6c54388301f0580db7c2b83b2d7d",
+              "contentType": "application/json"
+            }
+          ]
+        },
+        "provenance": {
+          "source": "unavailable",
+          "reason": "No server-resolved GitHub import provenance is stored for this version."
+        },
+        "security": {
+          "status": "suspicious",
+          "passed": false,
+          "rawStatus": "suspicious",
+          "verdict": "suspicious",
+          "confidence": "high",
+          "summary": "The skill is a coherent workflow-orchestration tool, but it needs review because it can broadly read/export installed skill instructions and persistently rewrite saved workflows.",
+          "model": "gpt-5.5",
+          "checkedAt": 1783648486101,
+          "signals": {
+            "staticScan": {
+              "status": "suspicious",
+              "rawStatus": "suspicious",
+              "reasonCodes": [
+                "suspicious.dynamic_code_execution"
+              ],
+              "summary": "Detected: suspicious.dynamic_code_execution",
+              "engineVersion": "v2.4.26",
+              "checkedAt": 1783648160878
+            },
+            "virusTotal": {
+              "status": "clean",
+              "rawStatus": "clean",
+              "verdict": null,
+              "analysis": null,
+              "source": "engines",
+              "scanner": null,
+              "engineStats": {
+                "harmless": 0,
+                "malicious": 0,
+                "suspicious": 0,
+                "undetected": 64
+              },
+              "checkedAt": 1783648318459
+            },
+            "skillSpector": {
+              "status": "suspicious",
+              "rawStatus": "suspicious",
+              "score": 59,
+              "severity": "HIGH",
+              "recommendation": "DO_NOT_INSTALL",
+              "issueCount": 6,
+              "scannerVersion": "2.3.5",
+              "summary": null,
+              "error": null,
+              "checkedAt": 1783648386395
+            },
+            "dependencyRegistry": null
+          }
+        },
+        "signature": {
+          "status": "unsigned"
+        }
+      }
     },
     "find-skills1": {
       "version": "1.0.0",
@@ -192,6 +925,80 @@
       "version": "1.1.4",
       "installedAt": 1778146490064,
       "registry": "https://clawhub.ai"
+    },
+    "homeassistant-skill": {
+      "version": "2.1.0",
+      "registry": "https://clawhub.ai",
+      "ownerHandle": "anotb",
+      "installedAt": 1789657272435,
+      "artifact": {
+        "kind": "archive",
+        "sha256": "152de49bad5a98aba6948e30355901fcf977b9a79b440030a1a2b2799ed76ba6",
+        "integrity": "sha256-FS3km61amKumlI4wNVkB/Pl3uaebRAAwoaKyeZ7Xa6Y="
+      },
+      "skillFile": {
+        "path": "SKILL.md",
+        "sha256": "c090c613489c913a78fb7da426f4361acaaed7ed0c2e8bfd0c0dd124a0ab1b7b"
+      },
+      "fileTreeSha256": "sha256:2564a87b8c107dd9de7559cffde9677c550605d79d8dfcd0ad7a7c918112c248",
+      "verification": {
+        "schema": "clawhub.skill.verify.v1",
+        "ok": false,
+        "decision": "fail",
+        "reasons": [
+          "security.status_not_clean"
+        ],
+        "card": {
+          "available": true,
+          "path": "skill-card.md",
+          "url": "https://wry-manatee-359.convex.site/api/v1/skills/homeassistant-skill/card?ownerHandle=anotb&version=2.1.0",
+          "sha256": "448c628423d94b52f193484049f6664841c2a6db46b4115829abc404fd4165cc",
+          "size": 2469,
+          "contentType": "text/markdown; charset=utf-8"
+        },
+        "artifact": {
+          "sourceFingerprint": "05e95a2ad3e0d3af7cbad4f31835eccf38189c47be2df5fe777af91e0afbf73e",
+          "bundleFingerprints": [
+            "ae71e5eb4833f095c999bbdf22cbb415f87da172ceb74317c189a3037fa00412",
+            "cde80b44febf064f1f882b40f622abb3639f1d0bc391553049f9afdb4b3d6cba"
+          ],
+          "files": [
+            {
+              "path": "README.md",
+              "size": 2973,
+              "sha256": "15fc62fd1478dbcd1a29a670f72a327aba583da3088380c9ffc5f7df7ff0b495",
+              "contentType": "text/markdown"
+            },
+            {
+              "path": "SKILL.md",
+              "size": 21390,
+              "sha256": "c090c613489c913a78fb7da426f4361acaaed7ed0c2e8bfd0c0dd124a0ab1b7b",
+              "contentType": "text/markdown"
+            }
+          ]
+        },
+        "provenance": {
+          "source": "unavailable",
+          "reason": "No server-resolved GitHub import provenance is stored for this version."
+        },
+        "security": {
+          "status": "suspicious",
+          "passed": false,
+          "rawStatus": "suspicious",
+          "verdict": "suspicious",
+          "confidence": "high",
+          "summary": "This skill is transparent about controlling Home Assistant, but it needs review because it uses a long-lived smart-home token for broad private-data access and high-impact actions with incomplete guardrails.",
+          "model": null,
+          "checkedAt": 1789055732012,
+          "scannerReports": {
+            "aig": null,
+            "skillspector": null
+          }
+        },
+        "signature": {
+          "status": "unsigned"
+        }
+      }
     }
   }
 }

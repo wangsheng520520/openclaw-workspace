@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "homeassistant-skill",
+  "ownerHandle": "anotb",
+  "installedAt": 1789657272435,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "152de49bad5a98aba6948e30355901fcf977b9a79b440030a1a2b2799ed76ba6",
+    "integrity": "sha256-FS3km61amKumlI4wNVkB/Pl3uaebRAAwoaKyeZ7Xa6Y="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "c090c613489c913a78fb7da426f4361acaaed7ed0c2e8bfd0c0dd124a0ab1b7b"
+  },
+  "fileTreeSha256": "sha256:2564a87b8c107dd9de7559cffde9677c550605d79d8dfcd0ad7a7c918112c248",
+  "installedVersion": "2.1.0"
+}
