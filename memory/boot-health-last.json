@@ -1,9 +1,9 @@
 {
-  "ts": "2026-10-02T12:13:39+08:00",
+  "ts": "2026-10-03T17:17:26+08:00",
   "checks": {
     "heartbeat": {
       "status": "ok",
-      "detail": "heartbeat fresh (34 min ago)"
+      "detail": "heartbeat fresh (7 min ago)"
     },
     "alignment": {
       "status": "ok",
@@ -16,7 +16,11 @@
     "feishuWs": {
       "status": "ok",
       "detail": "feishu WebSocket started within 24h"
+    },
+    "cronJobs": {
+      "status": "warn",
+      "detail": "SESSION-STATE 新鲜度检查 (连续 5 次) — ⚠️ Agent run failed (model: coding-plan/ark-code-latest)."
     }
   },
-  "attention": 0
+  "attention": 1
 }

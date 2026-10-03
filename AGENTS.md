@@ -377,12 +377,13 @@
 
 ### 🌤️ 天气预报
 
-- **城市**: 武汉
-- **区域**: 黄陂区
-- **位置**: 盘龙城 / 汉口北
-- **坐标**: 114.2649, 30.6877 (盘龙城)
-- **备用坐标**: 114.2858, 30.7089 (汉口北)
-- **检查频率**: 每天 2-4 次
+- **默认位置**：🏠 **家** — 长江新区大潭街道四合村窦湾（114.4052, 30.7978）
+- **工作位置**：⛎ **工作** — 黄陂区盘龙城 / 汉口北
+  - 盘龙城 114.2649, 30.6877
+  - 汉口北 114.2858, 30.7089（备）
+- **默认查询地址**：🟢 黄陂区（高德 adcode 420116；长江新区在民政上仍归黄陂区）
+- **检查频率**：每天 2-4 次
+- **完整双坐标语义**：见 `USER.md`（2026-10-02 更新）
 
 ---
 
@@ -539,3 +540,7 @@ openclaw cron add --name "每日心跳" --schedule "0 9,14,18 * * *" --payload '
 - **post-commit hook**（2026-08-07 修复）：自动同步 main→github/main，已加 `-c http.proxy= -c https.proxy=` 绕代理；`--force` 是 hook 原设计，勿删。
 - **feishu-skills 是第三方仓库**（autogame-17，非用户账号）：本地改动不要 push 回远程（403 无权限）；feishu-evolver-wrapper 源仓库在 autogame-17 名下，本地已删。
 - **CLI 回合命令必须加 `--timeout`**（2026-10-02）：`openclaw agent` 默认 30s 就放弃，而本机回合 prep 常 60s+（`bootstrap-context` 单段实测 37s），超时会打印 `Connection dropped without a close frame` / `Gateway process stopped or became unreachable`——**看着像网关挂了，实际网关一切正常**（同一时刻 PID 未变、18789 在听、UI 请求全部成功）。用法：`openclaw agent -m "..." --timeout 180000`。判断真故障前先看 `systemctl --user show openclaw-gateway.service -p MainPID -p Result` 和 `ss -ltn | grep 18789`，别急着重启网关。详见 `MEMORY-ops-playbook.md`。
+- **心跳 `outside the current turn` 卡死**（2026-10-02）：报错后 `cron` 一直 `skipped: requests-in-flight`，心跳再也不跑。判据：`session_nodes.entry_json` 里残留 `activeWriterRunId`（失败运行没释放 writer）。修法：`openclaw sessions delete "agent:main:main:heartbeat" --agent main --yes --json --timeout 360000`，**删完必须复查那行是否真没了**（in-flight 时第一次常白跑），再 `openclaw cron run c6df3ff2-e18b-40dc-b533-5cca81322573 --expect-final --timeout 360000` 验证。报错那条 assistant 事件 `usage` 全 0 = 本地断言失败，别去查模型/API key。详见 `MEMORY-ops-playbook.md`。
+- **决策模型不能用 ollama**（2026-10-02 查文档确认）：`decisionModel` 只接受决策 provider 插件注册的模型（官方仅 ONNX / TypeSafe AI，且都未发布），**没有回退到会话模型**。本机原值 `ollama/tev1:4b` 已删除，角色关闭。后期复查：`bash ~/.openclaw/workspace/scripts/check-decision-providers.sh`（0=仍无，10=有 provider）。详见 `MEMORY-models.md` + `MEMORY-ops-playbook.md`。
+- **cron 失败看门狗**（2026-10-03 落地）：`scripts/boot-health-check.sh` 新增 check 5，读 cron 状态库的 `consecutiveErrors`，≥3 次就**直接用 `lark-cli` 发飞书**（不经 agent run，避免"失败任务给自己报警"的死结），同批故障 12h 内只提醒一次。人工预演：`bash ~/.openclaw/workspace/scripts/boot-health-check.sh`（有故障时 exit 1）。调参看脚本顶部 `CRON_ERR_THRESHOLD` / `CRON_ALERT_REPEAT_HOURS`。详见 `MEMORY-ops-playbook.md`。
+- **Ark 的 `messages.tool_calls.type` 空值报错**（2026-10-02/03）：`volcengine-plan` 与 `coding-plan` 两个端点都会间歇命中（两天 45+56 次，几乎全在 `agent:main:main:heartbeat`），raw error = ``invalid value: ``, value must be `function` ``。该错误是 `providerRuntimeFailureKind: unclassified`，**不触发模型回退**，每次命中直接打死整轮。处置：把相关负载换到非 Ark 模型（10-03 已把心跳切 `ollama/gemma4:31b-cloud`）；自查 `journalctl --user -u openclaw-gateway --since today | grep -c "messages.tool_calls.type"`。上游稿件在 `reports/2026-10-03-ark-tool-calls-type-blank.md`。详见 `MEMORY-models.md`。

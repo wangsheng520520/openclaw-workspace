@@ -448,4 +448,95 @@ gateway 事件循环严重饥饿：`eventLoopDelayP99Ms=64793.6`（64 秒！）�
 **回滚（三次改动累计）**：
 - 最早备份 `/tmp/hb-model-change-20260922/openclaw.json.bak-20260922-014440`（心跳切换前，含全部旧值）
 
+---
+
+## 2026-10-02 23:35 决策模型（decisionModel）确认不支持 ollama，暂时关闭（用户拍板）
+
+**用户诉求**：把决策模型配成 `ollama/tev1:4b`。**要求先查文档再动手。**
+
+**查文档结论：做不到（配置层面无解）**
+
+- `decisionModel` 是独立的一套 provider 接口（`DecisionProviderV1`），**只接受决策 provider 插件**
+  在清单里通过 `contracts.decisionProviders` + `decisionModels` 注册的模型。
+- 官方只列两家：**ONNX**（本地分类器）与 **TypeSafe AI**（Jev/Kev），
+  且文档写明 "Both plugins are currently unpublished candidates."
+- 原话："There is no automatic fallback to a conversational model."
+  —— chat provider（含 ollama）不能顶替决策模型。
+- 该角色是 **2026.9.5 之后**才加入的；本机 2026.9.7 有代码但没有 provider 插件。
+
+**改动点（唯一）**
+
+| 配置路径 | 改前 | 改后 |
+|---|---|---|
+| `agents.entries.main.decisionModel` | `ollama/tev1:4b` | 删除（null） |
+
+命令：`openclaw config patch --stdin`（先 `--dry-run` 验证 schema）→
+输出 `Applied 1 config update(s). Change will apply without restarting the gateway.`
+
+**验证（全部实测）**
+
+- ✅ `openclaw.json` 里 `decisionModel` 出现次数 = **0**；`agents.entries.main` 只剩
+  `model` / `modelPolicy` / `models` / `subagents`
+- ✅ 扫描 67 个 `openclaw.plugin.json`：**0 个**声明 `decisionProviders` / `decisionModels`
+- ✅ `openclaw models status --json` 无 `decisionModels` 字段（该目录走 `models.list.decisionModels`）
+- ✅ ollama 侧无问题：`tev1:4b`（4.2B，qwen35 家族）本地已有，`127.0.0.1:11434` 可用
+- ✅ 决策模型角色当前 = **关闭**（预期状态；`decision_evaluate` 工具不下发属正常）
+
+**后期复查入口**（用户要求"看看后期是否支持 ollama 的决策模型"）
+
+```bash
+bash ~/.openclaw/workspace/scripts/check-decision-providers.sh
+# 退出码 0 = 仍无；10 = 发现决策 provider，需人工复核是否支持 ollama
+```
+
+复查时机：OpenClaw 升级后 / 官方插件市场上架决策 provider 后。
+
+**若将来要用 ollama 当决策模型**：唯一路径是自建插件（实现 `DecisionProviderV1`，
+manifest 声明 `decisionModels: [{provider:"ollama", id:"tev1:4b"}]`，内部调 ollama `/api/chat`）。
+代价：新增插件 + 启用 + 重启网关（本机约 10 分钟）。
+
+**回滚**：把原值写回即可
+`openclaw config patch --stdin` ← `{"agents":{"entries":{"main":{"decisionModel":"ollama/tev1:4b"}}}}`
+（注意：写回后 UI 仍会显示"已禁用"，因为没有 provider；仅用于留痕）
+
+---
+
+## 2026-10-03 17:00 心跳模型切到 ollama/gemma4:31b-cloud（用户拍板 A+C）
+
+**背景**：Ark 两个端点（`volcengine-plan` / `coding-plan`）持续返回
+`messages.tool_calls.type` 空值错误 —— 10-02 共 45 次、10-03 到 16:40 已 56 次，
+命中会话几乎全是 `agent:main:main:heartbeat`。该错误在 OpenClaw 里是
+`providerRuntimeFailureKind: unclassified` / `failoverReason: null`，
+**不触发模型回退链**，所以每次命中都直接把整轮打死。
+
+**用户决策**：A（心跳换非 Ark 模型止血）+ C（整理样本报上游）。
+
+**改动点（唯一）**
+
+| 配置路径 | 改前 | 改后 |
+|---|---|---|
+| `agents.defaults.heartbeat.model` | `coding-plan/ark-code-latest` | `ollama/gemma4:31b-cloud` |
+
+⚠️ 用户原话是"ollama 的 gemma4：31b"，但**本机不存在 `gemma4:31b` 这个 tag**，
+实际可用的是 `gemma4:31b-cloud`（32.7B，ollama cloud），且已在
+`models.providers.ollama.models` 白名单内 —— 按这个实际 tag 配置。
+
+**验证（实测）**
+
+- ✅ 配置：`heartbeat.model = 'ollama/gemma4:31b-cloud'`
+- ✅ 心跳会话 `077c5167-…` 的 `model-snapshot` = `provider=ollama model=gemma4:31b-cloud`，
+  4 次工具调用后 `stopReason=stop`，session node `status=done`
+- ✅ 心跳 cron 最近一次 receipt `ok`，`heartbeat-state.json` 的 `lastCheck = 17:07 CST`
+- ✅ 重启网关后 `readyz` 无 `messages.tool_calls.type` 记录
+
+**代价（重要）**：改这一行配置触发了插件全量重载，本次**升级成一次完整的网关
+drain + 重启**（`gateway is draining for restart` → 卡在 shutdown 4 分钟无进展 →
+手动 `systemctl --user restart` → 新 PID 236085，启动约 5 分钟）。详见
+`MEMORY-ops-playbook.md` 插件那一节。
+
+**上游 issue 稿件**：`reports/2026-10-03-ark-tool-calls-type-blank.md`（**尚未提交**）。
+
+**回滚**：
+`openclaw config patch --stdin` ← `{"agents":{"defaults":{"heartbeat":{"model":"coding-plan/ark-code-latest"}}}}`
+
 <!-- project: path:/home/wszmd520520/.openclaw/workspace -->

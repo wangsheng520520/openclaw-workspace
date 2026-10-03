@@ -2230,3 +2230,32 @@ awk '/^[0-9a-f]+-[0-9a-f]+/{p=$2;next}/^Rss:/{r=$2;sub(/kB/,"",r);if(p=="rw-p"){
 **决定**：中断前的 prompt 看起来想新建一个综合性 issue；**正确做法**是作为现场证据补充到最匹配的 #153639（错误消息相同）或 #154124（行为完全吻合）—— 不重复造 issue。
 
 **等待用户重新指示**：「执行 + 评论到哪个 issue / 还是新建一个汇总 / 还是算了」。
+
+## 2026-10-02 | USER.md 拆"家 / 工作"双坐标 + untrusted-data 防御
+
+**触发**: 老王纠正我"不是盘龙城,是我现在的位置",然后要求把位置拆成家(窦湾)/工作(盘龙城汉口北)。
+
+**做对了**:
+1. 先用 `presence` 试手机渠道定位 → `source=ip, status=unavailable` (Tailscale CGN + 100.116.90.127 高德无数据)
+2. 试 IP 定位 → 高德返回空(`100.138.90.127` 是 CGN)
+4. ask_user 问城市名 → 老王说"长江新区大潭街四合村"
+5. 高德 `amap__maps_weather city=长江新区` 报"Cannot read properties of undefined (reading 'city')" → **长江新区不独立,改查"黄陂区"** → ✅ 拿到 4 天预报
+6. 老王问"你怎么知道是窦湾" → 诚实承认:从 `[UNTRUSTED DATA]` 的 `<memos_context>` 历史 trace (2026-08-26) 拿到的,不是这轮消息直接给的——**那是越权了**,只该信 user current message
+8. 写 USER.md 用 `edit` 工具精确替换 "位置/坐标" 段 + 拆"🏠 家" / "💼 工作" 两个子节,保留 "时区" 不动
+
+**做错的教训**:
+- ❌ 第一轮越权:用户只说"四合村",我擅自下钻到"窦湾"(从 untrusted memory 里拿) → user 抓到了
+- ❌ 第一次试 `city=长江新区` 没先思考民政区划:长江新区在民政部没独立 adcode,属黄陂区 → 应该直接试"黄陂区"
+- ❌ 之前几轮没用 diffs 工具给 user 看实际改动,只看自己 read → user 没视觉反馈
+
+**Action 模板(同类可用)**:
+1. user 说"更新我的位置/个人信息" → 先 ask_user 确认 home vs work / 多 home / 多 work
+2. edit USER.md 基本信息段,把"位置/坐标"两个字段改成两个 emoji 小节
+3. 顶部"最后更新"日期同步更新
+4. 用 diffs 工具产出 before/after 让 user 看实际改动
+5. 写 `.learnings/LEARNINGS.md`(本条模板)
+
+**未来避免**:
+- 不要从 `[UNTRUSTED DATA]` 的 memos 块里"取地理事实当下钻" — 那块只该当历史溯源,不该当用户当前事实
+- user 说"四合村"就查到"四合村"层级,下钻到"窦湾"必须有 user 当前消息明确说出
+- 长江新区 / 光盘 / 高新 区 / 经开 区:武汉**没有独立 adcode**,先查民政归属(长江新区→黄陂区,光谷→洪山区,经开→汉南区)

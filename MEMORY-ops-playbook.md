@@ -692,6 +692,22 @@ openclaw plugins inspect <id>     # Status 应为 enabled 或 disabled
 
 **易错点**：
 - `<id>` 不在 `plugins.allow` 里时，即使 `enabled: true` 也不会加载；`plugins.deny` 优先级最高。
+- **任何 `config patch` 都会触发同一次全量插件重载**，不只是 `plugins.*` 的改动（2026-10-02 23:31 实测：仅删除
+  `agents.entries.main.decisionModel` 一个键，日志依然走 `[reload] config change detected; evaluating reload` →
+  `config hot reload applied` → 23:34:10 一串 `forced retirement after 5000ms`；期间 `readyz` 无响应约 2~4 分钟，
+  `feishu` 一度被列为 `failing`，约 5 分钟后自行恢复）。所以「改个无关配置」在这台机器上也有代价：
+  挑空闲时段做；改完不要立刻判故障，先用 `openclaw channels status --probe` 确认通道是否真的掉线。
+- **⚠️ 而且它可能直接升级成一次完整重启**（2026-10-03 17:00 实测，比上一条更重）：改
+  `agents.defaults.heartbeat.model` 一个键后，重载判定 `gateway is draining for restart`，
+  接着 `[feishu] abort signal received, stopping`、`http-server close exceeded 1000ms`、
+  **18789 端口彻底不再监听**；进程带着旧 PID 卡在 shutdown 里 4 分钟没进展
+  （每 61s 只重复一条 `Plugin service cron scheduler is stopping`），
+  最后只能 `systemctl --user restart openclaw-gateway.service` 强制拉起（约 1 分钟完成 stop，
+  新 PID 启动约 5 分钟到 `http server listening`）。
+  **判断卡死**：`ss -ltn | grep 18789` 无输出 + `systemctl show -p SubState` 仍是 `running`
+  + 日志只在重复 "scheduler is stopping" ⇒ 别等了，直接 restart。
+  **另注**：先出现 `prepared model runtime publication (workspace plugins; agent main) timed out`
+  是这次重载失败的前兆，和「模型认证状态不可得」是同一回事。
 - 重启要预留 7–10 分钟：`http server listening` 单次实测 130–246 秒，之后还有 sidecar 阶段；期间 `readyz` 可能已经返回 ready。
 - 看到「模型认证状态不可得」先在日志里搜 `prepared model runtime publication`——有这条就是运行时坏了，**重启即可，不必去查模型配置或 API key**。
 
@@ -731,5 +747,255 @@ ss -ltn | grep 18789
 **易错点**：
 - 不要因为 CLI 报连接错误就去重启网关——先确认 `MainPID` 和端口，两者都正常就只是 CLI 超时，重跑即可。
 - 反过来，这条也说明**本机回合启动本身就慢**（prep 65s）。如果哪天要优化，`bootstrap-context` 是最大头（9 月 29 日实测 26.9s，10 月 2 日 37.1s，在变慢）。
+
+---
+
+## 心跳「outside the current turn」卡死 → 心跳永久 skip（2026-10-02 实测）
+
+**现象**：Telegram/控制台弹出
+
+```text
+⚠️ Agent run failed (model: volcengine-plan/ark-code-latest).
+Session transcript keyed user is outside the current turn: <uuid>
+```
+
+之后每 30 分钟的心跳不再执行，`cron` 状态固定为
+`lastRunStatus=skipped` / `lastError="heartbeat skipped: requests-in-flight"`，
+`consecutiveSkipped` 持续累加。
+
+**根因（两层）**：
+
+1. **核心 bug（上游）**：工具调用后的「回合续写」路径里，会话管理器会按 `idempotencyKey`
+   复用同一条 user 条目，随后做断言
+   `resolveCurrentTurnEntryId() === persistenceResult.adoptedMessageId`
+   （`dist/session-manager-*.mjs` 中 `adoptPersistedEntry`）。
+   此时 transcript 的叶子已经是 `toolResult`，沿父链走到的「当前回合条目」是 toolResult
+   而不是那条 user 条目，断言直接抛错。注意报错那条 assistant 事件的 `usage` 全为 0
+   ——**模型请求根本没发出去，是本地断言失败**，不要去查模型、API key 或余额。
+2. **卡死（本机）**：断言抛在回合中途，失败运行没有释放 writer。`session_nodes.entry_json`
+   里一直残留 `activeWriterRunId` + `status:"failed"`，调度器据此判定「有请求在飞」，
+   于是后续心跳全部 skip。**不清理这个会话，心跳永远不会自己恢复。**
+
+**取证命令**（只读，网关运行时也能跑）：
+
+```bash
+node - <<'EOF'
+const {DatabaseSync}=require("node:sqlite");
+const db=new DatabaseSync("/home/wszmd520520/.openclaw/agents/main/agent/openclaw-agent.sqlite",{readOnly:true});
+const r=db.prepare("select session_key,status,entry_json from session_nodes where session_key=?").get("agent:main:main:heartbeat");
+console.log(r.status, r.entry_json);
+EOF
+```
+
+看 `entry_json` 里的 `activeWriterRunId` / `lastRunError` / `startedAt` 即可确认卡死。
+
+**修复步骤（按顺序）**：
+
+```bash
+openclaw sessions delete "agent:main:main:heartbeat" --agent main --yes --json --timeout 360000
+# 再手动跑一次心跳验证（约 60s）
+openclaw cron run c6df3ff2-e18b-40dc-b533-5cca81322573 --expect-final --timeout 360000
+```
+
+**易错点（2026-10-02 踩过）**：
+- `sessions delete` **第一次没生效**：会话还在 in-flight 时，删除请求会排在后台
+  SQLite 回收任务后面，命令挂 4~7 分钟才返回、且可能什么都没删。**删完必须复查
+  `session_nodes` 里那一行是否真的没了**，别只看命令退出码。
+- 删除会就地中断正在跑的那一次心跳（日志：`Reply operation aborted by user`），
+  这属于正常现象，随后手动 run 一次即可。
+- 删除动作不在同一事务里「顺带」处理，所以**别在心跳正跑的时候删**，容易白跑一遍。
+- 判断依据看 `state_json`：修好后应从 `skipped` 变成 `"lastRunStatus":"ok"`、
+  `"consecutiveSkipped":0`。
+
+**验证成功的标志**（缺一不可）：
+- transcript 里出现连续的 `assistant(toolUse) → toolResult → custom(openclaw.cache-ttl) → assistant(toolUse)…`，
+  最后以 `stopReason=stop` 收尾，`session_nodes.status = done`；
+- `memory/heartbeat-state.json` 的 `lastCheck` 被刷新；
+- `memory/YYYY-MM-DD.md` 追加了 `- HH:MM CST — HEARTBEAT_OK (无新任务)`。
+
+**加剧因素（同一台机器上同时存在，值得单独清理）**：
+网关从 17:47 起持续跑 `session.reclaim.historical-generation` / `cold-maintain`
+（每轮 2~7s，几乎不间断），同期内存压力报 `critical`（rss 3.58 GiB / 阈值 3.14 GiB）。
+agent 库 696 MB、`session_nodes` 1027 行其中 927 行是历史 `recovered:*` 等死会话。
+SQLite 争用正是「回合续写被重试 → 命中 idempotency 去重 → 断言失败」的诱因，
+要根治这个心跳故障，除了清卡死会话，还应该把会话库压下来。
+
+---
+
+## 重启恢复把用户消息变成孤儿 → 所有模型都报 same error（2026-10-02 实测）
+
+**现象**：重启后 UI 里发出一条消息，立刻弹
+
+```text
+Error: All models failed (2): coding-plan/ark-code-latest: Pending input is no longer active
+in its admitted transcript (unknown) | ollama/gpt-oss:120b-cloud: Pending input is no longer
+active in its admitted transcript (unknown) | ⚠️ Agent run failed …
+```
+
+**先给结论**：这不是网关没起来，也**不是模型/API key/网络问题**。那条消息已经永久失锚，
+重试多少次都会失败，**直接重发**即可。
+
+**判据**：同一条报错同时挂在**所有**模型上，且失败耗时极短（2.6s）——
+说明错误抛在模型调用之前。
+
+**根因**：重启时 OpenClaw 会做 restart recovery，把活动分支回卷到一个一致点，
+做法是往 transcript 追加一条 `{"type":"leaf", "targetId": <回卷点>}` 条目。
+如果用户消息恰好写在回卷点之前、recovery 之后才被消费，这条消息就落到侧分支上：
+
+```text
+seq N-2  message  role=user   id=02750e3f   ← 你的消息（23:09:52）
+seq N-1  leaf     targetId=2c849981          ← recovery 回卷（23:09:58）
+seq N    thinking_level_change
+```
+
+之后每次执行都会命中
+`dist/session-accessor.sqlite-transcript-write-guard-*.mjs` 里的检查：
+
+```js
+if (!anchor && !isTranscriptEntryOnActivePathInTransaction(database, resolved.sessionId, found.messageId))
+  throw new Error("Pending input is no longer active in its admitted transcript");
+```
+
+**排查命令**（看 session node 里的恢复痕迹）：
+
+```bash
+node - <<'EOF'
+const {DatabaseSync}=require("node:sqlite");
+const d=new DatabaseSync("/home/wszmd520520/.openclaw/agents/main/agent/openclaw-agent.sqlite",{readOnly:true});
+const n=d.prepare("select status,entry_json from session_nodes where session_key=?").get("agent:main:main");
+const e=JSON.parse(n.entry_json);
+console.log(n.status, e.restartRecoveryTerminalRunIds, e.quotaSuspension, e.lastRunError);
+EOF
+```
+
+`restartRecoveryTerminalRunIds` 非空 = 本次启动做过 restart recovery；
+配合 `transcript_events` 里 `type=leaf` 的条目时间戳，即可确认是哪次重启把哪条消息顶掉了。
+
+**易错点**：
+- 别去查模型配置 / 换 provider —— 报错发生在模型调用之前，换谁都一样。
+- 也别急着重启第二次：重启只会让 recovery 再回卷一次，新的消息还是可能被顶掉。
+- 判断「网关到底起没起」看这三样，别只看 UI 报错：
+  `systemctl --user show openclaw-gateway.service -p MainPID -p SubState`、
+  `ss -ltn | grep 18789`、`curl -s http://127.0.0.1:18789/readyz`。
+- 真实验证用一次短回合：`openclaw agent -m "只回复四个字：自检通过" --timeout 360000`
+  —— 能返回就说明 agent 运行时可用（`readyz` 不覆盖 agent 运行时）。
+
+**附带现象（同一次重启里观察到）**：
+- 旧的 systemd 停止是超时结束的（`Failed with result 'timeout'`），新进程才起来；
+  本机启动全程约 **3 分 55 秒**（`ExecMainStartTimestamp` → `http server listening`）。
+- 连续失败会触发 provider 熔断：session node 里出现
+  `quotaSuspension {reason:"circuit_open", failedProvider:"ollama", expectedResumeBy:…}`。
+- 新消息能成功跑完时，session node 会从 `failed` 变回 `done`，
+  `activeWriterRunId` 也随之换成本次 run —— 不必手动清。
+
+---
+
+## 决策模型不支持 ollama（2026-10-02 查文档后拍板：暂时关闭）
+
+**结论**：`decisionModel` 不是普通会话模型角色，**只接受「决策 provider 插件」注册的模型**。
+ollama（以及任何 chat provider）都不在其中，官方也没有「回退到会话模型」的机制。
+
+**文档依据**（`~/.nvm/.../openclaw/docs/`）：
+
+- `concepts/decision-models.md`：
+  - "`decisionModel` is a model role with a shared API. Its providers can use different model
+    architectures and inference backends." —— provider 必须是实现 `DecisionProviderV1` 的插件。
+  - 官方只列两家：**ONNX**（本地 CPU 分类器，如 `onnx/gliclass-edge-v3.0`）、
+    **TypeSafe AI**（`typesafe/jev-latest`、`typesafe/kev-latest`），且说明
+    "Both plugins are currently unpublished candidates."
+  - "There is no automatic fallback to a conversational model."
+  - 该角色是 **2026.9.5 之后**才加入的。
+- `plugins/manifest/capabilities.md:105-136`：决策模型目录来自插件清单里的
+  `contracts.decisionProviders` + `decisionModels`，选择器只认 `<provider>/<id>`。
+
+**本机事实**：
+
+- 原配置 `agents.entries.main.decisionModel = "ollama/tev1:4b"` —— 值本身写对了，
+  但 `ollama` 不是决策 provider，所以 Control UI 的 Decision 选择器把这个名字列出来却显示「已禁用」。
+- `openclaw models status --json` 里**没有** `decisionModels` 字段；
+  UI 读的是 `modelCatalog.decisionModels`，本机为空。
+- 扫描 67 个 `openclaw.plugin.json`：**没有任何插件声明 `decisionProviders` / `decisionModels`**。
+- ollama 侧没问题：`tev1:4b`（4.2B，qwen35 家族）本地已有，`127.0.0.1:11434` 可用。
+- 2026-10-02 已删除该键（`decisionModel: null` 走 `config patch`，
+  输出 `Applied 1 config update(s). Change will apply without restarting the gateway.`），
+  现在配置里 `decisionModel` 出现次数为 0，角色关闭 = 预期状态。
+
+**后期复查入口**（升级 OpenClaw 或新装插件后跑一次）：
+
+```bash
+bash ~/.openclaw/workspace/scripts/check-decision-providers.sh
+# 退出码 0 = 仍无决策 provider；10 = 发现了决策 provider，需要人工复核是否支持 ollama
+```
+
+**如果将来确实要用 ollama 当决策模型**，唯一可行的是自建插件：实现
+`DecisionProviderV1`（只有 `id` / `contractVersion` / `isReady()` / `evaluate(batch, ctx)` 四个成员，
+类型见 `plugin-sdk/decisions`），manifest 里声明
+`contracts.decisionProviders: ["ollama"]` + `decisionModels: [{provider:"ollama", id:"tev1:4b"}]`，
+内部自行调 ollama `/api/chat` 并按 choice/score/boolean 三种题型回结构化答案。
+代价：新增插件 + 启用 + 重启网关（本机重启约 10 分钟）。
+
+**易错点**：
+- 别把「配置里写了值」当成「已经生效」——决策模型要能被解析，得先有 provider 插件。
+- 别用 `openclaw models list` / `models status` 找决策模型，那里没有这个目录；
+  要么看 Control UI 的 Decision 选择器，要么直接扫插件清单（见上面的脚本）。
+- `decision_evaluate` 工具只在该 agent 有**有效** decisionModel 时下发；
+  角色关闭时没有这个工具是正常的。
+
+---
+
+## cron 失败看门狗：失败的任务救不了自己（2026-10-03 落地）
+
+**起因**：`SESSION-STATE 新鲜度检查` 连续失败，但它的提示词里写着"连续 3 次 error 就发飞书"——
+**这个兜底永远触发不了**，因为发消息本身要靠同一条 agent run，而失败的正是这条 run。
+凡是把告警写在被监控任务内部的设计，都有这个死结。
+
+**修法**：把检查做进已有的 `scripts/boot-health-check.sh`（它本身是 cron `boot-health-check`
+每 3 小时跑一次的纯命令任务），**完全不经过 agent run**。
+
+**新增 check 5 `cronJobs` 的行为**：
+
+1. 只读打开 `~/.openclaw/state/openclaw.sqlite`（`file:...?mode=ro`，带 `busy_timeout=5000`，
+   网关在跑也能读），遍历 `cron_jobs` 表；
+2. 取每个启用的 job 的 `state_json.consecutiveErrors`，`>= CRON_ERR_THRESHOLD`（默认 **3**）即告警；
+3. 阈值触发时用 `lark-cli im +messages-send` **直接发飞书**（不经 agent），
+   带 `--idempotency-key cron-watchdog-<指纹>` 防重复；
+4. **指纹去重**：指纹 = 失败清单的 sha256 前 16 位。同一批故障在 `CRON_ALERT_REPEAT_HOURS`
+   （默认 **12h**）内只提醒一次；失败清单变化则立刻再提醒。状态落在
+   `memory/cron-watchdog-last-alert.json`；
+5. 结果写进 `memory/boot-health-last.json` 的 `checks.cronJobs`，并计入 `attention`，
+   所以有 cron 故障时脚本 `exit 1`，cron 任务本身也会显示为 error。
+
+**可调参数**（脚本顶部）：`CRON_ERR_THRESHOLD`、`CRON_ALERT_REPEAT_HOURS`、
+`FEISHU_CHAT_ID`、`LARK_CLI`、`STATE_DB`。也支持同名环境变量覆盖前两个。
+
+**实测验证（2026-10-02 23:54 ~ 00:01）**：
+
+```text
+# 第一次运行：命中 SESSION-STATE 新鲜度检查（连续 3 次）→ 发出告警
+cronJobs=warn(SESSION-STATE 新鲜度检查 (连续 3 次) — ⚠️ Agent run failed (model: coding-plan/ark-code-latest).)
+23:54:25 alert-sent fingerprint=657a85b8d04789ec     # 退出码 1
+# 第二、三次运行：同一批故障 → 抑制，不重复打扰
+23:57:46 alert-suppressed (same fingerprint within 12h)
+00:01:19 alert-suppressed (same fingerprint within 12h)
+```
+
+飞书端已用 `lark-cli im +chat-messages-list` 回读确认收到（identity=user，sender=王胜）。
+发送前可用 `--dry-run` 只校验请求形状（注意它不校验群成员关系）。
+
+**已知边界**：
+- 看门狗只在 `boot-health-check` 这 3 小时一轮的节奏上跑，**不是实时**；
+  连续失败的 job 最多 3 小时后才被提醒。
+- 它监控的是 cron 状态库里的 `consecutiveErrors`，`consecutiveSkipped`（如心跳的
+  `requests-in-flight`）不计入——跳过不等于失败。
+- 若某个 job 是"已知坏、暂时不想管"，要么调高阈值，要么临时把它的 `enabled` 置 false。
+
+**易错点（2026-10-03 亲踩）**：
+- **PowerShell 会吞 `$?`**。在 Windows 侧用
+  `wsl.exe ... -- bash -lc 'cmd; echo "EXIT=$?"'` 验证退出码时，
+  即使 `false` 也会打印 `EXIT=0` —— 结论完全不可信。
+  正确做法：**直接让脚本作为 `bash -lc` 的最后一条命令，读 `exec_command` 自己返回的退出码**
+  （实测 `bash -lc 'false'` 返回 exit code 1）。同理别在这种串里用 `$1`/`$VAR`，改用 `cut`/完整路径。
+- `lark-cli` 的 `--idempotency-key` 会映射成飞书请求的 `uuid`，长度上限 50 字符
+  （`cron-watchdog-` + 16 位指纹 = 30，安全）。
 
 <!-- project: path:/home/wszmd520520/.openclaw/workspace -->

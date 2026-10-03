@@ -80,7 +80,8 @@
 | **会话切分** | `per-channel-peer`（飞书/微信/webchat/CLI 独立 session） | ✅ 已锁定，不改 dmScope |
 | **长期事实共享** | ✅ **2026-09-15 实测确认**：`plugins.slots.memory = "memos-local-plugin"`（MemOS Local V7 v2.0.19），extensions 下插件存在且 Memory Viewer（127.0.0.1:18799）运行中。原 09-12 记录的「slots 为空、memory-lancedb 未安装」状态已变更，memos-local-plugin 已接管 memory slot。详见 `MEMORY-models.md` | ✅ 已锁定（2026-09-15 用户确认预期状态） |
 | **短期对话上下文跨端口共享** | ❌ 不做（避免噪音串扰） | ✅ 不动 |
-| **主 agent (main) 模型** | `agents.entries.main.model.primary` = `volcengine-plan/ark-code-latest` | ✅ 保持（2026-09-21 统一到插件链路） |
+| **主 agent (main) 模型** | `agents.entries.main.model.primary` = `coding-plan/ark-code-latest`（**2026-10-02 用户明示**，与 openclaw.json 实测一致；修正 2026-09-21 旧记 `volcengine-plan/ark-code-latest` 为 stale） | ✅ 保持 |
+| **主 agent 决策模型** | `agents.entries.main.decisionModel` = `ollama/tev1:4b`（**2026-10-02 新增**，决策路由/评分/布尔概率走本地 4.2B Q8_0，262k 窗口，`Local Auth yes configured`，catalog/allow/models 三处已同步） | ✅ 保持（与主模型独立） |
 | **主 agent fallback** | `agents.entries.main.model.fallbacks` = `["minimax/MiniMax-M2.7"]` | ✅ 保持（2026-09-21 实测更正） |
 | **全局默认模型** | `agents.defaults.model.primary` = `volcengine-plan/ark-code-latest`（火山方舟 Coding Plan，走 volcengine 插件） | ✅ 保持（未指定模型的 agent 兜底，如 pi） |
 | **用户偏好表达** | 表格对比、详细报告、主动汇报 | ✅ 保持 |

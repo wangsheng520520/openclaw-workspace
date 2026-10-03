@@ -1,1 +1,24 @@
-{"lastCheck": "2026-10-02T13:53:00+08:00"}
+{
+  "lastCheck": "2026-10-03T17:07:00+08:00",
+  "lastCheckAt": "2026-10-02T17:40:00+08:00",
+  "homeLocation": {
+    "label": "长江新区大潭街道四合村窦湾",
+    "lat": 30.7978,
+    "lon": 114.4052,
+    "adcode": "420116",
+    "adcodeSource": "黄陂区（民政归属，2021 新区成立后归长江新区）",
+    "defaultFor": ["heartbeat", "weather_default", "cron_location"]
+  },
+  "workLocation": {
+    "label": "黄陂区盘龙城 / 汉口北",
+    "primary": { "name": "盘龙城", "lat": 30.6877, "lon": 114.2649 },
+    "secondary": { "name": "汉口北", "lat": 30.7089, "lon": 114.2858 },
+    "adcode": "420116",
+    "defaultFor": []
+  },
+  "weatherCityDefault": "黄陂区",
+  "weatherCityRationale": "长江新区在民政部无独立编码，区/县粒度查询必须用黄陂区（adcode 420116）",
+  "lastUpdated": "2026-10-03T09:00:00+08:00",
+  "_lastSessionStateFreshnessCheck": "2026-10-03T09:00:00+08:00",
+  "lastUpdatedReason": "USER.md 拆家 / 工作双坐标（用户 16:38 拍板）"
+}

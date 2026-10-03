@@ -1,0 +1,6 @@
+{
+  "fingerprint": "88f41d67fc5453cf",
+  "sentAtEpoch": 1791019046,
+  "sentAt": 1791019046,
+  "failing": "SESSION-STATE 新鲜度检查 (连续 5 次) — ⚠️ Agent run failed (model: coding-plan/ark-code-latest)."
+}
